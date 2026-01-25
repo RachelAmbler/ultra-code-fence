@@ -1,0 +1,21 @@
+{
+	"repo": "https://codeberg.org/ARACS-Thoughtworks/Obsidian-Ultra-Code-Fence",
+	"version": "2026.1.0",
+	"title": "What's New in Ultra Code Fence",
+	"subtitle": "January 2026",
+	"description": "A super-charged code fence replacement for Obsidian that allows for external code, line numbers, execution output, code folding and so much more",
+	"new": [
+		{ "highlight": "Multiple title styles", "text": "Choose from Tab, Integrated, Minimal, Info Bar, or hide completely" },
+		{ "highlight": "Clickable titles", "text": "Click to open source file in Obsidian or browser" },
+		{ "highlight": "Title templates", "text": "Use variables like {filename}, {size:kb}, {modified:relative}" },
+		{ "highlight": "Line numbers", "text": "Optional line number gutter with correct numbering for partial extracts" },
+		{ "highlight": "Zebra stripes", "text": "Alternate line highlighting for easier reading" },
+		{ "highlight": "Marker-based extraction", "text": "Extract code between comment markers instead of line numbers"},
+		{ "highlight": "Custom icons", "text": "Use your own icon images from a vault folder" },
+		{ "highlight": "Icon styles", "text": "Choose Emoji, Text labels, Custom images, or None" },
+		{ "highlight": "Theme integration", "text": "Automatically adapts to light/dark Obsidian themes" },
+		{ "highlight": "Per-block overrides", "text": "Override any default setting using YAML properties" },
+		{ "highlight": "Tabbed settings UI", "text": "Clean, organized settings with tabs and sections" }
+	],
+	"fixed": []
+}

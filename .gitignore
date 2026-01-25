@@ -1,0 +1,30 @@
+# CMake
+cmake-build-*/
+# File-based project format
+*.iws
+
+# Jetbrains
+.idea/
+out/
+
+# Crashlytics plugin (for Android Studio and IntelliJ)
+com_crashlytics_export_strings.xml
+crashlytics.properties
+crashlytics-build.properties
+fabric.properties
+
+# Dependencies
+node_modules/
+
+# Build output
+main.js
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# npm debug logs
+npm-debug.log*
+
+# Local environment file
+local.env

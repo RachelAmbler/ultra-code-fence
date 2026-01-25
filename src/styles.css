@@ -1,0 +1,984 @@
+/* noinspection CssUnresolvedCustomProperty */
+/* ============================================================================
+   Embed Code File Plugin Styles
+   ============================================================================ */
+
+/* CSS Variables - adapt to Obsidian theme */
+.ucf {
+    --ucf-bg: var(--code-background, #282c34);
+    --ucf-fg: var(--text-muted, #abb2bf);
+    --ucf-border: var(--background-modifier-border, rgba(255,255,255,0.1));
+    --ucf-hover: var(--background-modifier-hover, rgba(255,255,255,0.1));
+    --ucf-accent: var(--interactive-accent, #7c3aed);
+    --ucf-radius: 6px;
+}
+
+/* Container for embedded code */
+.ucf {
+    position: relative;
+    margin: 1em 0;
+}
+
+.ucf pre.ucf-code {
+    margin: 0 !important;
+    border-top-left-radius: 0 !important;
+}
+
+/* ============================================================================
+   Base Title Styles (shared)
+   ============================================================================ */
+
+.ucf-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-monospace);
+    font-size: 0.85em;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.15s ease;
+}
+
+.ucf-title:hover {
+    filter: brightness(1.1);
+}
+
+/* File icon */
+.ucf-icon {
+    font-size: 1.1em;
+    opacity: 0.8;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Custom icon images */
+.ucf-icon-img {
+    width: 1.2em;
+    height: 1.2em;
+    object-fit: contain;
+    vertical-align: middle;
+}
+
+.ucf-icon.ucf-icon-custom {
+    font-size: 1em;
+}
+
+/* Text label icons */
+.ucf-icon.ucf-icon-text {
+    font-size: 0.7em;
+    font-weight: 600;
+    font-family: var(--font-monospace);
+    background: var(--background-modifier-border);
+    padding: 2px 4px;
+    border-radius: 3px;
+    opacity: 0.9;
+}
+
+/* SVG icons (filled and outline) */
+.ucf-icon.ucf-icon-svg {
+    font-size: 1em;
+    line-height: 1;
+}
+
+.ucf-icon.ucf-icon-svg svg {
+    width: 1.4em;
+    height: 1.4em;
+    vertical-align: middle;
+    display: inline-block;
+}
+
+/* Outline icons inherit text color for theme awareness */
+.ucf-icon.ucf-icon-outline {
+    color: var(--text-muted);
+}
+
+.ucf-title:hover .ucf-icon.ucf-icon-outline {
+    color: var(--text-normal);
+}
+
+/* ============================================================================
+   Description - Below Title Mode
+   ============================================================================ */
+
+.ucf-description {
+    padding: 8px 12px;
+    font-size: 0.85em;
+    color: var(--ucf-desc-color, var(--text-muted));
+    background: var(--background-secondary);
+    border-left: 3px solid var(--background-modifier-border);
+    margin: 0;
+}
+
+.ucf.ucf-desc-italic .ucf-description {
+    font-style: italic;
+}
+
+.ucf-description p {
+    margin: 0;
+    line-height: 1.5;
+}
+
+.ucf-description p + p {
+    margin-top: 0.5em;
+}
+
+/* Wiki links and regular links in description */
+.ucf-description a.internal-link,
+.ucf-description a {
+    color: var(--link-color);
+    text-decoration: none;
+}
+
+.ucf-description a.internal-link:hover,
+.ucf-description a:hover {
+    text-decoration: underline;
+}
+
+/* Style adjustments per title style */
+.ucf.style-integrated .ucf-description {
+    border-radius: 0;
+}
+
+.ucf.style-infobar .ucf-description {
+    border-left-color: var(--interactive-accent);
+}
+
+/* ============================================================================
+   Description - Tooltip Mode
+   ============================================================================ */
+
+.ucf-title.has-tooltip {
+    position: relative;
+}
+
+.ucf-tooltip-container {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 8px;
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    pointer-events: none;
+}
+
+.ucf-title.has-tooltip:hover .ucf-tooltip-container {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.ucf-tooltip-content {
+    background: var(--background-primary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    min-width: 150px;
+    max-width: 350px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    font-size: 0.85em;
+    color: var(--ucf-desc-color, var(--text-normal));
+    white-space: normal;
+    text-align: left;
+}
+
+.ucf.ucf-desc-italic .ucf-tooltip-content {
+    font-style: italic;
+}
+
+.ucf-tooltip-content p {
+    margin: 0;
+    line-height: 1.5;
+}
+
+.ucf-tooltip-content p + p {
+    margin-top: 0.5em;
+}
+
+/* Wiki links in tooltip */
+.ucf-tooltip-content a.internal-link,
+.ucf-tooltip-content a {
+    color: var(--link-color);
+    text-decoration: none;
+}
+
+.ucf-tooltip-content a.internal-link:hover,
+.ucf-tooltip-content a:hover {
+    text-decoration: underline;
+}
+
+/* Arrow pointing down */
+.ucf-tooltip-container::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: var(--background-modifier-border);
+}
+
+.ucf-tooltip-container::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: var(--background-primary);
+    z-index: 1;
+}
+
+/* ============================================================================
+   Copy Button
+   ============================================================================ */
+
+.ucf-copy-button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    padding: 6px;
+    background: var(--background-secondary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 4px;
+    color: var(--text-muted);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease, background 0.15s ease, color 0.15s ease;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ucf-copy-button svg {
+    display: block;
+}
+
+/* Show on hover */
+pre.ucf-code:hover .ucf-copy-button {
+    opacity: 1;
+}
+
+.ucf-copy-button:hover {
+    background: var(--background-modifier-hover);
+    color: var(--text-normal);
+}
+
+.ucf-copy-button:active {
+    background: var(--background-modifier-active-hover);
+}
+
+/* Copied state */
+.ucf-copy-button.ucf-copied {
+    color: var(--text-success, #22c55e);
+    border-color: var(--text-success, #22c55e);
+    opacity: 1;
+}
+
+/* Always show on touch devices */
+@media (hover: none) {
+    .ucf-copy-button {
+        opacity: 0.7;
+    }
+}
+
+/* ============================================================================
+   Code Folding
+   ============================================================================ */
+
+pre.ucf-code.ucf-folded {
+    max-height: var(--ucf-folded-height, 200px);
+    overflow: hidden;
+}
+
+pre.ucf-code.ucf-folded code {
+    mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+}
+
+.ucf-fold-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    padding: 8px;
+    background: linear-gradient(to top, var(--background-primary) 50%, transparent);
+    z-index: 5;
+}
+
+pre.ucf-code:not(.ucf-folded) .ucf-fold-bar {
+    position: relative;
+    background: var(--background-secondary);
+    border-top: 1px solid var(--background-modifier-border);
+    margin-top: -1px;
+}
+
+.ucf-fold-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    background: var(--background-secondary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 4px;
+    color: var(--text-muted);
+    font-size: 0.8em;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.ucf-fold-button:hover {
+    background: var(--background-modifier-hover);
+    color: var(--text-normal);
+}
+
+.ucf-fold-button svg {
+    flex-shrink: 0;
+}
+
+.ucf-fold-button span {
+    white-space: nowrap;
+}
+
+/* Title text */
+.ucf-text {
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Link indicator */
+.ucf-link-indicator {
+    opacity: 0.5;
+    font-size: 0.9em;
+    flex-shrink: 0;
+    transition: opacity 0.15s ease;
+}
+
+.ucf-title:hover .ucf-link-indicator {
+    opacity: 1;
+}
+
+/* ============================================================================
+   Style: Tab (default)
+   - Looks like a file tab sitting on the code block
+   ============================================================================ */
+
+.ucf-title.style-tab {
+    display: inline-flex;
+    background: var(--ucf-bg);
+    color: var(--ucf-fg);
+    padding: 6px 14px;
+    border-radius: var(--ucf-radius) var(--ucf-radius) 0 0;
+    border: 1px solid var(--ucf-border);
+    border-bottom: none;
+    margin-bottom: -1px;
+    position: relative;
+    z-index: 1;
+    max-width: 80%;
+}
+
+.ucf-title.style-tab::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--ucf-accent);
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+.ucf-title.style-tab:hover::after {
+    opacity: 1;
+}
+
+.ucf.style-tab pre.ucf-code {
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: var(--ucf-radius) !important;
+}
+
+/* ============================================================================
+   Style: Integrated
+   - Blends into code block with subtle separator
+   ============================================================================ */
+
+.ucf-title.style-integrated {
+    background: var(--ucf-bg);
+    color: var(--ucf-fg);
+    padding: 10px 14px;
+    border-radius: var(--ucf-radius) var(--ucf-radius) 0 0;
+    border-bottom: 1px solid var(--ucf-border);
+}
+
+.ucf.style-integrated pre.ucf-code {
+    border-radius: 0 0 var(--ucf-radius) var(--ucf-radius) !important;
+}
+
+/* ============================================================================
+   Style: Minimal
+   - Small, understated filename
+   ============================================================================ */
+
+.ucf-title.style-minimal {
+    color: var(--ucf-fg);
+    padding: 4px 8px;
+    font-size: 0.75em;
+    opacity: 0.7;
+    background: transparent;
+    margin-bottom: 4px;
+}
+
+.ucf-title.style-minimal:hover {
+    opacity: 1;
+}
+
+.ucf-title.style-minimal .ucf-icon {
+    font-size: 1em;
+}
+
+.ucf.style-minimal pre.ucf-code {
+    border-radius: var(--ucf-radius) !important;
+}
+
+/* ============================================================================
+   Style: Info Bar
+   - Full width with icon and metadata on opposite ends
+   ============================================================================ */
+
+.ucf-title.style-infobar {
+    background: var(--ucf-bg);
+    color: var(--ucf-fg);
+    padding: 8px 14px;
+    border-radius: var(--ucf-radius) var(--ucf-radius) 0 0;
+    border-left: 3px solid var(--ucf-accent);
+    justify-content: space-between;
+}
+
+.ucf-title.style-infobar:hover {
+    filter: brightness(1.15);
+}
+
+.ucf-title.style-infobar .ucf-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow: hidden;
+}
+
+.ucf-title.style-infobar .ucf-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 0.85em;
+    opacity: 0.7;
+    flex-shrink: 0;
+}
+
+.ucf-title.style-infobar .ucf-meta span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.ucf.style-infobar pre.ucf-code {
+    border-radius: 0 0 var(--ucf-radius) var(--ucf-radius) !important;
+    border-left: 3px solid var(--ucf-accent);
+}
+
+/* ============================================================================
+   Custom Colors Override (when useThemeColors is false)
+   ============================================================================ */
+
+.ucf.custom-colors {
+    --ucf-bg: var(--custom-bg);
+    --ucf-fg: var(--custom-fg);
+}
+
+/* ============================================================================
+   Theme-specific adjustments
+   ============================================================================ */
+
+.theme-light .ucf {
+    --ucf-border: rgba(0,0,0,0.1);
+    --ucf-hover: rgba(0,0,0,0.05);
+}
+
+.theme-dark .ucf {
+    --ucf-border: rgba(255,255,255,0.1);
+    --ucf-hover: rgba(255,255,255,0.05);
+}
+
+/* ============================================================================
+   Code Block Adjustments
+   ============================================================================ */
+
+.ucf pre code {
+    display: block;
+    overflow-x: auto;
+}
+
+/* When line wrapping is active (line numbers or zebra stripes), use flex column
+   layout to stack the .ucf-line spans vertically. Only applies when those classes
+   are present on the pre element. */
+pre.ucf-code.ucf-line-numbers code,
+pre.ucf-code.ucf-zebra code {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Remove any extra margins from nested elements */
+.ucf > pre {
+    margin-top: 0 !important;
+}
+
+/* ============================================================================
+   Line Numbers
+   ============================================================================ */
+
+/* Base line styling - applies to all code blocks using ucf-line spans */
+/* Each line must be a block-level flex container to stack vertically while
+   allowing horizontal alignment of line numbers and content within each line */
+pre.ucf-code .ucf-line {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    line-height: 1.5;
+    min-height: 1.5em;
+}
+
+pre.ucf-code .ucf-line-content {
+    flex: 1;
+}
+
+/* Line number styling */
+.ucf-line-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    min-width: 3.5em;
+    padding-right: 1em;
+    margin-right: 1em;
+    text-align: right;
+    color: var(--text-faint, #6c7086);
+    opacity: 0.6;
+    font-size: 0.85em;
+    user-select: none;
+    border-right: 1px solid var(--background-modifier-border, rgba(255,255,255,0.1));
+    flex-shrink: 0;
+    align-self: stretch;
+}
+
+/* ============================================================================
+   Zebra Striping (Alternate Line Highlighting)
+   ============================================================================ */
+
+pre.ucf-zebra .ucf-line {
+    margin: 0 -1em;
+    padding: 0 1em;
+}
+
+pre.ucf-zebra .ucf-line-alt {
+    background: var(--background-modifier-hover, rgba(255,255,255,0.03));
+}
+
+/* Adjust for line numbers + zebra combination */
+pre.ucf-line-numbers.ucf-zebra .ucf-line {
+    margin-left: -1em;
+    padding-left: 0;
+}
+
+pre.ucf-line-numbers.ucf-zebra .ucf-line-num {
+    padding-left: 1em;
+}
+
+/* Theme-specific zebra colours */
+.theme-light pre.ucf-zebra .ucf-line-alt {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.theme-dark pre.ucf-zebra .ucf-line-alt {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+/* ============================================================================
+   Scrollable Code Blocks
+   ============================================================================ */
+
+pre.ucf-scrollable {
+    overflow-y: auto;
+    position: relative;
+}
+
+/* Scroll indicator - fade at bottom showing more content */
+.ucf-scroll-indicator {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background: linear-gradient(to bottom, transparent, var(--code-background, #282c34));
+    pointer-events: none;
+    margin-top: -20px;
+    transition: opacity 0.2s;
+}
+
+.ucf-scroll-indicator.ucf-hidden {
+    opacity: 0;
+}
+
+/* Custom scrollbar styling - highly visible */
+pre.ucf-scrollable::-webkit-scrollbar {
+    width: 14px;
+}
+
+pre.ucf-scrollable::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 7px;
+    margin: 4px;
+}
+
+pre.ucf-scrollable::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #7c8594, #5c6370);
+    border-radius: 7px;
+    border: 3px solid rgba(0, 0, 0, 0.4);
+    min-height: 40px;
+}
+
+pre.ucf-scrollable::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #9ca3af, #7c8594);
+}
+
+/* Firefox scrollbar */
+pre.ucf-scrollable {
+    scrollbar-width: auto;
+    scrollbar-color: #7c8594 rgba(0, 0, 0, 0.4);
+}
+
+/* Light theme adjustments */
+.theme-light pre.ucf-scrollable::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+.theme-light pre.ucf-scrollable::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #9ca3af, #6b7280);
+    border: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.theme-light pre.ucf-scrollable {
+    scrollbar-color: #9ca3af rgba(0, 0, 0, 0.15);
+}
+
+.theme-light .ucf-scroll-indicator {
+    background: linear-gradient(to bottom, transparent, var(--code-background, #f5f5f5));
+}
+
+/* Firefox scrollbar */
+pre.ucf-scrollable {
+    scrollbar-width: auto;
+    scrollbar-color: var(--text-muted, #888) var(--background-primary-alt, rgba(0,0,0,0.2));
+}
+
+/* ============================================================================
+   Command Output (ufence-cmdout)
+   ============================================================================ */
+
+.ucf-cmdout {
+    margin: 1em 0;
+}
+
+.ucf-cmdout-pre {
+    margin: 0;
+    padding: 1em;
+    background: var(--code-background, #282c34);
+    border-radius: 0 0 6px 6px;
+    overflow-x: auto;
+}
+
+.ucf-cmdout-pre code {
+    display: block;
+    font-family: var(--font-monospace);
+    font-size: var(--code-size, 0.9em);
+    line-height: 1.5;
+}
+
+/* Each line in cmdout must be a block element */
+.ucf-cmdout-pre .ucf-cmdout-line {
+    display: block !important;
+}
+
+.ucf-cmdout-pre .ucf-cmdout-prompt {
+    /* Prompt styling - defaults can be overridden inline */
+}
+
+.ucf-cmdout-pre .ucf-cmdout-command {
+    /* Command styling - defaults can be overridden inline */
+}
+
+.ucf-cmdout-pre .ucf-cmdout-output {
+    /* Output styling - defaults can be overridden inline */
+}
+
+/* ============================================================================
+   Settings UI - Tabs
+   ============================================================================ */
+
+.ucf-settings {
+    --ucf-tab-bg: var(--background-secondary);
+    --ucf-tab-active: var(--interactive-accent);
+    --ucf-tab-hover: var(--background-modifier-hover);
+    --ucf-divider: var(--background-modifier-border);
+}
+
+.ucf-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--background-modifier-border);
+    margin-bottom: 20px;
+    padding-bottom: 0;
+}
+
+.ucf-settings .ucf-tab {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 0;
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 400;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.ucf-settings .ucf-tab:hover {
+    color: var(--text-normal);
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.ucf-settings .ucf-tab.ucf-tab-active {
+    color: var(--interactive-accent);
+    border-bottom-color: var(--interactive-accent);
+    font-weight: 500;
+    background: transparent !important;
+}
+
+.ucf-tab-content {
+    padding: 0;
+}
+
+.ucf-tab-intro {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-bottom: 16px;
+    padding: 8px 12px;
+    background: var(--background-secondary);
+    border-radius: 4px;
+}
+
+/* ============================================================================
+   Settings UI - Sections and Dividers
+   ============================================================================ */
+
+.ucf-section-header {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-normal);
+    margin: 0 0 4px 0;
+    padding: 0;
+}
+
+.ucf-section-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 0 0 12px 0;
+}
+
+.ucf-divider {
+    border: none;
+    border-top: 1px solid var(--ucf-divider);
+    margin: 20px 0;
+}
+
+/* ============================================================================
+   Settings UI - Help Grid
+   ============================================================================ */
+
+.ucf-help-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+    background: var(--background-secondary);
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+.ucf-help-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+}
+
+.ucf-help-label {
+    font-weight: 500;
+    color: var(--text-muted);
+    min-width: 80px;
+}
+
+.ucf-help-grid code {
+    background: var(--background-primary);
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+}
+
+/* ============================================================================
+   Settings UI - What's New Box (in General tab)
+   ============================================================================ */
+
+.ucf-whats-new-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 16px;
+    background: var(--background-secondary);
+    border-radius: 6px;
+    margin-bottom: 4px;
+}
+
+.ucf-whats-new-summary {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-muted);
+    flex: 1;
+}
+
+.ucf-view-updates-btn {
+    padding: 6px 14px;
+    font-size: 13px;
+    background: var(--background-primary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 4px;
+    color: var(--text-normal);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+}
+
+.ucf-view-updates-btn:hover {
+    background: var(--background-modifier-hover);
+    border-color: var(--interactive-accent);
+}
+
+/* ============================================================================
+   What's New Modal
+   ============================================================================ */
+
+.ucf-whats-new-modal {
+    max-width: 600px;
+}
+
+.ucf-whats-new-modal h2 {
+    margin-top: 0;
+    color: var(--text-normal);
+}
+
+.ucf-version-info {
+    margin-bottom: 16px;
+    color: var(--text-muted);
+}
+
+.ucf-version-info strong {
+    color: var(--text-normal);
+}
+
+.ucf-intro-text {
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    padding: 12px;
+    background: var(--background-secondary);
+    border-radius: 6px;
+}
+
+.ucf-changelog-section {
+    margin-bottom: 20px;
+}
+
+.ucf-changelog-section h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.ucf-changelog-new {
+    background: rgba(76, 175, 80, 0.2);
+    color: #81c784;
+}
+
+.ucf-changelog-fixed {
+    background: rgba(244, 143, 177, 0.2);
+    color: #f48fb1;
+}
+
+.ucf-changelog-technical {
+    background: rgba(100, 181, 246, 0.2);
+    color: #90caf9;
+}
+
+.ucf-changelog-section ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.ucf-changelog-section li {
+    margin-bottom: 6px;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.ucf-highlight {
+    color: var(--text-normal);
+    font-weight: 500;
+}
+
+.ucf-credits {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--background-modifier-border);
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.ucf-credits p {
+    margin: 0;
+}
+
+.ucf-modal-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.ucf-modal-buttons button {
+    padding: 8px 20px;
+}

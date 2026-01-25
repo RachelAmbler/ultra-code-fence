@@ -1,0 +1,44 @@
+/**
+ * Ultra Code Fence - Constants Index
+ *
+ * Re-exports all constants for convenient importing.
+ */
+
+export { DEFAULT_SETTINGS } from './defaults';
+
+export {
+	ICON_COLOURS,
+	ICON_LABELS,
+	ICON_EMOJIS,
+	DEFAULT_ICON_COLOUR,
+	DEFAULT_ICON_LABEL,
+	DEFAULT_ICON_EMOJI,
+	getIconColour,
+	getIconLabel,
+	getIconEmoji,
+} from './icons';
+
+export {
+	VAULT_PREFIX,
+	HTTPS_PREFIX,
+	HTTP_PREFIX,
+	INLINE_CODE_SEPARATOR,
+	INLINE_CODE_SEPARATOR_END,
+	CSS_PREFIX,
+	CSS_CLASSES,
+	styleClass,
+	LINE_HEIGHT_MULTIPLIER,
+	SCROLL_BOTTOM_TOLERANCE,
+	WHATS_NEW_DELAY_MS,
+	COPY_SUCCESS_DURATION_MS,
+	YAML_SECTIONS,
+	YAML_META,
+	YAML_RENDER_DISPLAY,
+	YAML_FILTER,
+	YAML_FILTER_BY_LINES,
+	YAML_FILTER_BY_MARKS,
+	YAML_RENDER_CMDOUT,
+	YAML_TEXT_STYLE,
+	YAML_PROMPT,
+	ICON_IMAGE_EXTENSIONS,
+} from './patterns';
