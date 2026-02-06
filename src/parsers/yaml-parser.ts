@@ -67,7 +67,27 @@ export function parseBlockContent(rawContent: string): ParsedBlockContent {
 		return parseEmbeddedCodeBlock(rawContent);
 	}
 
-	return parseYamlOnlyBlock(rawContent);
+	// Try to parse as YAML — if valid and contains known sections, use it
+	try {
+		const yamlProperties = parseYaml(rawContent) as Record<string, unknown>;
+
+		if (yamlProperties && typeof yamlProperties === 'object' && hasKnownYamlSections(yamlProperties)) {
+			return {
+				yamlProperties,
+				embeddedCode: null,
+				hasEmbeddedCode: false,
+			};
+		}
+	} catch {
+		// YAML parsing failed — not YAML
+	}
+
+	// No valid YAML structure found — treat entire content as plain code
+	return {
+		yamlProperties: {},
+		embeddedCode: rawContent,
+		hasEmbeddedCode: true,
+	};
 }
 
 /**
@@ -101,19 +121,22 @@ function parseEmbeddedCodeBlock(rawContent: string): ParsedBlockContent {
 }
 
 /**
- * Parses a YAML-only block (no embedded code).
+ * Checks whether parsed YAML contains any recognised ufence top-level sections.
  *
- * @param rawContent - Raw YAML content
- * @returns Parsed configuration
+ * Used to distinguish genuine ufence YAML configuration from plain code that
+ * happened to survive YAML parsing without throwing an error.
+ *
+ * @param yamlProps - Parsed YAML properties
+ * @returns True if at least one known section key is present
  */
-function parseYamlOnlyBlock(rawContent: string): ParsedBlockContent {
-	const yamlProperties = parseYaml(rawContent) as Record<string, unknown>;
-
-	return {
-		yamlProperties: yamlProperties ?? {},
-		embeddedCode: null,
-		hasEmbeddedCode: false,
-	};
+function hasKnownYamlSections(yamlProps: Record<string, unknown>): boolean {
+	const knownKeys = [
+		YAML_SECTIONS.meta,
+		YAML_SECTIONS.render,
+		YAML_SECTIONS.filter,
+		YAML_PROMPT,
+	];
+	return knownKeys.some(key => key in yamlProps);
 }
 
 // =============================================================================
@@ -441,7 +464,7 @@ export function resolveBlockConfig(
 	return {
 		// META section
 		sourcePath: parsed.META?.PATH ?? null,
-		titleTemplate: parsed.META?.TITLE ?? settings.defaultTitleTemplate,
+		titleTemplate: parsed.META?.TITLE ?? '',
 		descriptionText: parsed.META?.DESC ?? '',
 
 		// RENDER section

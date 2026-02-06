@@ -46,6 +46,15 @@ Embed code directly (inline):
     echo "Hello, World!"
     ```
 
+Use as a drop-in replacement for standard code fences (no YAML needed):
+
+    ```ufence-bash
+    #!/bin/bash
+    echo "Hello, World!"
+    ```
+
+This renders identically to a standard code fence but with Ultra Code Fence features (copy button, line numbers, zebra striping, etc.) applied from your global settings. No title tab is shown unless you explicitly provide one.
+
 ## Block Types
 
 ### Language-specific blocks
@@ -144,7 +153,7 @@ RENDER:                   # Styling for cmdout
 | Property | Type | Description |
 |----------|------|-------------|
 | `PATH` | string | File path. Use `vault://path/to/file` for vault files or `https://...` for remote URLs |
-| `TITLE` | string | Title text. Use `""` to hide title. Supports template variables |
+| `TITLE` | string | Title text. If omitted, no title tab is displayed. Supports template variables |
 | `DESC` | string | Description text shown below or as tooltip |
 
 ## RENDER Section
