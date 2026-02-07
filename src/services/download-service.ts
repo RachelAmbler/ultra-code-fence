@@ -81,11 +81,8 @@ async function downloadDesktop(
 	saveSettings: () => Promise<void>
 ): Promise<void> {
 	// Dynamic requires for Node/Electron modules
-	// eslint-disable-next-line @typescript-eslint/no-var-requires
 	const fs = require('fs') as typeof import('fs');
-	// eslint-disable-next-line @typescript-eslint/no-var-requires
 	const path = require('path') as typeof import('path');
-	// eslint-disable-next-line @typescript-eslint/no-var-requires
 	const { remote } = require('electron');
 
 	// Build default path from remembered directory + suggested filename
@@ -123,7 +120,7 @@ function downloadMobile(codeText: string, suggestedFilename: string): void {
 	const anchor = document.createElement('a');
 	anchor.href = url;
 	anchor.download = suggestedFilename;
-	anchor.style.display = 'none';
+	anchor.hidden = true;
 
 	document.body.appendChild(anchor);
 	anchor.click();

@@ -6,7 +6,7 @@
  * Command Output, and Appearance.
  */
 
-import { App, Platform, PluginSettingTab, Setting } from 'obsidian';
+import { App, Platform, Plugin, PluginSettingTab, Setting } from 'obsidian';
 import type { PluginSettings, TitleBarStyle, FileIconStyle, DescriptionDisplayMode, ReleaseNotesData } from '../types';
 import { CSS_CLASSES } from '../constants';
 import { WhatsNewModal } from './whats-new-modal';
@@ -54,7 +54,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 	 * @param releaseNotesData - Release notes data for the modal
 	 */
 	constructor(app: App, plugin: SettingsPlugin, releaseNotesData: ReleaseNotesData) {
-		super(app, plugin as any);
+		super(app, plugin as unknown as Plugin);
 		this.plugin = plugin;
 		this.releaseNotesData = releaseNotesData;
 	}
@@ -66,9 +66,6 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 		containerEl.addClass(CSS_CLASSES.settings);
-
-		// Header
-		containerEl.createEl('h2', { text: 'Ultra Code Fence' });
 
 		// Tab navigation
 		const tabContainer = containerEl.createEl('div', { cls: CSS_CLASSES.tabs });
@@ -145,7 +142,8 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 	 * Creates a section header with optional description.
 	 */
 	private createSectionHeader(containerElement: HTMLElement, headerText: string, descriptionText?: string): void {
-		containerElement.createEl('h4', { text: headerText, cls: CSS_CLASSES.sectionHeader });
+		const heading = new Setting(containerElement).setName(headerText).setHeading();
+		heading.settingEl.addClass(CSS_CLASSES.sectionHeader);
 
 		if (descriptionText) {
 			containerElement.createEl('p', { text: descriptionText, cls: CSS_CLASSES.sectionDesc });
@@ -185,6 +183,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 			.setName('Supported languages')
 			.setDesc('Comma-separated list. Creates ufence-{lang} code blocks.')
 			.addText(textInput => textInput
+				// eslint-disable-next-line obsidianmd/ui/sentence-case
 				.setPlaceholder('python,javascript,bash,...')
 				.setValue(this.plugin.settings.supportedLanguages)
 				.onChange(async (value) => {
@@ -254,7 +253,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 				.addOption('tab', 'Tab')
 				.addOption('integrated', 'Integrated')
 				.addOption('minimal', 'Minimal')
-				.addOption('infobar', 'Info Bar')
+				.addOption('infobar', 'Info bar')
 				.addOption('none', 'Hidden')
 				.setValue(this.plugin.settings.defaultTitleBarStyle)
 				.onChange(async (value) => {
@@ -439,7 +438,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 		const thead = table.createEl('thead');
 		const headerRow = thead.createEl('tr');
 		headerRow.createEl('th', { text: 'Lang', cls: 'ucf-cj-col-lang' });
-		headerRow.createEl('th', { text: '⇧ Click', cls: 'ucf-cj-col-op' });
+		headerRow.createEl('th', { text: '⇧ click', cls: 'ucf-cj-col-op' });
 		headerRow.createEl('th', { text: `${altModLabel} Click`, cls: 'ucf-cj-col-op' });
 		headerRow.createEl('th', { text: 'Ignore', cls: 'ucf-cj-col-ignore' });
 		headerRow.createEl('th', { text: '', cls: 'ucf-cj-col-action' });
@@ -578,6 +577,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 			.setName('Default language')
 			.setDesc('Language when RENDER.LANG is not specified in ufence-code blocks')
 			.addText(textInput => textInput
+				// eslint-disable-next-line obsidianmd/ui/sentence-case
 				.setPlaceholder('text')
 				.setValue(this.plugin.settings.defaultLanguage)
 				.onChange(async (value) => {
@@ -599,7 +599,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 		// Prompt styling
 		new Setting(containerElement)
 			.setName('Prompt')
-			.setDesc('Colour / Bold / Italic')
+			.setDesc('Colour / bold / italic')
 			.addColorPicker(picker => picker
 				.setValue(this.plugin.settings.commandPromptColour || '#6b7280')
 				.onChange(async (value) => {
@@ -624,7 +624,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 		// Command styling
 		new Setting(containerElement)
 			.setName('Command')
-			.setDesc('Colour / Bold / Italic')
+			.setDesc('Colour / bold / italic')
 			.addColorPicker(picker => picker
 				.setValue(this.plugin.settings.commandTextColour || '#98c379')
 				.onChange(async (value) => {
@@ -649,7 +649,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 		// Output styling
 		new Setting(containerElement)
 			.setName('Output')
-			.setDesc('Colour / Bold / Italic')
+			.setDesc('Colour / bold / italic')
 			.addColorPicker(picker => picker
 				.setValue(this.plugin.settings.outputTextColour || '#abb2bf')
 				.onChange(async (value) => {
@@ -702,6 +702,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 				.setName('Icon folder')
 				.setDesc('Folder with icon files (python.svg, bash.png, etc.)')
 				.addText(textInput => textInput
+					// eslint-disable-next-line obsidianmd/ui/sentence-case
 					.setPlaceholder('Assets/Icons')
 					.setValue(this.plugin.settings.customIconFolder)
 					.onChange(async (value) => {

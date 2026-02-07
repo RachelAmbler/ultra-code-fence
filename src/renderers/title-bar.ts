@@ -54,7 +54,7 @@ export async function createTitleBarElement(
 	app: App,
 	settings: PluginSettings,
 	options: TitleBarCreationOptions,
-	component: Component
+	_component: Component
 ): Promise<HTMLDivElement> {
 	const { titleText, clickablePath, titleBarStyle, fileMetadata, language } = options;
 

@@ -8,7 +8,7 @@
  * All heavy lifting is delegated to specialised modules in the src folder.
  */
 
-import { Plugin, MarkdownRenderer, MarkdownPostProcessorContext, MarkdownView } from 'obsidian';
+import { Component, Plugin, MarkdownRenderer, MarkdownPostProcessorContext, MarkdownView } from 'obsidian';
 
 // Types
 import type { PluginSettings, TitleBarStyle, SourceFileMetadata } from './types';
@@ -23,7 +23,6 @@ import {
 	resolveBlockConfig,
 	resolveCmdoutConfig,
 	applyFilterChain,
-	countLines,
 } from './parsers';
 
 // Services
@@ -201,7 +200,7 @@ export default class UltraCodeFence extends Plugin {
 		let parsedBlock;
 		try {
 			parsedBlock = parseBlockContent(rawContent);
-		} catch (e) {
+		} catch {
 			await this.renderErrorMessage(containerElement, 'invalid embedding (invalid YAML)');
 			return;
 		}
@@ -259,13 +258,16 @@ export default class UltraCodeFence extends Plugin {
 
 		const totalLineCount = countSourceLines(sourceCode);
 
-		// Render the code block
+		// Render the code block (use a short-lived component instead of the plugin
+		// instance to avoid memory leaks from the long-lived plugin lifecycle)
+		const renderComponent = new Component();
+		renderComponent.load();
 		await MarkdownRenderer.render(
 			this.app,
 			'```' + config.language + '\n' + sourceCode + '\n```',
 			containerElement,
 			'',
-			this
+			renderComponent
 		);
 
 		// Process code block (line numbers, zebra, scrolling)
@@ -503,12 +505,14 @@ export default class UltraCodeFence extends Plugin {
 	 * Renders an error message.
 	 */
 	private async renderErrorMessage(containerElement: HTMLElement, errorText: string): Promise<void> {
+		const errorComponent = new Component();
+		errorComponent.load();
 		await MarkdownRenderer.render(
 			this.app,
 			`\`ERROR: ${errorText}\``,
 			containerElement,
 			'',
-			this
+			errorComponent
 		);
 	}
 }

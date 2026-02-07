@@ -314,9 +314,6 @@ export interface CodeButtonOptions {
 export function addCodeBlockButtons(preElement: HTMLPreElement, options: CodeButtonOptions): void {
 	const { showCopyButton, showDownloadButton, totalLineCount, foldLines, shiftCopyJoin, altCopyJoin, joinIgnoreRegex, onDownload } = options;
 
-	// Ensure pre has relative positioning for button placement
-	preElement.style.position = 'relative';
-
 	if (showCopyButton) {
 		addCopyButton(preElement, { shiftCopyJoin, altCopyJoin, joinIgnoreRegex });
 	}

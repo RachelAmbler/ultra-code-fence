@@ -90,7 +90,7 @@ export async function loadVaultFile(app: App, vaultPath: string): Promise<Source
 			sourceCode,
 			fileMetadata,
 		};
-	} catch (e) {
+	} catch {
 		return {
 			succeeded: false,
 			sourceCode: '',
@@ -116,7 +116,7 @@ export async function loadRemoteFile(url: string): Promise<SourceLoadResult> {
 			sourceCode: response.text,
 			fileMetadata,
 		};
-	} catch (e) {
+	} catch {
 		return {
 			succeeded: false,
 			sourceCode: '',

@@ -20,6 +20,7 @@
 }
 
 .ucf pre.ucf-code {
+    position: relative;
     margin: 0 !important;
     border-top-left-radius: 0 !important;
 }

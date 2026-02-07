@@ -1,6 +1,6 @@
 {
 	"name": "ultra-code-fence",
-	"version": "2026.2.8",
+	"version": "2026.2.9",
 	"description": "A Super charged code fence replacement for Obsidian featuring multiple title styles, icons, line numbers, folding, scrolling, and command output formatting",
 	"main": "main.js",
 	"scripts": {
@@ -21,15 +21,20 @@
 	"author": "Rachel Ambler",
 	"license": "MIT",
 	"devDependencies": {
+		"@eslint/js": "^9.39.2",
 		"@types/js-yaml": "^4.0.9",
 		"@types/node": "^22.10.0",
+		"@typescript-eslint/parser": "^8.54.0",
 		"@vitest/coverage-v8": "^4.0.18",
 		"builtin-modules": "^4.0.0",
 		"esbuild": "^0.24.0",
+		"eslint": "^9.39.2",
+		"eslint-plugin-obsidianmd": "^0.1.9",
 		"js-yaml": "^4.1.1",
 		"obsidian": "^1.7.2",
 		"tslib": "^2.8.0",
 		"typescript": "^5.7.0",
+		"typescript-eslint": "^8.54.0",
 		"vitest": "^4.0.18"
 	},
 	"dependencies": {

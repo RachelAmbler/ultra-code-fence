@@ -88,7 +88,6 @@ export function wrapPreElement(preElement: HTMLPreElement, containerElement: HTM
 	preElement.parentElement?.insertBefore(containerElement, preElement);
 	containerElement.appendChild(preElement);
 	preElement.classList.add(CSS_CLASSES.codeBlock);
-	preElement.style.position = 'relative';
 }
 
 // =============================================================================

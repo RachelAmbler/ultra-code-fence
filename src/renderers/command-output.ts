@@ -260,7 +260,6 @@ export async function renderCommandOutput(
 
 	// Add copy button if enabled
 	if (options.showCopyButton) {
-		preElement.style.position = 'relative';
 		addCopyButton(preElement);
 	}
 
