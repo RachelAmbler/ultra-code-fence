@@ -200,7 +200,7 @@ export function extractLines(sourceCode: string, linesSpec: string): string {
  * @param spec - Line specification (e.g., "1,5-10,15")
  * @returns Array of individual line numbers
  */
-function parseLineSpec(spec: string): number[] {
+export function parseLineSpec(spec: string): number[] {
 	const lineNumbers: number[] = [];
 	const parts = spec.split(',');
 

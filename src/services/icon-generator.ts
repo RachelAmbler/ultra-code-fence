@@ -28,7 +28,7 @@ import {
  * @param labelLength - Number of characters in the label
  * @returns Font size in SVG units
  */
-function calculateBadgeFontSize(labelLength: number): number {
+export function calculateBadgeFontSize(labelLength: number): number {
 	if (labelLength >= 5) return 5;
 	if (labelLength >= 4) return 6;
 	if (labelLength >= 3) return 7;

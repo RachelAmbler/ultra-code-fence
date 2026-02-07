@@ -2,7 +2,7 @@
  * Tests for src/parsers/line-extractor.ts
  *
  * Covers: extractBetweenMarkersWithOptions, extractBetweenMarkers,
- *         extractLines, extractLineRange, countLines,
+ *         extractLines, parseLineSpec, extractLineRange, countLines,
  *         trimTrailingEmptyLines, applyFilterChain
  */
 
@@ -15,6 +15,7 @@ import {
 	countLines,
 	trimTrailingEmptyLines,
 	applyFilterChain,
+	parseLineSpec,
 } from '../../src/parsers/line-extractor';
 import type { ResolvedBlockConfig, ResolvedFilterByLines, ResolvedFilterByMarks } from '../../src/types';
 
@@ -244,6 +245,56 @@ describe('extractLines', () => {
 
 	it('ignores invalid non-numeric parts', () => {
 		expect(extractLines(SAMPLE_CODE, 'abc,1')).toBe('line 1');
+	});
+});
+
+// =============================================================================
+// parseLineSpec
+// =============================================================================
+
+describe('parseLineSpec', () => {
+	it('parses a single line number', () => {
+		expect(parseLineSpec('5')).toEqual([5]);
+	});
+
+	it('parses comma-separated line numbers', () => {
+		expect(parseLineSpec('1,5,10')).toEqual([1, 5, 10]);
+	});
+
+	it('expands a range', () => {
+		expect(parseLineSpec('3-6')).toEqual([3, 4, 5, 6]);
+	});
+
+	it('parses mixed lines and ranges', () => {
+		expect(parseLineSpec('1,5-7,10')).toEqual([1, 5, 6, 7, 10]);
+	});
+
+	it('trims whitespace around parts', () => {
+		expect(parseLineSpec(' 1 , 3 ')).toEqual([1, 3]);
+	});
+
+	it('trims whitespace around range dash', () => {
+		expect(parseLineSpec('1 - 3')).toEqual([1, 2, 3]);
+	});
+
+	it('returns empty array for non-numeric input', () => {
+		expect(parseLineSpec('abc')).toEqual([]);
+	});
+
+	it('skips invalid parts but keeps valid ones', () => {
+		expect(parseLineSpec('abc,3,xyz')).toEqual([3]);
+	});
+
+	it('returns empty array for empty string', () => {
+		expect(parseLineSpec('')).toEqual([]);
+	});
+
+	it('ignores reversed ranges (start > end)', () => {
+		expect(parseLineSpec('5-3')).toEqual([]);
+	});
+
+	it('handles single-line range (start == end)', () => {
+		expect(parseLineSpec('5-5')).toEqual([5]);
 	});
 });
 

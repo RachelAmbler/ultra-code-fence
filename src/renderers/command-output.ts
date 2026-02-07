@@ -53,7 +53,7 @@ export interface CommandOutputRenderOptions {
  * @param styleStrings - Style strings for each element type
  * @returns HTML string for the line
  */
-function processOutputLine(
+export function processOutputLine(
 	lineContent: string,
 	promptPattern: RegExp | undefined,
 	styleStrings: { prompt: string; command: string; output: string }
@@ -91,7 +91,7 @@ function processOutputLine(
 /**
  * Creates a styled span element as HTML string.
  */
-function createStyledSpanHtml(className: string, content: string, styleAttribute: string): string {
+export function createStyledSpanHtml(className: string, content: string, styleAttribute: string): string {
 	const styleAttr = styleAttribute ? ` style="${styleAttribute}"` : '';
 	return `<span class="${className}"${styleAttr}>${content}</span>`;
 }
@@ -104,7 +104,7 @@ function createStyledSpanHtml(className: string, content: string, styleAttribute
  * @param styleStrings - Style strings for each element type
  * @returns HTML string with all processed lines
  */
-function processAllOutputLines(
+export function processAllOutputLines(
 	rawCode: string,
 	promptPattern: RegExp | undefined,
 	styleStrings: { prompt: string; command: string; output: string }

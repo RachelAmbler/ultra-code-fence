@@ -1,15 +1,51 @@
 /**
  * Tests for src/services/icon-generator.ts
  *
- * Covers the pure SVG generators: generateFilledBadgeSvg,
- * generateOutlineBadgeSvg (which also exercise calculateBadgeFontSize)
+ * Covers: calculateBadgeFontSize, generateFilledBadgeSvg,
+ * generateOutlineBadgeSvg
  */
 
 import { describe, it, expect } from 'vitest';
 import {
+	calculateBadgeFontSize,
 	generateFilledBadgeSvg,
 	generateOutlineBadgeSvg,
 } from '../../src/services/icon-generator';
+
+// =============================================================================
+// calculateBadgeFontSize
+// =============================================================================
+
+describe('calculateBadgeFontSize', () => {
+	it('returns 10 for single character', () => {
+		expect(calculateBadgeFontSize(1)).toBe(10);
+	});
+
+	it('returns 8 for 2 characters', () => {
+		expect(calculateBadgeFontSize(2)).toBe(8);
+	});
+
+	it('returns 7 for 3 characters', () => {
+		expect(calculateBadgeFontSize(3)).toBe(7);
+	});
+
+	it('returns 6 for 4 characters', () => {
+		expect(calculateBadgeFontSize(4)).toBe(6);
+	});
+
+	it('returns 5 for 5 characters', () => {
+		expect(calculateBadgeFontSize(5)).toBe(5);
+	});
+
+	it('returns 5 for 6+ characters', () => {
+		expect(calculateBadgeFontSize(6)).toBe(5);
+		expect(calculateBadgeFontSize(10)).toBe(5);
+	});
+
+	it('returns 10 for zero length', () => {
+		expect(calculateBadgeFontSize(0)).toBe(10);
+	});
+});
 
 // =============================================================================
 // generateFilledBadgeSvg
