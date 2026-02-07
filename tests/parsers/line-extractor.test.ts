@@ -44,7 +44,7 @@ function testConfig(
 		sourcePath: null,
 		titleTemplate: '',
 		descriptionText: '',
-		titleBarStyle: 'default',
+		titleBarStyle: 'tab',
 		language: 'txt',
 		foldLines: 0,
 		scrollLines: 0,
