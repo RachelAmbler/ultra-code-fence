@@ -1,6 +1,6 @@
 {
 	"name": "ultra-code-fence",
-	"version": "2026.2.9",
+	"version": "2026.2.10",
 	"description": "A Super charged code fence replacement for Obsidian featuring multiple title styles, icons, line numbers, folding, scrolling, and command output formatting",
 	"main": "main.js",
 	"scripts": {

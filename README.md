@@ -1,5 +1,7 @@
 # Ultra Code Fence
 
+![Ultra Code Fence](Assets/social-preview.png)
+
 Ultra Code Fence extends Obsidian's standard fenced code blocks with advanced embedding, formatting, and display capabilities.
 
 Loosely based on [embed-code-file](https://github.com/almariah/embed-code-file) by Abdullah Almariah.

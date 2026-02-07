@@ -1,8 +1,8 @@
 {
 	"repo": "https://codeberg.org/ARACS-Thoughtworks/Obsidian-Ultra-Code-Fence",
-	"version": "2026.1.0",
+	"version": "2026.2.9",
 	"title": "What's New in Ultra Code Fence",
-	"subtitle": "January 2026",
+	"subtitle": "February 2026",
 	"description": "A super-charged code fence replacement for Obsidian that allows for external code, line numbers, execution output, code folding and so much more",
 	"new": [
 		{ "highlight": "Multiple title styles", "text": "Choose from Tab, Integrated, Minimal, Info Bar, or hide completely" },
