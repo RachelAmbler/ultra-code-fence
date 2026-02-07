@@ -21,7 +21,7 @@ jobs:
 
       - name: Build plugin
         run: |
-          npm install
+          npm install --force
           npm run build
           cp src/styles.css styles.css
 
