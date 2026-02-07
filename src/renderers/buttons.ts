@@ -65,7 +65,7 @@ export interface CopyButtonOptions {
  * @param ignoreRegex - Optional regex pattern to identify lines to strip
  * @returns Single-line string with lines joined by the operator
  */
-function joinCodeLines(codeText: string, joinOperator: string, ignoreRegex?: RegExp): string {
+export function joinCodeLines(codeText: string, joinOperator: string, ignoreRegex?: RegExp): string {
 	return codeText
 		.split('\n')
 		.map(line => line.trim())
