@@ -28,3 +28,17 @@ npm-debug.log*
 
 # Local environment file
 local.env
+
+# Issue 5 - adding test Obsidian vault
+
+# Obsidian vault - user-specific config
+Obsidian/Test/.obsidian/workspace.json
+Obsidian/Test/.obsidian/app.json
+Obsidian/Test/.obsidian/appearance.json
+Obsidian/Test/.obsidian/graph.json
+
+# Deployed plugin artifacts (built from src/)
+Obsidian/Test/.obsidian/plugins/ultra-code-fence/main.js
+Obsidian/Test/.obsidian/plugins/ultra-code-fence/styles.css
+Obsidian/Test/.obsidian/plugins/ultra-code-fence/manifest.json
+Obsidian/Test/.obsidian/plugins/ultra-code-fence/data.json
