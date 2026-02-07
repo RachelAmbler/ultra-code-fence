@@ -306,6 +306,16 @@ export function parseRenderDisplaySection(yamlProps: Record<string, unknown>): Y
 		LANG: render[YAML_RENDER_DISPLAY.lang] !== undefined
 			? String(render[YAML_RENDER_DISPLAY.lang])
 			: undefined,
+		SHIFT_COPY_JOIN: render[YAML_RENDER_DISPLAY.shiftCopyJoin] !== undefined
+			? String(render[YAML_RENDER_DISPLAY.shiftCopyJoin])
+			: undefined,
+		// ALT_COPY_JOIN and CMD_COPY_JOIN are synonymous
+		ALT_COPY_JOIN: (render[YAML_RENDER_DISPLAY.altCopyJoin] ?? render[YAML_RENDER_DISPLAY.cmdCopyJoin]) !== undefined
+			? String(render[YAML_RENDER_DISPLAY.altCopyJoin] ?? render[YAML_RENDER_DISPLAY.cmdCopyJoin])
+			: undefined,
+		JOIN_IGNORE_REGEX: render[YAML_RENDER_DISPLAY.joinIgnoreRegex] !== undefined
+			? String(render[YAML_RENDER_DISPLAY.joinIgnoreRegex])
+			: undefined,
 	};
 }
 
@@ -475,6 +485,15 @@ export function resolveBlockConfig(
 		showZebraStripes: parsed.RENDER?.ZEBRA ?? settings.showZebraStripes,
 		showLineNumbers: parsed.RENDER?.LINES ?? settings.showLineNumbers,
 		showCopyButton: parsed.RENDER?.COPY ?? settings.showCopyButton,
+		shiftCopyJoin: parsed.RENDER?.SHIFT_COPY_JOIN
+			?? settings.languageCopyJoinDefaults[defaultLanguage]?.shiftJoin
+			?? '',
+		altCopyJoin: parsed.RENDER?.ALT_COPY_JOIN
+			?? settings.languageCopyJoinDefaults[defaultLanguage]?.altJoin
+			?? '',
+		joinIgnoreRegex: parsed.RENDER?.JOIN_IGNORE_REGEX
+			?? settings.languageCopyJoinDefaults[defaultLanguage]?.joinIgnoreRegex
+			?? '',
 
 		// FILTER section - BY_LINES
 		filterByLines: {

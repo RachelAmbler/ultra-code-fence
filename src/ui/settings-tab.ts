@@ -6,7 +6,7 @@
  * Command Output, and Appearance.
  */
 
-import { App, PluginSettingTab, Setting } from 'obsidian';
+import { App, Platform, PluginSettingTab, Setting } from 'obsidian';
 import type { PluginSettings, TitleBarStyle, FileIconStyle, DescriptionDisplayMode, ReleaseNotesData } from '../types';
 import { CSS_CLASSES } from '../constants';
 import { WhatsNewModal } from './whats-new-modal';
@@ -366,6 +366,16 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				}));
 
+		new Setting(containerElement)
+			.setName('Download button')
+			.setDesc('Show a button to save code block content to a file')
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.showDownloadButton)
+				.onChange(async (value) => {
+					this.plugin.settings.showDownloadButton = value;
+					await this.plugin.saveSettings();
+				}));
+
 		this.createSectionDivider(containerElement);
 
 		// Folding section
@@ -398,6 +408,147 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					}
 				}));
+
+		this.createSectionDivider(containerElement);
+
+		// Copy join section
+		const altModLabel = (Platform.isMacOS || Platform.isIosApp) ? '⌘' : 'Alt';
+		this.createSectionHeader(
+			containerElement,
+			'Copy Join',
+			`Configure modifier+click copy behaviour per language. Shift+click and ${altModLabel}+click join lines with the specified operator. Ignore regex strips matching lines before joining.`
+		);
+
+		this.renderCopyJoinTable(containerElement, altModLabel);
+	}
+
+	// ===========================================================================
+	// Copy Join Table
+	// ===========================================================================
+
+	/**
+	 * Renders the Copy Join table with column headers and editable rows.
+	 */
+	private renderCopyJoinTable(containerElement: HTMLElement, altModLabel: string): void {
+		const tableWrapper = containerElement.createEl('div', { cls: 'ucf-copyjoin-wrapper' });
+
+		// Build table
+		const table = tableWrapper.createEl('table', { cls: 'ucf-copyjoin-table' });
+
+		// Header row
+		const thead = table.createEl('thead');
+		const headerRow = thead.createEl('tr');
+		headerRow.createEl('th', { text: 'Lang', cls: 'ucf-cj-col-lang' });
+		headerRow.createEl('th', { text: '⇧ Click', cls: 'ucf-cj-col-op' });
+		headerRow.createEl('th', { text: `${altModLabel} Click`, cls: 'ucf-cj-col-op' });
+		headerRow.createEl('th', { text: 'Ignore', cls: 'ucf-cj-col-ignore' });
+		headerRow.createEl('th', { text: '', cls: 'ucf-cj-col-action' });
+
+		// Body rows
+		const tbody = table.createEl('tbody');
+		const configuredLangs = Object.keys(this.plugin.settings.languageCopyJoinDefaults).sort();
+
+		for (const lang of configuredLangs) {
+			const stored = this.plugin.settings.languageCopyJoinDefaults[lang];
+			const row = tbody.createEl('tr');
+
+			// Language name (read-only)
+			row.createEl('td', { cls: 'ucf-cj-col-lang' }).createEl('code', { text: lang });
+
+			// Shift join input
+			const shiftCell = row.createEl('td', { cls: 'ucf-cj-col-op' });
+			const shiftInput = shiftCell.createEl('input', {
+				type: 'text',
+				cls: 'ucf-cj-input ucf-cj-input-op',
+				value: stored?.shiftJoin ?? '',
+				attr: { placeholder: '&&' },
+			});
+			shiftInput.addEventListener('change', async () => {
+				this.plugin.settings.languageCopyJoinDefaults[lang].shiftJoin = shiftInput.value;
+				await this.plugin.saveSettings();
+			});
+
+			// Alt/Cmd join input
+			const altCell = row.createEl('td', { cls: 'ucf-cj-col-op' });
+			const altInput = altCell.createEl('input', {
+				type: 'text',
+				cls: 'ucf-cj-input ucf-cj-input-op',
+				value: stored?.altJoin ?? '',
+				attr: { placeholder: ';' },
+			});
+			altInput.addEventListener('change', async () => {
+				this.plugin.settings.languageCopyJoinDefaults[lang].altJoin = altInput.value;
+				await this.plugin.saveSettings();
+			});
+
+			// Ignore regex input
+			const ignoreCell = row.createEl('td', { cls: 'ucf-cj-col-ignore' });
+			const ignoreInput = ignoreCell.createEl('input', {
+				type: 'text',
+				cls: 'ucf-cj-input ucf-cj-input-ignore',
+				value: stored?.joinIgnoreRegex ?? '',
+				attr: { placeholder: '^\\s*#' },
+			});
+			ignoreInput.addEventListener('change', async () => {
+				this.plugin.settings.languageCopyJoinDefaults[lang].joinIgnoreRegex = ignoreInput.value;
+				await this.plugin.saveSettings();
+			});
+
+			// Remove button
+			const actionCell = row.createEl('td', { cls: 'ucf-cj-col-action' });
+			const removeBtn = actionCell.createEl('button', {
+				text: '✕',
+				cls: 'ucf-cj-remove',
+				attr: { 'aria-label': `Remove ${lang}` },
+			});
+			removeBtn.addEventListener('click', async () => {
+				delete this.plugin.settings.languageCopyJoinDefaults[lang];
+				await this.plugin.saveSettings();
+				this.display();
+			});
+		}
+
+		// Add-language row
+		const tfoot = table.createEl('tfoot');
+		const addRow = tfoot.createEl('tr');
+		const addCell = addRow.createEl('td', { cls: 'ucf-cj-col-lang' });
+		const addInput = addCell.createEl('input', {
+			type: 'text',
+			cls: 'ucf-cj-input ucf-cj-input-lang',
+			attr: { placeholder: 'e.g. bash' },
+		});
+
+		// Empty cells to fill the row
+		addRow.createEl('td', { cls: 'ucf-cj-col-op' });
+		addRow.createEl('td', { cls: 'ucf-cj-col-op' });
+		addRow.createEl('td', { cls: 'ucf-cj-col-ignore' });
+
+		const addActionCell = addRow.createEl('td', { cls: 'ucf-cj-col-action' });
+		const addBtn = addActionCell.createEl('button', {
+			text: '+',
+			cls: 'ucf-cj-add',
+			attr: { 'aria-label': 'Add language' },
+		});
+		addBtn.addEventListener('click', async () => {
+			const newLang = addInput.value.trim().toLowerCase();
+			if (newLang && !this.plugin.settings.languageCopyJoinDefaults[newLang]) {
+				this.plugin.settings.languageCopyJoinDefaults[newLang] = {
+					shiftJoin: '&&',
+					altJoin: ';',
+					joinIgnoreRegex: '^\\s*#',
+				};
+				await this.plugin.saveSettings();
+				this.display();
+			}
+		});
+
+		// Allow Enter key in the add input
+		addInput.addEventListener('keydown', (event) => {
+			if (event.key === 'Enter') {
+				event.preventDefault();
+				addBtn.click();
+			}
+		});
 	}
 
 	// ===========================================================================

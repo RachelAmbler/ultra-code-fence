@@ -4,11 +4,12 @@
  * Re-exports all renderer functions for convenient importing.
  */
 
-export type { CodeButtonOptions } from './buttons';
+export type { CodeButtonOptions, DownloadCallback } from './buttons';
 
 export {
 	addCopyButton,
 	addFoldButton,
+	addDownloadButton,
 	addCodeBlockButtons,
 } from './buttons';
 

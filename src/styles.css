@@ -288,6 +288,53 @@ pre.ucf-code:hover .ucf-copy-button {
 }
 
 /* ============================================================================
+   Download Button
+   ============================================================================ */
+
+.ucf-download-button {
+    position: absolute;
+    top: 8px;
+    right: 40px;
+    padding: 6px;
+    background: var(--background-secondary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 4px;
+    color: var(--text-muted);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease, background 0.15s ease, color 0.15s ease;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ucf-download-button svg {
+    display: block;
+}
+
+/* Show on hover */
+pre.ucf-code:hover .ucf-download-button {
+    opacity: 1;
+}
+
+.ucf-download-button:hover {
+    background: var(--background-modifier-hover);
+    color: var(--text-normal);
+}
+
+.ucf-download-button:active {
+    background: var(--background-modifier-active-hover);
+}
+
+/* Always show on touch devices */
+@media (hover: none) {
+    .ucf-download-button {
+        opacity: 0.7;
+    }
+}
+
+/* ============================================================================
    Code Folding
    ============================================================================ */
 
@@ -844,6 +891,143 @@ pre.ucf-scrollable {
     padding: 2px 6px;
     border-radius: 3px;
     font-size: 12px;
+}
+
+/* ============================================================================
+   Settings UI - Copy Join Table
+   ============================================================================ */
+
+.ucf-copyjoin-wrapper {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 12px;
+}
+
+.ucf-copyjoin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    table-layout: fixed;
+}
+
+.ucf-copyjoin-table thead th {
+    text-align: left;
+    font-weight: 600;
+    font-size: 11px;
+    color: var(--text-muted);
+    padding: 4px 6px 8px 6px;
+    border-bottom: 1px solid var(--background-modifier-border);
+    white-space: nowrap;
+}
+
+.ucf-copyjoin-table tbody td,
+.ucf-copyjoin-table tfoot td {
+    padding: 3px 4px;
+    vertical-align: middle;
+}
+
+.ucf-copyjoin-table tbody tr:hover {
+    background: var(--background-modifier-hover);
+}
+
+/* Column widths */
+.ucf-cj-col-lang {
+    width: 80px;
+}
+
+.ucf-cj-col-op {
+    width: 60px;
+}
+
+.ucf-cj-col-ignore {
+    /* takes remaining space */
+}
+
+.ucf-cj-col-action {
+    width: 36px;
+    text-align: center;
+}
+
+/* Language label */
+.ucf-copyjoin-table tbody td.ucf-cj-col-lang code {
+    font-size: 12px;
+    font-family: var(--font-monospace);
+    background: var(--background-primary);
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+
+/* Inputs */
+.ucf-cj-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 4px 6px;
+    font-size: 12px;
+    font-family: var(--font-monospace);
+    background: var(--background-primary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 4px;
+    color: var(--text-normal);
+    transition: border-color 0.15s ease;
+}
+
+.ucf-cj-input:focus {
+    border-color: var(--interactive-accent);
+    outline: none;
+}
+
+.ucf-cj-input::placeholder {
+    color: var(--text-faint);
+}
+
+/* Operator inputs — short, centred */
+.ucf-cj-input-op {
+    text-align: center;
+}
+
+/* Remove button */
+.ucf-cj-remove {
+    padding: 2px 6px;
+    font-size: 12px;
+    line-height: 1;
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.ucf-cj-remove:hover {
+    color: var(--text-error, #e53935);
+    border-color: var(--text-error, #e53935);
+    background: var(--background-modifier-hover);
+}
+
+/* Add button */
+.ucf-cj-add {
+    padding: 2px 8px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1;
+    background: none;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 4px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.ucf-cj-add:hover {
+    color: var(--interactive-accent);
+    border-color: var(--interactive-accent);
+    background: var(--background-modifier-hover);
+}
+
+/* Footer row separator */
+.ucf-copyjoin-table tfoot td {
+    border-top: 1px solid var(--background-modifier-border);
+    padding-top: 8px;
 }
 
 /* ============================================================================

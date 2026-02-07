@@ -31,6 +31,8 @@ import {
 	loadSource,
 	createEmbeddedCodeMetadata,
 	isRemotePath,
+	buildSuggestedFilename,
+	downloadCodeToFile,
 } from './services';
 
 // Renderers
@@ -274,6 +276,16 @@ export default class UltraCodeFence extends Plugin {
 			scrollLines: enableScrolling ? config.scrollLines : 0,
 		});
 
+		// Build download callback — prefer source filename over display title
+		const downloadName = fileMetadata?.filename || displayTitle || '';
+		const suggestedFilename = buildSuggestedFilename(downloadName, config.language);
+		const notePath = processorContext.sourcePath;
+		const onDownload = this.settings.showDownloadButton
+			? async (codeText: string) => {
+				await downloadCodeToFile(codeText, suggestedFilename, notePath, this.settings, () => this.saveSettings());
+			}
+			: undefined;
+
 		// Add title or just buttons
 		if (!shouldHideTitle && displayTitle) {
 			const clickablePath = parsedBlock.hasEmbeddedCode
@@ -293,15 +305,25 @@ export default class UltraCodeFence extends Plugin {
 				processorContext.sourcePath,
 				config.showCopyButton,
 				totalLineCount,
-				config.foldLines
+				config.foldLines,
+				config.shiftCopyJoin,
+				config.altCopyJoin,
+				config.joinIgnoreRegex,
+				this.settings.showDownloadButton,
+				onDownload
 			);
 		} else {
 			const preElement = findPreElement(containerElement);
 			if (preElement) {
 				addCodeBlockButtons(preElement, {
 					showCopyButton: config.showCopyButton,
+					showDownloadButton: this.settings.showDownloadButton,
 					totalLineCount,
 					foldLines: config.foldLines,
+					shiftCopyJoin: config.shiftCopyJoin,
+					altCopyJoin: config.altCopyJoin,
+					joinIgnoreRegex: config.joinIgnoreRegex,
+					onDownload,
 				});
 			}
 		}
@@ -436,7 +458,12 @@ export default class UltraCodeFence extends Plugin {
 		containingNotePath: string,
 		showCopyButton: boolean,
 		totalLineCount: number,
-		foldLines: number
+		foldLines: number,
+		shiftCopyJoin?: string,
+		altCopyJoin?: string,
+		joinIgnoreRegex?: string,
+		showDownloadButton?: boolean,
+		onDownload?: (codeText: string) => Promise<void>
 	): Promise<void> {
 		const preElement = findPreElement(containerElement);
 		if (!preElement) return;
@@ -462,8 +489,13 @@ export default class UltraCodeFence extends Plugin {
 
 		addCodeBlockButtons(preElement, {
 			showCopyButton,
+			showDownloadButton: showDownloadButton ?? false,
 			totalLineCount,
 			foldLines,
+			shiftCopyJoin,
+			altCopyJoin,
+			joinIgnoreRegex,
+			onDownload,
 		});
 	}
 

@@ -76,6 +76,7 @@ export const CSS_CLASSES = {
 	linkIndicator: 'ucf-link-indicator',
 	copyButton: 'ucf-copy-button',
 	copied: 'ucf-copied',
+	downloadButton: 'ucf-download-button',
 	foldBar: 'ucf-fold-bar',
 	foldButton: 'ucf-fold-button',
 	folded: 'ucf-folded',
@@ -199,6 +200,10 @@ export const YAML_RENDER_DISPLAY = {
 	copy: 'COPY',
 	style: 'STYLE',
 	lang: 'LANG',
+	shiftCopyJoin: 'SHIFT_COPY_JOIN',
+	altCopyJoin: 'ALT_COPY_JOIN',
+	cmdCopyJoin: 'CMD_COPY_JOIN',
+	joinIgnoreRegex: 'JOIN_IGNORE_REGEX',
 } as const;
 
 /**

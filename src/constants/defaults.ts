@@ -72,4 +72,11 @@ export const DEFAULT_SETTINGS: PluginSettings = {
 	outputTextColour: '',
 	outputTextBold: false,
 	outputTextItalic: false,
+
+	// Copy join defaults per language
+	languageCopyJoinDefaults: {},
+
+	// Download button
+	showDownloadButton: true,
+	downloadPathHistory: {},
 };

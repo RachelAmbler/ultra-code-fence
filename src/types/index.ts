@@ -148,6 +148,15 @@ export interface PluginSettings {
 
 	/** Italic formatting for output text */
 	outputTextItalic: boolean;
+
+	/** Per-language copy join operators keyed by language ID */
+	languageCopyJoinDefaults: Record<string, { shiftJoin: string; altJoin: string; joinIgnoreRegex: string }>;
+
+	/** Show download button on code blocks */
+	showDownloadButton: boolean;
+
+	/** Last-used download directory per note path */
+	downloadPathHistory: Record<string, string>;
 }
 
 // =============================================================================
@@ -472,6 +481,15 @@ export interface YamlRenderDisplayConfig {
 
 	/** Syntax highlighting language override */
 	LANG?: string;
+
+	/** Join operator for Shift+click copy (e.g., "&&") */
+	SHIFT_COPY_JOIN?: string;
+
+	/** Join operator for Alt/Cmd+click copy (e.g., ";") */
+	ALT_COPY_JOIN?: string;
+
+	/** Regex pattern matching lines to ignore during joined copies */
+	JOIN_IGNORE_REGEX?: string;
 }
 
 /**
@@ -637,6 +655,15 @@ export interface ResolvedBlockConfig {
 
 	/** Show copy button */
 	showCopyButton: boolean;
+
+	/** Join operator for Shift+click copy (empty = disabled) */
+	shiftCopyJoin: string;
+
+	/** Join operator for Alt/Cmd+click copy (empty = disabled) */
+	altCopyJoin: string;
+
+	/** Regex pattern matching lines to ignore during joined copies (empty = disabled) */
+	joinIgnoreRegex: string;
 
 	// FILTER section
 	/** BY_LINES filter configuration */

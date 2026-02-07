@@ -167,6 +167,9 @@ RENDER:                   # Styling for cmdout
 | `COPY` | boolean | true | Show copy button |
 | `STYLE` | string | `tab` | Title bar style: `tab`, `integrated`, `minimal`, `infobar`, `none` |
 | `LANG` | string | (auto) | Language for syntax highlighting (ufence-code only) |
+| `SHIFT_COPY_JOIN` | string | (from settings) | Join operator used when Shift+clicking the copy button |
+| `ALT_COPY_JOIN` | string | (from settings) | Join operator used when Alt/Cmd+clicking the copy button. `CMD_COPY_JOIN` is also accepted |
+| `JOIN_IGNORE_REGEX` | string | (from settings) | Regex pattern matching lines to strip before joining (e.g., `^\s*#` for shell comments) |
 
 ## FILTER Section
 
@@ -198,6 +201,51 @@ FILTER:
     END: "# END CONFIG"
     INCLUSIVE: false    # Exclude the marker lines
 ```
+
+## Copy with Line Joining
+
+The copy button supports modifier keys for joining lines into a single command, useful when a code block contains sequential terminal commands:
+
+- **Click** — copies the code as-is
+- **Shift+click** — joins non-empty lines with the Shift join operator
+- **Alt/Cmd+click** — joins non-empty lines with the Alt/Cmd join operator
+
+For example, with Shift join set to `&&`, a block containing:
+
+    apt update
+    apt upgrade
+    apt autoremove
+
+Shift+click copies as: `apt update && apt upgrade && apt autoremove`
+
+Join operators are configured in Settings (Code tab) per-language. They can also be overridden per-block:
+
+```yaml
+RENDER:
+  SHIFT_COPY_JOIN: "&&"
+  ALT_COPY_JOIN: ";"
+```
+
+### Ignoring Lines During Join
+
+Use `JOIN_IGNORE_REGEX` to strip lines matching a regex before joining. This is useful for removing comments from the joined output:
+
+```yaml
+RENDER:
+  SHIFT_COPY_JOIN: "&&"
+  JOIN_IGNORE_REGEX: "^\\s*#"
+```
+
+With the above configuration, a block containing:
+
+    # Update packages
+    apt update
+    # Upgrade everything
+    apt upgrade
+
+Shift+click copies as: `apt update && apt upgrade`
+
+The ignore regex can also be set per-language in Settings (Code tab). Per-block YAML overrides the per-language default.
 
 ## PROMPT and RENDER Sections (ufence-cmdout only)
 
@@ -499,11 +547,20 @@ Load icons from a vault folder. Place files named `{language}.svg`, `{language}.
 
 No icons displayed.
 
+## Download Button
+
+Code blocks can include a download button that saves the content to a file. Enable it in Settings (Code tab) with the **Download button** toggle.
+
+On desktop, clicking the button opens a native OS save dialog. Obsidian remembers the last directory used for each note, so subsequent downloads default to the same location. On mobile, the button triggers a standard browser download.
+
+The suggested filename is derived from the title (if set) with the language as the extension. For example, a block with `TITLE: "deploy"` in `ufence-bash` suggests `deploy.bash`. If no title is provided, the default is `code.{lang}`.
+
 ## Keyboard Shortcuts
 
 - **Click title**: Open source file (vault files open in Obsidian; URLs open in browser)
 - **Ctrl/Cmd + Click title**: Open vault file in new pane
 - **Click copy button**: Copy code to clipboard
+- **Click download button**: Save code to file
 - **Click fold button**: Expand/collapse code block
 
 ## CSS Classes

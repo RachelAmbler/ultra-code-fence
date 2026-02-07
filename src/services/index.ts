@@ -25,3 +25,8 @@ export {
 	createIconElement,
 	createIconFromSettings,
 } from './icon-generator';
+
+export {
+	buildSuggestedFilename,
+	downloadCodeToFile,
+} from './download-service';
