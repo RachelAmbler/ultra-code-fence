@@ -245,7 +245,7 @@ export default class UltraCodeFence extends Plugin {
 		sourceCode = filterResult.content;
 
 		// Resolve display options
-		const shouldHideTitle = config.titleTemplate === '' || config.titleBarStyle === 'none';
+		const shouldHideTitle = config.titleTemplate === '' || config.titleTemplate.toLowerCase() === 'none' || config.titleBarStyle === 'none';
 
 		let displayTitle = config.titleTemplate;
 

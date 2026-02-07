@@ -571,6 +571,7 @@ pre.ucf-code:not(.ucf-folded) .ucf-fold-bar {
 .ucf pre code {
     display: block;
     overflow-x: auto;
+    white-space: pre;
 }
 
 /* When line wrapping is active (line numbers or zebra stripes), use flex column
