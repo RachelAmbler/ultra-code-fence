@@ -39,6 +39,17 @@ export {
 	YAML_FILTER_BY_MARKS,
 	YAML_RENDER_CMDOUT,
 	YAML_TEXT_STYLE,
+	YAML_CALLOUT,
+	YAML_CALLOUT_ENTRY,
 	YAML_PROMPT,
 	ICON_IMAGE_EXTENSIONS,
 } from './patterns';
+
+export {
+	CALLOUT_TYPE_ALIASES,
+	CALLOUT_TYPE_COLORS,
+	CALLOUT_TYPE_ICONS,
+	normalizeCalloutType,
+	getCalloutColor,
+	getCalloutIcon,
+} from './callout-types';

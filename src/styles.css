@@ -1171,6 +1171,209 @@ pre.ucf-scrollable {
 }
 
 /* ============================================================================
+   Callout Styles — Inline
+   ============================================================================ */
+
+/* Inline callout row between code lines — "standard" style (left border only) */
+.ucf-callout-inline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px 4px 16px;
+    margin: 2px 0;
+    border-left: 3px solid;
+    background: transparent !important;
+    border-radius: 0 4px 4px 0;
+    font-size: 0.85em;
+    line-height: 1.5;
+}
+
+/* Inline callout row — "border" style (thin rounded outline) */
+.ucf-callout-inline-border {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 12px;
+    margin: 3px 8px;
+    border: 1.5px solid;
+    background: transparent !important;
+    border-radius: 6px;
+    font-size: 0.85em;
+    line-height: 1.5;
+}
+
+/* Callout type icon (Lucide SVG) */
+.ucf-callout-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.1em;
+    height: 1.1em;
+    flex-shrink: 0;
+}
+
+.ucf-callout-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Legacy callout marker badge [N] — kept for backward compat */
+.ucf-callout-marker {
+    color: var(--ucf-accent);
+    font-weight: 700;
+    font-size: 0.85em;
+    flex-shrink: 0;
+    font-family: var(--font-monospace);
+}
+
+/* Callout text (used in inline, footnote entries, popovers, and replaced lines) */
+.ucf-callout-text {
+    color: var(--text-muted);
+}
+
+.ucf-callout-text code {
+    font-family: var(--font-monospace);
+    font-size: 0.9em;
+    padding: 1px 4px;
+    border-radius: 3px;
+    background: var(--background-modifier-border, rgba(0, 0, 0, 0.08));
+}
+
+.ucf-callout-text a {
+    color: var(--text-accent, var(--ucf-accent));
+    text-decoration: underline;
+}
+
+.ucf-callout-text strong {
+    font-weight: 700;
+    color: var(--text-normal);
+}
+
+.ucf-callout-text em {
+    font-style: italic;
+}
+
+/* ============================================================================
+   Callout Styles — Footnote
+   ============================================================================ */
+
+/* Superscript reference inside line content */
+.ucf-callout-ref {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.2em;
+    height: 1.2em;
+    margin-left: 4px;
+    padding: 0 3px;
+    font-size: 0.7em;
+    font-weight: 700;
+    font-style: normal;
+    line-height: 1;
+    color: var(--text-on-accent, #fff);
+    background: var(--ucf-accent);
+    border-radius: 999px;
+    vertical-align: super;
+    cursor: default;
+    user-select: none;
+}
+
+/* Footnote section below code block */
+.ucf-callout-section {
+    padding: 10px 14px;
+    margin: 0;
+    background: var(--background-secondary-alt, rgba(0, 0, 0, 0.04));
+    border-left: 3px solid var(--ucf-accent);
+    border-radius: 0 0 var(--ucf-radius) var(--ucf-radius);
+    font-size: 0.85em;
+}
+
+/* Individual footnote entry */
+.ucf-callout-entry {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 3px 0;
+    line-height: 1.5;
+}
+
+.ucf-callout-entry + .ucf-callout-entry {
+    border-top: 1px solid var(--background-modifier-border, rgba(0, 0, 0, 0.06));
+}
+
+/* Footnote number */
+.ucf-callout-number {
+    color: var(--ucf-accent);
+    font-weight: 700;
+    font-family: var(--font-monospace);
+    flex-shrink: 0;
+}
+
+/* ============================================================================
+   Callout Styles — Popover
+   ============================================================================ */
+
+/* Trigger icon inline with code */
+.ucf-callout-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.3em;
+    height: 1.3em;
+    margin-left: 4px;
+    font-size: 0.8em;
+    font-style: normal;
+    color: var(--ucf-accent);
+    border: 1.5px solid var(--ucf-accent);
+    border-radius: 50%;
+    cursor: pointer;
+    vertical-align: middle;
+    user-select: none;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.ucf-callout-trigger:hover {
+    background: var(--ucf-accent);
+    color: var(--text-on-accent, #fff);
+}
+
+/* Popover content (hidden by default, toggled via JS) */
+.ucf-callout-popover {
+    display: none;
+    position: absolute;
+    z-index: 20;
+    max-width: 300px;
+    padding: 8px 12px;
+    background: var(--background-primary);
+    border: 1px solid var(--background-modifier-border);
+    border-left: 3px solid var(--ucf-accent);
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    font-size: 0.85em;
+    line-height: 1.5;
+    right: 12px;
+    top: 8px;
+}
+
+/* ============================================================================
+   Callout Styles — Theme adjustments
+   ============================================================================ */
+
+/* Callout inline backgrounds removed — transparent lets zebra/code bg show cleanly */
+
+.theme-light .ucf-callout-section {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.theme-dark .ucf-callout-section {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.theme-dark .ucf-callout-popover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* ============================================================================
    Print Styles
    ============================================================================ */
 
@@ -1179,7 +1382,9 @@ pre.ucf-scrollable {
     .ucf-copy-button,
     .ucf-download-button,
     .ucf-fold-bar,
-    .ucf-scroll-indicator {
+    .ucf-scroll-indicator,
+    .ucf-callout-popover,
+    .ucf-callout-trigger {
         display: none !important;
     }
 

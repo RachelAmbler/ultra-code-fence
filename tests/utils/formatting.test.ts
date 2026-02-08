@@ -7,6 +7,7 @@
 
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import {
+	formatCalloutMarkdown,
 	escapeHtml,
 	buildStyleString,
 	applyCaseFormat,
@@ -306,5 +307,81 @@ describe('formatTimestamp', () => {
 
 	afterEach(() => {
 		vi.restoreAllMocks();
+	});
+});
+
+// =============================================================================
+// formatCalloutMarkdown
+// =============================================================================
+
+describe('formatCalloutMarkdown', () => {
+	it('returns plain text unchanged', () => {
+		expect(formatCalloutMarkdown('Hello world')).toBe('Hello world');
+	});
+
+	it('converts bold markdown', () => {
+		expect(formatCalloutMarkdown('**bold text**')).toBe('<strong>bold text</strong>');
+	});
+
+	it('converts italic markdown', () => {
+		expect(formatCalloutMarkdown('*italic text*')).toBe('<em>italic text</em>');
+	});
+
+	it('converts inline code markdown', () => {
+		expect(formatCalloutMarkdown('use `const` here')).toBe('use <code>const</code> here');
+	});
+
+	it('converts link markdown', () => {
+		expect(formatCalloutMarkdown('[click here](https://example.com)'))
+			.toBe('<a href="https://example.com">click here</a>');
+	});
+
+	it('handles mixed bold and italic', () => {
+		const result = formatCalloutMarkdown('**bold** and *italic*');
+		expect(result).toBe('<strong>bold</strong> and <em>italic</em>');
+	});
+
+	it('handles mixed code and bold', () => {
+		const result = formatCalloutMarkdown('Use `const` for **immutable** values');
+		expect(result).toBe('Use <code>const</code> for <strong>immutable</strong> values');
+	});
+
+	it('handles link with bold text inside', () => {
+		// Bold inside link text
+		const result = formatCalloutMarkdown('[**bold link**](https://example.com)');
+		expect(result).toBe('<a href="https://example.com"><strong>bold link</strong></a>');
+	});
+
+	it('escapes HTML before applying markdown', () => {
+		expect(formatCalloutMarkdown('<script>alert(1)</script>'))
+			.toBe('&lt;script&gt;alert(1)&lt;/script&gt;');
+	});
+
+	it('escapes HTML but still applies markdown', () => {
+		const result = formatCalloutMarkdown('**bold** with <div>html</div>');
+		expect(result).toBe('<strong>bold</strong> with &lt;div&gt;html&lt;/div&gt;');
+	});
+
+	it('handles empty string', () => {
+		expect(formatCalloutMarkdown('')).toBe('');
+	});
+
+	it('handles text with no markdown', () => {
+		expect(formatCalloutMarkdown('Just plain text here')).toBe('Just plain text here');
+	});
+
+	it('handles multiple bold segments', () => {
+		expect(formatCalloutMarkdown('**one** then **two**'))
+			.toBe('<strong>one</strong> then <strong>two</strong>');
+	});
+
+	it('handles multiple italic segments', () => {
+		expect(formatCalloutMarkdown('*one* then *two*'))
+			.toBe('<em>one</em> then <em>two</em>');
+	});
+
+	it('does not treat ** inside word as bold', () => {
+		// a**b**c should still work (markdown spec allows this)
+		expect(formatCalloutMarkdown('a**b**c')).toBe('a<strong>b</strong>c');
 	});
 });

@@ -23,6 +23,7 @@ import {
 	resolveBlockConfig,
 	resolveCmdoutConfig,
 	applyFilterChain,
+	resolveCalloutConfig,
 } from './parsers';
 
 // Services
@@ -42,13 +43,14 @@ import {
 	addCodeBlockButtons,
 	buildTitleContainer,
 	renderCommandOutput,
+	injectCallouts,
 } from './renderers';
 
 // UI
 import { UltraCodeFenceSettingTab, WhatsNewModal } from './ui';
 
 // Utils
-import { replaceTemplateVariables, containsTemplateVariables, findPreElement } from './utils';
+import { replaceTemplateVariables, containsTemplateVariables, findPreElement, findCodeElement } from './utils';
 
 // What's New data
 import releaseNotesData from './data/whatsnew.json';
@@ -277,6 +279,17 @@ export default class UltraCodeFence extends Plugin {
 			startingLineNumber: 1,
 			scrollLines: enableScrolling ? config.scrollLines : 0,
 		});
+
+		// Resolve and inject callouts (must happen after processCodeBlock
+		// creates the ucf-line DOM structure that callouts attach to)
+		const calloutConfig = resolveCalloutConfig(yamlConfig.CALLOUT, sourceCode, totalLineCount);
+		if (calloutConfig.enabled) {
+			const codeEl = findCodeElement(containerElement);
+			const preEl = findPreElement(containerElement);
+			if (codeEl && preEl) {
+				injectCallouts(codeEl, preEl, containerElement, calloutConfig);
+			}
+		}
 
 		// Set print behaviour attribute on <pre> for @media print CSS
 		const preElementForPrint = findPreElement(containerElement);

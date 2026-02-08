@@ -101,6 +101,19 @@ export const CSS_CLASSES = {
 	tooltipContent: 'ucf-tooltip-content',
 	hasTooltip: 'has-tooltip',
 
+	// Callout classes
+	calloutInline: 'ucf-callout-inline',
+	calloutSection: 'ucf-callout-section',
+	calloutEntry: 'ucf-callout-entry',
+	calloutRef: 'ucf-callout-ref',
+	calloutMarker: 'ucf-callout-marker',
+	calloutText: 'ucf-callout-text',
+	calloutNumber: 'ucf-callout-number',
+	calloutPopover: 'ucf-callout-popover',
+	calloutTrigger: 'ucf-callout-trigger',
+	calloutIcon: 'ucf-callout-icon',
+	calloutInlineBorder: 'ucf-callout-inline-border',
+
 	// Command output
 	cmdoutLine: 'ucf-cmdout-line',
 	cmdoutCmdLine: 'ucf-cmdout-cmdline',
@@ -178,6 +191,7 @@ export const YAML_SECTIONS = {
 	meta: 'META',
 	render: 'RENDER',
 	filter: 'FILTER',
+	callout: 'CALLOUT',
 } as const;
 
 /**
@@ -248,6 +262,29 @@ export const YAML_TEXT_STYLE = {
 	colour: 'COLOUR',
 	bold: 'BOLD',
 	italic: 'ITALIC',
+} as const;
+
+/**
+ * CALLOUT section property names.
+ */
+export const YAML_CALLOUT = {
+	display: 'DISPLAY',
+	printDisplay: 'PRINT_DISPLAY',
+	style: 'STYLE',
+	entries: 'ENTRIES',
+} as const;
+
+/**
+ * CALLOUT.ENTRIES subsection property names.
+ */
+export const YAML_CALLOUT_ENTRY = {
+	line: 'LINE',
+	mark: 'MARK',
+	lines: 'LINES',
+	text: 'TEXT',
+	replace: 'REPLACE',
+	display: 'DISPLAY',
+	type: 'TYPE',
 } as const;
 
 /**

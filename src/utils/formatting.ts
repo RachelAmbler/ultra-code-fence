@@ -233,3 +233,42 @@ export function buildStyleString(colour: string, isBold: boolean, isItalic: bool
 
 	return styleRules.join('; ');
 }
+
+// =============================================================================
+// Callout Markdown Formatting
+// =============================================================================
+
+/**
+ * Converts basic Markdown syntax to HTML for callout text.
+ *
+ * Supports: **bold**, *italic*, `code`, [text](url).
+ * HTML is escaped first for safety, then Markdown is applied.
+ *
+ * @param text - Text with optional Markdown formatting
+ * @returns HTML string safe for innerHTML
+ *
+ * @example
+ * formatCalloutMarkdown('**bold** and *italic*')
+ * // '<strong>bold</strong> and <em>italic</em>'
+ */
+export function formatCalloutMarkdown(text: string): string {
+	if (!text) return '';
+
+	// Escape HTML first to prevent XSS
+	let html = escapeHtml(text);
+
+	// Apply markdown formatting (order matters)
+	// 1. Code: `text` → <code>text</code>
+	html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+	// 2. Links: [text](url) → <a href="url">text</a>
+	html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+
+	// 3. Bold: **text** → <strong>text</strong>
+	html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+	// 4. Italic: *text* → <em>text</em> (after bold to avoid conflicts)
+	html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+
+	return html;
+}

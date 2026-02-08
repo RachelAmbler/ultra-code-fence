@@ -15,6 +15,8 @@ export {
 	parseLineRange,
 	resolveBlockConfig,
 	resolveCmdoutConfig,
+	parseCalloutSection,
+	resolveCalloutConfig,
 } from './yaml-parser';
 
 export type {

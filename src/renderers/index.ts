@@ -38,3 +38,5 @@ export {
 	getCommandOutputStylesFromSettings,
 	mergeCommandOutputStyles,
 } from './command-output';
+
+export { injectCallouts } from './callout-renderer';

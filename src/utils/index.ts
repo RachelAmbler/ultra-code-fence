@@ -5,6 +5,7 @@
  */
 
 export {
+	formatCalloutMarkdown,
 	applyCaseFormat,
 	formatFileSize,
 	calculateRelativeTime,
@@ -30,3 +31,15 @@ export {
 	createCodeBlockContainer,
 	extractCodeText,
 } from './dom';
+
+export {
+	groupCalloutsByLine,
+	buildInlineCalloutHTML,
+	buildFootnoteRefHTML,
+	buildFootnoteEntryHTML,
+	buildFootnoteSectionHTML,
+	buildPopoverTriggerHTML,
+	buildPopoverContentHTML,
+	shouldReplaceLine,
+	filterByDisplayMode,
+} from './callout-processor';

@@ -577,6 +577,105 @@ export interface YamlRenderCmdoutConfig {
 	OUTPUT?: YamlTextStyleConfig;
 }
 
+// =============================================================================
+// Callout Configuration
+// =============================================================================
+
+/**
+ * Single callout entry in the CALLOUT section.
+ *
+ * Specifies what line(s) to annotate and what text to display.
+ * At least one of LINE, MARK, or LINES must be provided to target code.
+ */
+export interface YamlCalloutEntry {
+	/** Single line number to target (1-based) */
+	LINE?: number;
+
+	/** Marker string to search for in the code (first match) */
+	MARK?: string;
+
+	/** Line range as "start, end" string or [start, end] array */
+	LINES?: string | [number, number];
+
+	/** The annotation text to display */
+	TEXT?: string;
+
+	/** Whether to replace the marker line (default: false = keep alongside) */
+	REPLACE?: boolean;
+
+	/** Display mode override for this specific entry: inline | footnote | popover */
+	DISPLAY?: string;
+
+	/** Callout type for styling: note, info, warning, danger, etc. Defaults to "note" */
+	TYPE?: string;
+}
+
+/**
+ * CALLOUT section - Inline code annotations.
+ *
+ * Allows marking specific lines with explanatory notes rendered as
+ * inline callouts, footnotes, or popovers.
+ */
+export interface YamlCalloutConfig {
+	/** Default display mode for all entries: inline | footnote | popover */
+	DISPLAY?: string;
+
+	/** Print display mode (print-only override): inline | footnote */
+	PRINT_DISPLAY?: string;
+
+	/** Visual style for inline callouts: standard (left border) | border (rounded outline) */
+	STYLE?: string;
+
+	/** Array of callout entries to apply to the code block */
+	ENTRIES?: YamlCalloutEntry[];
+}
+
+/**
+ * Resolved callout entry with computed target line numbers.
+ *
+ * After resolution, all targeting (LINE, MARK, LINES) has been
+ * converted to concrete line numbers.
+ */
+export interface ResolvedCalloutEntry {
+	/** Whether this entry is enabled (has valid target lines) */
+	enabled: boolean;
+
+	/** Target line numbers (1-based, may contain multiple lines for ranges) */
+	targetLines: number[];
+
+	/** The annotation text */
+	text: string;
+
+	/** Whether to replace the marker line with callout text */
+	replace: boolean;
+
+	/** Display mode for this entry */
+	displayMode: 'inline' | 'footnote' | 'popover';
+
+	/** Callout type for styling (resolved, defaults to "note") */
+	type: string;
+}
+
+/**
+ * Resolved callout configuration with all defaults applied.
+ */
+export interface ResolvedCalloutConfig {
+	/** Whether callouts are enabled (at least one valid entry) */
+	enabled: boolean;
+
+	/** Default display mode */
+	displayMode: 'inline' | 'footnote' | 'popover';
+
+	/** Print display mode */
+	printDisplayMode: 'inline' | 'footnote';
+
+	/** Visual style for inline callouts: standard | border */
+	style: 'standard' | 'border';
+
+	/** Resolved callout entries */
+	entries: ResolvedCalloutEntry[];
+}
+
 /**
  * Complete parsed YAML configuration from a ufence block.
  *
@@ -586,6 +685,7 @@ export interface ParsedYamlConfig {
 	META?: YamlMetaConfig;
 	RENDER?: YamlRenderDisplayConfig;
 	FILTER?: YamlFilterConfig;
+	CALLOUT?: YamlCalloutConfig;
 
 	/** Top-level PROMPT regex pattern (for cmdout blocks) */
 	PROMPT?: string;
@@ -684,6 +784,9 @@ export interface ResolvedBlockConfig {
 
 	/** Print behaviour: 'expand' or 'asis' */
 	printBehaviour: string;
+
+	/** CALLOUT section configuration (placeholder; resolved with source code in main.ts) */
+	calloutConfig: ResolvedCalloutConfig;
 }
 
 /**

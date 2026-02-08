@@ -13,10 +13,14 @@ import type {
 	YamlMetaConfig,
 	YamlRenderDisplayConfig,
 	YamlFilterConfig,
+	YamlCalloutConfig,
+	YamlCalloutEntry,
 	YamlRenderCmdoutConfig,
 	YamlTextStyleConfig,
 	ResolvedBlockConfig,
 	ResolvedCmdoutConfig,
+	ResolvedCalloutConfig,
+	ResolvedCalloutEntry,
 	PluginSettings,
 	TitleBarStyle,
 	CommandOutputStyles,
@@ -31,7 +35,10 @@ import {
 	YAML_FILTER_BY_MARKS,
 	YAML_RENDER_CMDOUT,
 	YAML_TEXT_STYLE,
+	YAML_CALLOUT,
+	YAML_CALLOUT_ENTRY,
 	YAML_PROMPT,
+	normalizeCalloutType,
 } from '../constants';
 
 // =============================================================================
@@ -134,6 +141,7 @@ function hasKnownYamlSections(yamlProps: Record<string, unknown>): boolean {
 		YAML_SECTIONS.meta,
 		YAML_SECTIONS.render,
 		YAML_SECTIONS.filter,
+		YAML_SECTIONS.callout,
 		YAML_PROMPT,
 	];
 	return knownKeys.some(key => key in yamlProps);
@@ -396,6 +404,78 @@ export function parseFilterSection(yamlProps: Record<string, unknown>): YamlFilt
 }
 
 /**
+ * Parses the CALLOUT section from YAML configuration.
+ *
+ * Validates entry structure and normalises values. Each entry should have
+ * TEXT and at least one targeting property (LINE, MARK, or LINES).
+ *
+ * @param yamlProps - Parsed YAML properties
+ * @returns CALLOUT section configuration
+ */
+export function parseCalloutSection(yamlProps: Record<string, unknown>): YamlCalloutConfig {
+	const callout = getSection(yamlProps, YAML_SECTIONS.callout);
+	const result: YamlCalloutConfig = {};
+
+	// Parse DISPLAY mode
+	if (callout[YAML_CALLOUT.display] !== undefined) {
+		result.DISPLAY = String(callout[YAML_CALLOUT.display]).toLowerCase();
+	}
+
+	// Parse PRINT_DISPLAY mode
+	if (callout[YAML_CALLOUT.printDisplay] !== undefined) {
+		result.PRINT_DISPLAY = String(callout[YAML_CALLOUT.printDisplay]).toLowerCase();
+	}
+
+	// Parse STYLE
+	if (callout[YAML_CALLOUT.style] !== undefined) {
+		result.STYLE = String(callout[YAML_CALLOUT.style]).toLowerCase();
+	}
+
+	// Parse ENTRIES array
+	const entries = callout[YAML_CALLOUT.entries];
+	if (Array.isArray(entries)) {
+		result.ENTRIES = entries
+			.filter(entry => entry && typeof entry === 'object' && !Array.isArray(entry))
+			.map(entryObj => {
+				const entry = entryObj as Record<string, unknown>;
+				const parsed: YamlCalloutEntry = {};
+
+				if (entry[YAML_CALLOUT_ENTRY.line] !== undefined) {
+					parsed.LINE = resolveNumber(entry[YAML_CALLOUT_ENTRY.line], -1);
+				}
+
+				if (entry[YAML_CALLOUT_ENTRY.mark] !== undefined) {
+					parsed.MARK = String(entry[YAML_CALLOUT_ENTRY.mark]);
+				}
+
+				if (entry[YAML_CALLOUT_ENTRY.lines] !== undefined) {
+					parsed.LINES = entry[YAML_CALLOUT_ENTRY.lines] as string | [number, number];
+				}
+
+				if (entry[YAML_CALLOUT_ENTRY.text] !== undefined) {
+					parsed.TEXT = String(entry[YAML_CALLOUT_ENTRY.text]);
+				}
+
+				if (entry[YAML_CALLOUT_ENTRY.replace] !== undefined) {
+					parsed.REPLACE = resolveBoolean(entry[YAML_CALLOUT_ENTRY.replace], false);
+				}
+
+				if (entry[YAML_CALLOUT_ENTRY.display] !== undefined) {
+					parsed.DISPLAY = String(entry[YAML_CALLOUT_ENTRY.display]).toLowerCase();
+				}
+
+				if (entry[YAML_CALLOUT_ENTRY.type] !== undefined) {
+					parsed.TYPE = String(entry[YAML_CALLOUT_ENTRY.type]);
+				}
+
+				return parsed;
+			});
+	}
+
+	return result;
+}
+
+/**
  * Parses a text style subsection (COLOUR, BOLD, ITALIC).
  *
  * @param styleObj - The subsection object (e.g., RENDER.PROMPT)
@@ -446,6 +526,7 @@ export function parseNestedYamlConfig(yamlProps: Record<string, unknown>): Parse
 		META: parseMetaSection(yamlProps),
 		RENDER: parseRenderDisplaySection(yamlProps),
 		FILTER: parseFilterSection(yamlProps),
+		CALLOUT: parseCalloutSection(yamlProps),
 		// Top-level PROMPT for cmdout blocks
 		PROMPT: yamlProps[YAML_PROMPT] !== undefined ? String(yamlProps[YAML_PROMPT]) : undefined,
 		// RENDER section for cmdout styling (stored separately as RENDER_CMDOUT)
@@ -516,6 +597,116 @@ export function resolveBlockConfig(
 
 		// Print behaviour
 		printBehaviour: parsed.RENDER?.PRINT ?? settings.printBehaviour,
+
+		// CALLOUT section — placeholder; resolved in main.ts with source code
+		calloutConfig: {
+			enabled: false,
+			displayMode: 'inline',
+			printDisplayMode: 'inline',
+			style: 'standard',
+			entries: [],
+		},
+	};
+}
+
+/**
+ * Resolves parsed YAML callout configuration with actual source code.
+ *
+ * Matches callout entries to concrete line numbers by resolving
+ * LINE (direct), MARK (string search), and LINES (range) targets.
+ *
+ * @param parsed - Parsed YAML callout configuration
+ * @param sourceCode - The source code (used to resolve MARK targets)
+ * @param totalLineCount - Total lines in source code
+ * @returns Fully resolved callout configuration
+ */
+export function resolveCalloutConfig(
+	parsed: YamlCalloutConfig | undefined,
+	sourceCode: string,
+	totalLineCount: number
+): ResolvedCalloutConfig {
+	if (!parsed || !parsed.ENTRIES || parsed.ENTRIES.length === 0) {
+		return {
+			enabled: false,
+			displayMode: 'inline',
+			printDisplayMode: 'inline',
+			style: 'standard',
+			entries: [],
+		};
+	}
+
+	const displayMode = (parsed.DISPLAY ?? 'inline') as 'inline' | 'footnote' | 'popover';
+	const rawPrintDisplay = parsed.PRINT_DISPLAY ?? 'inline';
+	const printDisplayMode = (rawPrintDisplay === 'footnote' ? 'footnote' : 'inline') as 'inline' | 'footnote';
+	const style = (parsed.STYLE === 'border' ? 'border' : 'standard') as 'standard' | 'border';
+	const sourceLines = sourceCode.split('\n');
+
+	const resolvedEntries = parsed.ENTRIES
+		.filter(entry => entry.TEXT) // Only entries with text
+		.map(entry => resolveCalloutEntry(entry, sourceLines, totalLineCount, displayMode))
+		.filter(entry => entry.enabled); // Filter out entries with no matching lines
+
+	return {
+		enabled: resolvedEntries.length > 0,
+		displayMode,
+		printDisplayMode,
+		style,
+		entries: resolvedEntries,
+	};
+}
+
+/**
+ * Resolves a single callout entry to actual line numbers.
+ *
+ * Priority: LINE > MARK > LINES (first matching target type wins).
+ *
+ * @param entry - Parsed callout entry
+ * @param sourceLines - Array of source code lines
+ * @param totalLineCount - Total line count
+ * @param defaultDisplayMode - Default display mode from CALLOUT section
+ * @returns Resolved entry with target line numbers
+ */
+function resolveCalloutEntry(
+	entry: YamlCalloutEntry,
+	sourceLines: string[],
+	totalLineCount: number,
+	defaultDisplayMode: 'inline' | 'footnote' | 'popover'
+): ResolvedCalloutEntry {
+	let targetLines: number[] = [];
+
+	// Try LINE first (direct line number reference)
+	if (entry.LINE !== undefined && entry.LINE > 0 && entry.LINE <= totalLineCount) {
+		targetLines = [entry.LINE];
+	}
+	// Try MARK (search for marker string in source code)
+	else if (entry.MARK !== undefined) {
+		const lineIndex = sourceLines.findIndex(line => line.includes(entry.MARK!));
+		if (lineIndex >= 0) {
+			targetLines = [lineIndex + 1]; // Convert 0-based to 1-based
+		}
+	}
+	// Try LINES (range specification)
+	else if (entry.LINES !== undefined) {
+		const range = parseLineRange(entry.LINES);
+		if (range) {
+			const [start, end] = range;
+			targetLines = Array.from(
+				{ length: end - start + 1 },
+				(_, i) => start + i
+			).filter(lineNum => lineNum >= 1 && lineNum <= totalLineCount);
+		}
+	}
+
+	const entryDisplayMode = (entry.DISPLAY ?? defaultDisplayMode) as 'inline' | 'footnote' | 'popover';
+	const type = normalizeCalloutType(entry.TYPE ?? 'note');
+
+	return {
+		enabled: targetLines.length > 0,
+		targetLines,
+		text: entry.TEXT || '',
+		replace: entry.REPLACE ?? false,
+		displayMode: entryDisplayMode,
+		type,
 	};
 }
 

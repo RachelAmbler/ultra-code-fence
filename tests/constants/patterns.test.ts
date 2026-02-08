@@ -27,6 +27,8 @@ import {
 	YAML_FILTER_BY_MARKS,
 	YAML_RENDER_CMDOUT,
 	YAML_TEXT_STYLE,
+	YAML_CALLOUT,
+	YAML_CALLOUT_ENTRY,
 	YAML_PROMPT,
 	ICON_IMAGE_EXTENSIONS,
 } from '../../src/constants/patterns';
@@ -262,5 +264,92 @@ describe('countSourceLines', () => {
 
 	it('counts trailing newline as extra line', () => {
 		expect(countSourceLines('a\nb\n')).toBe(3);
+	});
+});
+
+// =============================================================================
+// YAML_CALLOUT constants
+// =============================================================================
+
+describe('YAML_CALLOUT constants', () => {
+	it('YAML_SECTIONS includes callout', () => {
+		expect(YAML_SECTIONS.callout).toBe('CALLOUT');
+	});
+
+	it('YAML_CALLOUT has expected keys', () => {
+		expect(YAML_CALLOUT.display).toBe('DISPLAY');
+		expect(YAML_CALLOUT.printDisplay).toBe('PRINT_DISPLAY');
+		expect(YAML_CALLOUT.entries).toBe('ENTRIES');
+	});
+
+	it('YAML_CALLOUT_ENTRY has expected keys', () => {
+		expect(YAML_CALLOUT_ENTRY.line).toBe('LINE');
+		expect(YAML_CALLOUT_ENTRY.mark).toBe('MARK');
+		expect(YAML_CALLOUT_ENTRY.lines).toBe('LINES');
+		expect(YAML_CALLOUT_ENTRY.text).toBe('TEXT');
+		expect(YAML_CALLOUT_ENTRY.replace).toBe('REPLACE');
+		expect(YAML_CALLOUT_ENTRY.display).toBe('DISPLAY');
+	});
+
+	it('all YAML_CALLOUT values are uppercase', () => {
+		for (const val of Object.values(YAML_CALLOUT)) {
+			expect(val).toBe(val.toUpperCase());
+		}
+	});
+
+	it('all YAML_CALLOUT_ENTRY values are uppercase', () => {
+		for (const val of Object.values(YAML_CALLOUT_ENTRY)) {
+			expect(val).toBe(val.toUpperCase());
+		}
+	});
+});
+
+// =============================================================================
+// CSS_CLASSES - Callout classes
+// =============================================================================
+
+describe('CSS_CLASSES callout entries', () => {
+	it('includes calloutInline', () => {
+		expect(CSS_CLASSES.calloutInline).toBe('ucf-callout-inline');
+	});
+
+	it('includes calloutSection', () => {
+		expect(CSS_CLASSES.calloutSection).toBe('ucf-callout-section');
+	});
+
+	it('includes calloutEntry', () => {
+		expect(CSS_CLASSES.calloutEntry).toBe('ucf-callout-entry');
+	});
+
+	it('includes calloutRef', () => {
+		expect(CSS_CLASSES.calloutRef).toBe('ucf-callout-ref');
+	});
+
+	it('includes calloutMarker', () => {
+		expect(CSS_CLASSES.calloutMarker).toBe('ucf-callout-marker');
+	});
+
+	it('includes calloutText', () => {
+		expect(CSS_CLASSES.calloutText).toBe('ucf-callout-text');
+	});
+
+	it('includes calloutNumber', () => {
+		expect(CSS_CLASSES.calloutNumber).toBe('ucf-callout-number');
+	});
+
+	it('includes calloutPopover', () => {
+		expect(CSS_CLASSES.calloutPopover).toBe('ucf-callout-popover');
+	});
+
+	it('includes calloutTrigger', () => {
+		expect(CSS_CLASSES.calloutTrigger).toBe('ucf-callout-trigger');
+	});
+
+	it('all callout classes start with ucf- prefix', () => {
+		const calloutKeys = Object.entries(CSS_CLASSES)
+			.filter(([key]) => key.startsWith('callout'));
+		for (const [key, value] of calloutKeys) {
+			expect(value).toMatch(/^ucf-/);
+		}
 	});
 });
