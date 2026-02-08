@@ -8,10 +8,10 @@
  * All heavy lifting is delegated to specialised modules in the src folder.
  */
 
-import { Component, Plugin, MarkdownRenderer, MarkdownPostProcessorContext, MarkdownView } from 'obsidian';
+import { Component, Plugin, MarkdownRenderer, MarkdownPostProcessorContext, MarkdownView, parseYaml } from 'obsidian';
 
 // Types
-import type { PluginSettings, TitleBarStyle, SourceFileMetadata } from './types';
+import type { PluginSettings, TitleBarStyle, SourceFileMetadata, ParsedYamlConfig } from './types';
 
 // Constants
 import { DEFAULT_SETTINGS, WHATS_NEW_DELAY_MS } from './constants';
@@ -50,7 +50,7 @@ import {
 import { UltraCodeFenceSettingTab, WhatsNewModal } from './ui';
 
 // Utils
-import { replaceTemplateVariables, containsTemplateVariables, findPreElement, findCodeElement } from './utils';
+import { replaceTemplateVariables, containsTemplateVariables, findPreElement, findCodeElement, resolvePreset } from './utils';
 
 // What's New data
 import releaseNotesData from './data/whatsnew.json';
@@ -67,6 +67,9 @@ import releaseNotesData from './data/whatsnew.json';
  */
 export default class UltraCodeFence extends Plugin {
 	settings: PluginSettings;
+
+	/** Page-level config defaults, keyed by note path */
+	private pageConfigs = new Map<string, ParsedYamlConfig>();
 
 	/**
 	 * Called when the plugin is loaded.
@@ -98,6 +101,9 @@ export default class UltraCodeFence extends Plugin {
 
 		// Register command output processor
 		this.registerCommandOutputProcessor();
+
+		// Register ufence-ufence config processor (invisible page-level defaults)
+		this.registerConfigProcessor();
 	}
 
 	// ===========================================================================
@@ -177,6 +183,62 @@ export default class UltraCodeFence extends Plugin {
 		);
 	}
 
+	/**
+	 * Registers the ufence-ufence config processor.
+	 *
+	 * This invisible block allows page-level defaults to be set for all
+	 * ufence blocks on the page. Supports both named preset references
+	 * (PRESET: name) and inline YAML config (e.g. RENDER:\n  ZEBRA: true).
+	 */
+	private registerConfigProcessor(): void {
+		this.registerMarkdownCodeBlockProcessor(
+			'ufence-ufence',
+			(content, element, _context) => {
+				try {
+					const raw = parseYaml(content);
+					if (raw && typeof raw === 'object') {
+						const record = raw as Record<string, unknown>;
+
+						// Handle top-level PRESET: shorthand → move to META.PRESET
+						if (record['PRESET'] !== undefined) {
+							if (!record['META'] || typeof record['META'] !== 'object') {
+								record['META'] = {};
+							}
+							(record['META'] as Record<string, unknown>)['PRESET'] = record['PRESET'];
+							delete record['PRESET'];
+						}
+
+						const config = parseNestedYamlConfig(record);
+						this.setPageConfig(_context.sourcePath, config);
+					}
+				} catch {
+					// Silently ignore parse errors in config blocks
+				}
+
+				// Make the block invisible
+				element.style.display = 'none';
+			}
+		);
+	}
+
+	// ===========================================================================
+	// Page-Level Config Helpers
+	// ===========================================================================
+
+	/**
+	 * Sets the page-level config defaults for a given note path.
+	 */
+	private setPageConfig(notePath: string, config: ParsedYamlConfig): void {
+		this.pageConfigs.set(notePath, config);
+	}
+
+	/**
+	 * Gets the page-level config defaults for a given note path.
+	 */
+	private getPageConfig(notePath: string): ParsedYamlConfig | undefined {
+		return this.pageConfigs.get(notePath);
+	}
+
 	// ===========================================================================
 	// Block Processing
 	// ===========================================================================
@@ -209,7 +271,15 @@ export default class UltraCodeFence extends Plugin {
 
 		// Parse nested YAML configuration and resolve with defaults
 		const yamlConfig = parseNestedYamlConfig(parsedBlock.yamlProperties);
-		const config = resolveBlockConfig(yamlConfig, this.settings, defaultLanguage);
+
+		// Apply preset and/or page-level defaults (if any)
+		const mergedConfig = resolvePreset(
+			yamlConfig,
+			this.settings.presets,
+			this.getPageConfig(processorContext.sourcePath)
+		);
+
+		const config = resolveBlockConfig(mergedConfig, this.settings, defaultLanguage);
 
 		let sourceCode = '';
 		let fileMetadata: SourceFileMetadata;
@@ -282,7 +352,7 @@ export default class UltraCodeFence extends Plugin {
 
 		// Resolve and inject callouts (must happen after processCodeBlock
 		// creates the ucf-line DOM structure that callouts attach to)
-		const calloutConfig = resolveCalloutConfig(yamlConfig.CALLOUT, sourceCode, totalLineCount);
+		const calloutConfig = resolveCalloutConfig(mergedConfig.CALLOUT, sourceCode, totalLineCount);
 		if (calloutConfig.enabled) {
 			const codeEl = findCodeElement(containerElement);
 			const preEl = findPreElement(containerElement);

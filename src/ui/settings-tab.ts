@@ -10,6 +10,7 @@ import { App, Platform, Plugin, PluginSettingTab, Setting } from 'obsidian';
 import type { PluginSettings, TitleBarStyle, FileIconStyle, DescriptionDisplayMode, ReleaseNotesData } from '../types';
 import { CSS_CLASSES } from '../constants';
 import { WhatsNewModal } from './whats-new-modal';
+import { createYamlEditor } from './yaml-editor';
 
 // =============================================================================
 // Types
@@ -78,6 +79,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 			{ tabId: 'inline', tabLabel: 'Inline' },
 			{ tabId: 'cmdout', tabLabel: 'Cmd Output' },
 			{ tabId: 'appearance', tabLabel: 'Appearance' },
+			{ tabId: 'presets', tabLabel: 'Presets' },
 		];
 
 		// Render tabs and content
@@ -119,6 +121,9 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 					break;
 				case 'appearance':
 					this.renderAppearanceTab(tabContentContainer);
+					break;
+				case 'presets':
+					this.renderPresetsTab(tabContentContainer);
 					break;
 			}
 		};
@@ -768,5 +773,126 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					}));
 		}
+	}
+
+	// ===========================================================================
+	// Presets Tab
+	// ===========================================================================
+
+	private renderPresetsTab(containerElement: HTMLElement): void {
+		// Intro
+		containerElement.createEl('p', {
+			text: 'Create named YAML presets to reuse across code blocks. Reference a preset with META.PRESET in any ufence block, or set a page-level default with an invisible ufence-ufence block.',
+			cls: CSS_CLASSES.tabIntro,
+		});
+
+		this.createSectionDivider(containerElement);
+
+		// Existing presets
+		const presets = this.plugin.settings.presets ?? {};
+		const names = Object.keys(presets).sort();
+
+		if (names.length > 0) {
+			this.createSectionHeader(containerElement, 'Saved Presets');
+
+			for (const name of names) {
+				this.renderPresetEntry(containerElement, name, presets[name]);
+			}
+
+			this.createSectionDivider(containerElement);
+		}
+
+		// Add new preset
+		this.createSectionHeader(containerElement, 'Add New Preset');
+
+		let newName = '';
+		let newYaml = '';
+
+		new Setting(containerElement)
+			.setName('Name')
+			.setDesc('A unique name for this preset')
+			.addText(text => text
+				.setPlaceholder('e.g. teaching')
+				.onChange(value => { newName = value.trim(); }));
+
+		// YAML editor with syntax highlighting + validation
+		const yamlContainer = containerElement.createEl('div');
+		createYamlEditor(yamlContainer, {
+			initialValue: '',
+			placeholder: 'RENDER:\n  LINES: true\n  ZEBRA: true\n  FOLD: 20',
+			onChange: (value) => { newYaml = value; },
+		});
+
+		new Setting(containerElement)
+			.addButton(button => button
+				.setButtonText('Add preset')
+				.setCta()
+				.onClick(async () => {
+					if (!newName) return;
+
+					// Check for duplicate name
+					if (this.plugin.settings.presets[newName]) {
+						// Overwrite silently — user can see the name already exists above
+					}
+
+					this.plugin.settings.presets[newName] = newYaml;
+					await this.plugin.saveSettings();
+					this.display();
+				}));
+	}
+
+	/**
+	 * Renders a single preset entry with an editable textarea and delete button.
+	 */
+	private renderPresetEntry(containerElement: HTMLElement, name: string, yamlContent: string): void {
+		const wrapper = containerElement.createEl('div', { cls: 'ucf-preset-entry' });
+		wrapper.style.marginBottom = '1.5em';
+
+		// Name heading
+		const heading = wrapper.createEl('h4');
+		heading.textContent = name;
+		heading.style.margin = '0 0 0.5em 0';
+
+		// Editable YAML editor with syntax highlighting + validation
+		const editorContainer = wrapper.createEl('div');
+		editorContainer.style.marginBottom = '0.5em';
+		const editor = createYamlEditor(editorContainer, {
+			initialValue: yamlContent,
+			onChange: () => { /* live update — save on button click */ },
+		});
+
+		// Button row
+		const buttonRow = wrapper.createEl('div');
+		buttonRow.style.display = 'flex';
+		buttonRow.style.gap = '0.5em';
+
+		// Save button
+		const saveBtn = buttonRow.createEl('button', { text: 'Save' });
+		saveBtn.addEventListener('click', async () => {
+			this.plugin.settings.presets[name] = editor.getValue();
+			await this.plugin.saveSettings();
+			// Brief visual feedback
+			saveBtn.textContent = 'Saved ✓';
+			setTimeout(() => { saveBtn.textContent = 'Save'; }, 1500);
+		});
+
+		// Delete button
+		const deleteBtn = buttonRow.createEl('button', { text: 'Delete' });
+		deleteBtn.style.color = 'var(--text-error, #e74c3c)';
+		deleteBtn.addEventListener('click', async () => {
+			// Confirm deletion
+			if (deleteBtn.dataset.confirming === 'true') {
+				delete this.plugin.settings.presets[name];
+				await this.plugin.saveSettings();
+				this.display();
+			} else {
+				deleteBtn.dataset.confirming = 'true';
+				deleteBtn.textContent = 'Click again to confirm';
+				setTimeout(() => {
+					deleteBtn.dataset.confirming = 'false';
+					deleteBtn.textContent = 'Delete';
+				}, 3000);
+			}
+		});
 	}
 }

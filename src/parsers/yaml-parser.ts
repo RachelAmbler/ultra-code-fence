@@ -280,6 +280,7 @@ export function parseMetaSection(yamlProps: Record<string, unknown>): YamlMetaCo
 		PATH: meta[YAML_META.path] !== undefined ? String(meta[YAML_META.path]) : undefined,
 		TITLE: meta[YAML_META.title] !== undefined ? String(meta[YAML_META.title]) : undefined,
 		DESC: meta[YAML_META.desc] !== undefined ? String(meta[YAML_META.desc]) : undefined,
+		PRESET: meta[YAML_META.preset] !== undefined ? String(meta[YAML_META.preset]) : undefined,
 	};
 }
 
@@ -532,6 +533,31 @@ export function parseNestedYamlConfig(yamlProps: Record<string, unknown>): Parse
 		// RENDER section for cmdout styling (stored separately as RENDER_CMDOUT)
 		RENDER_CMDOUT: parseRenderCmdoutSection(yamlProps),
 	};
+}
+
+/**
+ * Parses a raw YAML string (from a saved preset) into a ParsedYamlConfig.
+ *
+ * This is used to convert the free-form YAML stored in plugin settings into
+ * the same structured format used by code block configs.
+ *
+ * @param yamlString - Raw YAML string from a preset
+ * @returns Parsed YAML configuration, or empty config on failure
+ */
+export function parsePresetYaml(yamlString: string): ParsedYamlConfig {
+	if (!yamlString || !yamlString.trim()) {
+		return {};
+	}
+
+	try {
+		const yamlProps = parseYaml(yamlString) as Record<string, unknown>;
+		if (!yamlProps || typeof yamlProps !== 'object') {
+			return {};
+		}
+		return parseNestedYamlConfig(yamlProps);
+	} catch {
+		return {};
+	}
 }
 
 /**

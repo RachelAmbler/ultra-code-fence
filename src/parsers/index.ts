@@ -17,6 +17,7 @@ export {
 	resolveCmdoutConfig,
 	parseCalloutSection,
 	resolveCalloutConfig,
+	parsePresetYaml,
 } from './yaml-parser';
 
 export type {

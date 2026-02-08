@@ -43,3 +43,7 @@ export {
 	shouldReplaceLine,
 	filterByDisplayMode,
 } from './callout-processor';
+
+export { deepMergeYamlConfigs } from './config-merge';
+
+export { resolvePreset } from './preset-resolver';

@@ -82,4 +82,7 @@ export const DEFAULT_SETTINGS: PluginSettings = {
 
 	// Print behaviour: 'expand' = show full code, 'asis' = keep folded/scrolled state
 	printBehaviour: 'expand',
+
+	// Presets: named YAML presets (empty by default)
+	presets: {},
 };

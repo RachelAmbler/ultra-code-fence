@@ -164,6 +164,9 @@ export interface PluginSettings {
 	 * - 'asis': Print as currently displayed (folded/scrolled state preserved)
 	 */
 	printBehaviour: string;
+
+	/** Named YAML presets. Keys are preset names, values are raw YAML strings. */
+	presets: Record<string, string>;
 }
 
 // =============================================================================
@@ -460,6 +463,9 @@ export interface YamlMetaConfig {
 
 	/** Description text shown below title or as tooltip */
 	DESC?: string;
+
+	/** Name of a saved preset to apply as base configuration */
+	PRESET?: string;
 }
 
 /**

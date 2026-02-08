@@ -201,6 +201,7 @@ export const YAML_META = {
 	path: 'PATH',
 	title: 'TITLE',
 	desc: 'DESC',
+	preset: 'PRESET',
 } as const;
 
 /**
