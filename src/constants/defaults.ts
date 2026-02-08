@@ -79,4 +79,7 @@ export const DEFAULT_SETTINGS: PluginSettings = {
 	// Download button
 	showDownloadButton: true,
 	downloadPathHistory: {},
+
+	// Print behaviour: 'expand' = show full code, 'asis' = keep folded/scrolled state
+	printBehaviour: 'expand',
 };

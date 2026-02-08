@@ -157,6 +157,13 @@ export interface PluginSettings {
 
 	/** Last-used download directory per note path */
 	downloadPathHistory: Record<string, string>;
+
+	/**
+	 * Default print behaviour for folded/scrolled code blocks.
+	 * - 'expand': Remove fold/scroll constraints when printing (show full code)
+	 * - 'asis': Print as currently displayed (folded/scrolled state preserved)
+	 */
+	printBehaviour: string;
 }
 
 // =============================================================================
@@ -490,6 +497,9 @@ export interface YamlRenderDisplayConfig {
 
 	/** Regex pattern matching lines to ignore during joined copies */
 	JOIN_IGNORE_REGEX?: string;
+
+	/** Print behaviour override: 'expand' or 'asis' */
+	PRINT?: string;
 }
 
 /**
@@ -671,6 +681,9 @@ export interface ResolvedBlockConfig {
 
 	/** BY_MARKS filter configuration */
 	filterByMarks: ResolvedFilterByMarks;
+
+	/** Print behaviour: 'expand' or 'asis' */
+	printBehaviour: string;
 }
 
 /**
@@ -698,4 +711,7 @@ export interface ResolvedCmdoutConfig {
 	// RENDER section
 	/** Command output styles */
 	styles: CommandOutputStyles;
+
+	/** Print behaviour: 'expand' or 'asis' */
+	printBehaviour: string;
 }

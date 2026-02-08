@@ -204,6 +204,7 @@ export const YAML_RENDER_DISPLAY = {
 	altCopyJoin: 'ALT_COPY_JOIN',
 	cmdCopyJoin: 'CMD_COPY_JOIN',
 	joinIgnoreRegex: 'JOIN_IGNORE_REGEX',
+	print: 'PRINT',
 } as const;
 
 /**

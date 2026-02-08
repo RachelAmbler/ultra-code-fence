@@ -163,6 +163,7 @@ describe('YAML section constants', () => {
 		expect(YAML_RENDER_DISPLAY.copy).toBe('COPY');
 		expect(YAML_RENDER_DISPLAY.style).toBe('STYLE');
 		expect(YAML_RENDER_DISPLAY.lang).toBe('LANG');
+		expect(YAML_RENDER_DISPLAY.print).toBe('PRINT');
 	});
 
 	it('YAML_FILTER has expected keys', () => {

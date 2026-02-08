@@ -316,6 +316,9 @@ export function parseRenderDisplaySection(yamlProps: Record<string, unknown>): Y
 		JOIN_IGNORE_REGEX: render[YAML_RENDER_DISPLAY.joinIgnoreRegex] !== undefined
 			? String(render[YAML_RENDER_DISPLAY.joinIgnoreRegex])
 			: undefined,
+		PRINT: render[YAML_RENDER_DISPLAY.print] !== undefined
+			? String(render[YAML_RENDER_DISPLAY.print]).toLowerCase()
+			: undefined,
 	};
 }
 
@@ -510,6 +513,9 @@ export function resolveBlockConfig(
 			endMarker: parsed.FILTER?.BY_MARKS?.END ?? '',
 			inclusive: parsed.FILTER?.BY_MARKS?.INCLUSIVE ?? true,
 		},
+
+		// Print behaviour
+		printBehaviour: parsed.RENDER?.PRINT ?? settings.printBehaviour,
 	};
 }
 
@@ -555,5 +561,8 @@ export function resolveCmdoutConfig(
 		// RENDER section (cmdout styling)
 		promptPattern,
 		styles,
+
+		// Print behaviour
+		printBehaviour: parsed.RENDER?.PRINT ?? settings.printBehaviour,
 	};
 }

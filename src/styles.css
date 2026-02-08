@@ -663,6 +663,7 @@ pre.ucf-line-numbers.ucf-zebra .ucf-line-num {
    ============================================================================ */
 
 pre.ucf-scrollable {
+    max-height: var(--ucf-scroll-height);
     overflow-y: auto;
     position: relative;
 }
@@ -1167,4 +1168,48 @@ pre.ucf-scrollable {
 
 .ucf-modal-buttons button {
     padding: 8px 20px;
+}
+
+/* ============================================================================
+   Print Styles
+   ============================================================================ */
+
+@media print {
+    /* Always hide interactive elements when printing */
+    .ucf-copy-button,
+    .ucf-download-button,
+    .ucf-fold-bar,
+    .ucf-scroll-indicator {
+        display: none !important;
+    }
+
+    /* Hide all scrollbars and wrap long lines for print */
+    pre[data-ucf-print] {
+        overflow: hidden !important;
+        scrollbar-width: none !important;
+    }
+
+    pre[data-ucf-print]::-webkit-scrollbar {
+        display: none !important;
+    }
+
+    pre[data-ucf-print] code {
+        white-space: pre-wrap !important;
+        word-wrap: break-word !important;
+    }
+
+    /* Expand: remove fold constraints and show full code */
+    pre[data-ucf-print="expand"].ucf-folded {
+        max-height: none !important;
+    }
+
+    pre[data-ucf-print="expand"].ucf-folded code {
+        mask-image: none !important;
+        -webkit-mask-image: none !important;
+    }
+
+    /* Expand: remove scroll constraints via CSS variable override */
+    pre[data-ucf-print="expand"].ucf-scrollable {
+        --ucf-scroll-height: none;
+    }
 }

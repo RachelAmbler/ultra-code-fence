@@ -277,6 +277,7 @@ describe('parseRenderDisplaySection', () => {
 				SHIFT_COPY_JOIN: '&&',
 				ALT_COPY_JOIN: ';',
 				JOIN_IGNORE_REGEX: '^\\s*#',
+				PRINT: 'expand',
 			},
 		});
 		expect(result.FOLD).toBe(10);
@@ -289,6 +290,7 @@ describe('parseRenderDisplaySection', () => {
 		expect(result.SHIFT_COPY_JOIN).toBe('&&');
 		expect(result.ALT_COPY_JOIN).toBe(';');
 		expect(result.JOIN_IGNORE_REGEX).toBe('^\\s*#');
+		expect(result.PRINT).toBe('expand');
 	});
 
 	it('returns undefined for missing RENDER section', () => {
@@ -300,6 +302,7 @@ describe('parseRenderDisplaySection', () => {
 		expect(result.COPY).toBeUndefined();
 		expect(result.STYLE).toBeUndefined();
 		expect(result.LANG).toBeUndefined();
+		expect(result.PRINT).toBeUndefined();
 	});
 
 	it('resolves booleans from strings', () => {
@@ -336,6 +339,21 @@ describe('parseRenderDisplaySection', () => {
 			RENDER: { CMD_COPY_JOIN: 'cmd-op' },
 		});
 		expect(result.ALT_COPY_JOIN).toBe('cmd-op');
+	});
+
+	it('lowercases PRINT property', () => {
+		expect(parseRenderDisplaySection({ RENDER: { PRINT: 'Expand' } }).PRINT).toBe('expand');
+		expect(parseRenderDisplaySection({ RENDER: { PRINT: 'ASIS' } }).PRINT).toBe('asis');
+		expect(parseRenderDisplaySection({ RENDER: { PRINT: 'AsIs' } }).PRINT).toBe('asis');
+	});
+
+	it('returns PRINT as undefined when not specified', () => {
+		expect(parseRenderDisplaySection({ RENDER: {} }).PRINT).toBeUndefined();
+	});
+
+	it('converts non-string PRINT values to string', () => {
+		expect(parseRenderDisplaySection({ RENDER: { PRINT: true } }).PRINT).toBe('true');
+		expect(parseRenderDisplaySection({ RENDER: { PRINT: 42 } }).PRINT).toBe('42');
 	});
 
 	it('handles RENDER as non-object (ignored)', () => {
@@ -831,6 +849,32 @@ describe('resolveBlockConfig', () => {
 		expect(result.filterByMarks.startMarker).toBe('');
 		expect(result.filterByMarks.endMarker).toBe('');
 	});
+
+	it('uses YAML PRINT value when present', () => {
+		const parsed: ParsedYamlConfig = {
+			RENDER: { PRINT: 'asis' },
+		};
+		const result = resolveBlockConfig(parsed, testSettings(), 'text');
+		expect(result.printBehaviour).toBe('asis');
+	});
+
+	it('uses YAML PRINT "expand" when explicitly set', () => {
+		const parsed: ParsedYamlConfig = {
+			RENDER: { PRINT: 'expand' },
+		};
+		const result = resolveBlockConfig(parsed, testSettings({ printBehaviour: 'asis' }), 'text');
+		expect(result.printBehaviour).toBe('expand');
+	});
+
+	it('falls back to settings printBehaviour when PRINT not in YAML', () => {
+		const result = resolveBlockConfig({}, testSettings({ printBehaviour: 'asis' }), 'text');
+		expect(result.printBehaviour).toBe('asis');
+	});
+
+	it('defaults printBehaviour to "expand" with default settings', () => {
+		const result = resolveBlockConfig({}, testSettings(), 'text');
+		expect(result.printBehaviour).toBe('expand');
+	});
 });
 
 describe('resolveCmdoutConfig', () => {
@@ -917,5 +961,23 @@ describe('resolveCmdoutConfig', () => {
 	it('defaults titleText to undefined when not set', () => {
 		const result = resolveCmdoutConfig({}, testSettings());
 		expect(result.titleText).toBeUndefined();
+	});
+
+	it('uses YAML PRINT value for printBehaviour', () => {
+		const parsed: ParsedYamlConfig = {
+			RENDER: { PRINT: 'asis' },
+		};
+		const result = resolveCmdoutConfig(parsed, testSettings());
+		expect(result.printBehaviour).toBe('asis');
+	});
+
+	it('falls back to settings printBehaviour when PRINT not in YAML', () => {
+		const result = resolveCmdoutConfig({}, testSettings({ printBehaviour: 'asis' }));
+		expect(result.printBehaviour).toBe('asis');
+	});
+
+	it('defaults printBehaviour to "expand" with default settings', () => {
+		const result = resolveCmdoutConfig({}, testSettings());
+		expect(result.printBehaviour).toBe('expand');
 	});
 });

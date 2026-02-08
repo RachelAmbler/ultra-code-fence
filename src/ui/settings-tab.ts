@@ -408,6 +408,18 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 					}
 				}));
 
+		new Setting(containerElement)
+			.setName('Print behaviour')
+			.setDesc('How folded/scrolled code blocks behave when printing. Override: RENDER.PRINT: expand')
+			.addDropdown(dropdown => dropdown
+				.addOption('expand', 'Expand (show full code)')
+				.addOption('asis', 'As displayed')
+				.setValue(this.plugin.settings.printBehaviour)
+				.onChange(async (value) => {
+					this.plugin.settings.printBehaviour = value;
+					await this.plugin.saveSettings();
+				}));
+
 		this.createSectionDivider(containerElement);
 
 		// Copy join section

@@ -278,6 +278,12 @@ export default class UltraCodeFence extends Plugin {
 			scrollLines: enableScrolling ? config.scrollLines : 0,
 		});
 
+		// Set print behaviour attribute on <pre> for @media print CSS
+		const preElementForPrint = findPreElement(containerElement);
+		if (preElementForPrint) {
+			preElementForPrint.dataset.ucfPrint = config.printBehaviour;
+		}
+
 		// Build download callback — prefer source filename over display title
 		const downloadName = fileMetadata?.filename || displayTitle || '';
 		const suggestedFilename = buildSuggestedFilename(downloadName, config.language);
@@ -380,6 +386,12 @@ export default class UltraCodeFence extends Plugin {
 		}, this);
 
 		containerElement.appendChild(renderedContainer);
+
+		// Set print behaviour attribute on <pre> for @media print CSS
+		const cmdoutPre = renderedContainer.querySelector('pre');
+		if (cmdoutPre) {
+			cmdoutPre.dataset.ucfPrint = config.printBehaviour;
+		}
 	}
 
 	/**

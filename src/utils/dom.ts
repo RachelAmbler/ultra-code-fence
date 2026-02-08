@@ -29,7 +29,7 @@ export function addScrollBehaviour(preElement: HTMLPreElement, maxVisibleLines: 
 
 	// Calculate height based on line count (1.4em per line is a good estimate)
 	const maxHeightEm = maxVisibleLines * LINE_HEIGHT_MULTIPLIER;
-	preElement.style.maxHeight = `${maxHeightEm}em`;
+	preElement.style.setProperty('--ucf-scroll-height', `${maxHeightEm}em`);
 
 	// Create scroll indicator (gradient fade at bottom)
 	const scrollIndicator = document.createElement('div');
