@@ -56,6 +56,9 @@ export class TFile {
 export class App {
 	vault = {
 		getAbstractFileByPath: (_path: string): TFile | null => null,
+		adapter: {
+			getResourcePath: (path: string): string => `app://local/${path}`,
+		},
 	};
 	workspace = {
 		getLeaf: (_newLeaf?: boolean) => ({
@@ -130,6 +133,23 @@ export class PluginSettingTab {
 // Setting (chainable builder)
 // =============================================================================
 
+/**
+ * Creates a fully-chainable stub object where every method call returns
+ * the same object. This lets the Obsidian Setting API chaining
+ * (e.g. `.setPlaceholder(...).setValue(...).onChange(...)`) work in tests.
+ */
+function _chainStub(): Record<string, unknown> {
+	const self: Record<string, unknown> = {};
+	const proxy: Record<string, unknown> = new Proxy(self, {
+		get(_target, prop) {
+			if (prop in self) return self[prop];
+			// Any unknown property returns a function that returns the proxy
+			return (..._args: unknown[]) => proxy;
+		},
+	});
+	return proxy;
+}
+
 export class Setting {
 	settingEl: HTMLElement;
 	nameEl: HTMLElement;
@@ -153,59 +173,42 @@ export class Setting {
 	setHeading(): this { return this; }
 	setClass(_cls: string): this { return this; }
 
-	addToggle(cb: (toggle: { setValue: (v: boolean) => unknown; onChange: (fn: (v: boolean) => unknown) => unknown }) => void): this {
-		cb({
-			setValue: () => ({ onChange: () => ({}) }),
-			onChange: () => ({}),
-		});
+	addToggle(cb: (toggle: Record<string, unknown>) => void): this {
+		const stub = _chainStub();
+		cb(stub);
 		return this;
 	}
 
-	addText(cb: (text: { setValue: (v: string) => unknown; onChange: (fn: (v: string) => unknown) => unknown; setPlaceholder: (v: string) => unknown }) => void): this {
-		cb({
-			setValue: () => ({ onChange: () => ({}) }),
-			onChange: () => ({}),
-			setPlaceholder: () => ({}),
-		});
+	addText(cb: (text: Record<string, unknown>) => void): this {
+		const stub = _chainStub();
+		cb(stub);
 		return this;
 	}
 
-	addDropdown(cb: (dropdown: { addOption: (v: string, l: string) => unknown; setValue: (v: string) => unknown; onChange: (fn: (v: string) => unknown) => unknown }) => void): this {
-		cb({
-			addOption: () => ({}),
-			setValue: () => ({ onChange: () => ({}) }),
-			onChange: () => ({}),
-		});
+	addDropdown(cb: (dropdown: Record<string, unknown>) => void): this {
+		const stub = _chainStub();
+		cb(stub);
 		return this;
 	}
 
-	addButton(cb: (btn: { setButtonText: (v: string) => unknown; onClick: (fn: () => unknown) => unknown; setCta: () => unknown }) => void): this {
-		cb({
-			setButtonText: () => ({}),
-			onClick: () => ({}),
-			setCta: () => ({}),
-		});
+	addButton(cb: (btn: Record<string, unknown>) => void): this {
+		const stub = _chainStub();
+		cb(stub);
 		return this;
 	}
 
-	addTextArea(cb: (ta: { setValue: (v: string) => unknown; onChange: (fn: (v: string) => unknown) => unknown; setPlaceholder: (v: string) => unknown; inputEl: HTMLTextAreaElement }) => void): this {
-		const inputEl = typeof document !== 'undefined'
+	addTextArea(cb: (ta: Record<string, unknown>) => void): this {
+		const stub = _chainStub();
+		stub.inputEl = typeof document !== 'undefined'
 			? document.createElement('textarea')
 			: ({} as HTMLTextAreaElement);
-		cb({
-			setValue: () => ({ onChange: () => ({}) }),
-			onChange: () => ({}),
-			setPlaceholder: () => ({}),
-			inputEl,
-		});
+		cb(stub);
 		return this;
 	}
 
-	addColorPicker(cb: (picker: { setValue: (v: string) => unknown; onChange: (fn: (v: string) => unknown) => unknown }) => void): this {
-		cb({
-			setValue: () => ({ onChange: () => ({}) }),
-			onChange: () => ({}),
-		});
+	addColorPicker(cb: (picker: Record<string, unknown>) => void): this {
+		const stub = _chainStub();
+		cb(stub);
 		return this;
 	}
 }
