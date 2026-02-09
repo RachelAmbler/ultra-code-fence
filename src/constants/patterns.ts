@@ -150,7 +150,10 @@ export const CSS_CLASSES = {
 // =============================================================================
 
 /**
- * Generates a style class (e.g., "style-tab", "style-infobar").
+ * Generates a BEM-style modifier class for title bar styling.
+ *
+ * @param style - Style name (e.g., "tab", "infobar", "minimal")
+ * @returns CSS class string in the form "style-{name}"
  */
 export function styleClass(style: string): string {
 	return `style-${style}`;

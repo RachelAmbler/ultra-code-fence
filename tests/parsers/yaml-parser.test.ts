@@ -15,15 +15,8 @@ import {
 	resolveBlockConfig,
 	resolveCmdoutConfig,
 } from '../../src/parsers/yaml-parser';
-import type { ParsedYamlConfig, PluginSettings } from '../../src/types';
-import { DEFAULT_SETTINGS } from '../../src/constants/defaults';
-
-/**
- * Creates a PluginSettings object for testing with optional overrides.
- */
-function testSettings(overrides?: Partial<PluginSettings>): PluginSettings {
-	return { ...DEFAULT_SETTINGS, ...overrides };
-}
+import type { ParsedYamlConfig } from '../../src/types';
+import { testSettings } from '../helpers/test-settings';
 
 // =============================================================================
 // Value Resolution

@@ -846,25 +846,19 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 	 */
 	private renderPresetEntry(containerElement: HTMLElement, name: string, yamlContent: string): void {
 		const wrapper = containerElement.createEl('div', { cls: 'ucf-preset-entry' });
-		wrapper.style.marginBottom = '1.5em';
 
-		// Name heading
-		const heading = wrapper.createEl('h4');
-		heading.textContent = name;
-		heading.style.margin = '0 0 0.5em 0';
+		// Name heading — use Setting API as recommended by Obsidian lint
+		new Setting(wrapper).setName(name).setHeading();
 
 		// Editable YAML editor with syntax highlighting + validation
-		const editorContainer = wrapper.createEl('div');
-		editorContainer.style.marginBottom = '0.5em';
+		const editorContainer = wrapper.createEl('div', { cls: 'ucf-preset-editor' });
 		const editor = createYamlEditor(editorContainer, {
 			initialValue: yamlContent,
 			onChange: () => { /* live update — save on button click */ },
 		});
 
 		// Button row
-		const buttonRow = wrapper.createEl('div');
-		buttonRow.style.display = 'flex';
-		buttonRow.style.gap = '0.5em';
+		const buttonRow = wrapper.createEl('div', { cls: 'ucf-preset-buttons' });
 
 		// Save button
 		const saveBtn = buttonRow.createEl('button', { text: 'Save' });
@@ -877,8 +871,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 		});
 
 		// Delete button
-		const deleteBtn = buttonRow.createEl('button', { text: 'Delete' });
-		deleteBtn.style.color = 'var(--text-error, #e74c3c)';
+		const deleteBtn = buttonRow.createEl('button', { text: 'Delete', cls: 'ucf-preset-delete' });
 		deleteBtn.addEventListener('click', async () => {
 			// Confirm deletion
 			if (deleteBtn.dataset.confirming === 'true') {

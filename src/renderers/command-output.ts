@@ -7,7 +7,7 @@
 
 import { App, MarkdownRenderer, Component } from 'obsidian';
 import type { CommandOutputStyles, PluginSettings } from '../types';
-import { CSS_CLASSES, styleClass } from '../constants';
+import { CSS_CLASSES, styleClass, COMMAND_OUTPUT_ICON } from '../constants';
 import { escapeHtml, buildStyleString, addScrollBehaviour } from '../utils';
 import { addCopyButton } from './buttons';
 
@@ -89,7 +89,12 @@ export function processOutputLine(
 }
 
 /**
- * Creates a styled span element as HTML string.
+ * Creates a styled span element as an HTML string.
+ *
+ * @param className - CSS class name for the span
+ * @param content - Inner HTML content for the span
+ * @param styleAttribute - Inline style string (empty string = no style attribute)
+ * @returns HTML string representing the styled span element
  */
 export function createStyledSpanHtml(className: string, content: string, styleAttribute: string): string {
 	const styleAttr = styleAttribute ? ` style="${styleAttribute}"` : '';
@@ -170,7 +175,7 @@ function createCommandOutputTitle(titleText: string): HTMLDivElement {
 	// Terminal icon
 	const iconSpan = document.createElement('span');
 	iconSpan.className = CSS_CLASSES.icon;
-	iconSpan.textContent = '💻';
+	iconSpan.textContent = COMMAND_OUTPUT_ICON;
 	leftGroup.appendChild(iconSpan);
 
 	// Title text

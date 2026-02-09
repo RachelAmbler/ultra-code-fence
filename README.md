@@ -557,6 +557,58 @@ On desktop, clicking the button opens a native OS save dialog. Obsidian remember
 
 The suggested filename is derived from the title (if set) with the language as the extension. For example, a block with `TITLE: "deploy"` in `ufence-bash` suggests `deploy.bash`. If no title is provided, the default is `code.{lang}`.
 
+## Presets & Page Defaults
+
+Presets let you define reusable YAML configurations that can be referenced by name across multiple code blocks.
+
+### Creating a preset
+
+Open Settings → Ultra Code Fence → **Presets** tab. Give your preset a name and enter the YAML config it should contain (using the same `RENDER:`, `META:`, `FILTER:` structure as a regular block).
+
+### Using a preset in a block
+
+Reference a preset by name under `META.PRESET`:
+
+```yaml
+META:
+  PRESET: "teaching"
+  TITLE: "My Override Title"
+RENDER:
+  ZEBRA: false
+```
+
+Block-level properties always take priority over preset values, so you can override individual settings as needed.
+
+### Page-level defaults with ufence-ufence
+
+You can set defaults for every ufence block on a page by adding an invisible `ufence-ufence` config block:
+
+````
+```ufence-ufence
+RENDER:
+  ZEBRA: true
+  LINES: true
+```
+````
+
+The block is hidden in the rendered view. All ufence blocks on the same page inherit these defaults (unless they override them individually). Only one `ufence-ufence` block is supported per page.
+
+You can also reference a named preset at page level:
+
+````
+```ufence-ufence
+PRESET: "teaching"
+```
+````
+
+### Refreshing after changes
+
+Changes to a `ufence-ufence` block or to a saved preset do **not** update existing code blocks automatically. To see your changes, use the **Force Refresh** command:
+
+**Command palette** → *Ultra Code Fence: Force refresh all code blocks*
+
+You can assign a hotkey to this command in Settings → Hotkeys for quicker access. Preset changes made via the Settings UI apply automatically when you click **Save**.
+
 ## Keyboard Shortcuts
 
 - **Click title**: Open source file (vault files open in Obsidian; URLs open in browser)

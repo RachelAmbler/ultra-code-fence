@@ -260,6 +260,11 @@ export const ICON_EMOJIS: Record<string, string> = {
  */
 export const DEFAULT_ICON_EMOJI = '📄';
 
+/**
+ * Icon used for command output title bars.
+ */
+export const COMMAND_OUTPUT_ICON = '💻';
+
 // =============================================================================
 // Lookup Functions
 // =============================================================================

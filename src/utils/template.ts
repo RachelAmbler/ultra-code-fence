@@ -52,17 +52,24 @@ function parseTemplateVariable(variableString: string): ParsedTemplateVariable {
 // =============================================================================
 
 /**
- * Text field names that support case formatting.
+ * Template variable names that map to text-based file metadata fields.
+ * Each supports optional case formatting via a colon modifier (e.g., {filename:upper}).
  */
 const TEXT_FIELD_NAMES = ['filename', 'basename', 'extension', 'fullpath', 'parentfolder'] as const;
 
 /**
- * Case formats supported by text fields.
+ * Recognised case format modifiers for text template variables.
+ * Used to validate the modifier portion of patterns like {filename:upper}.
  */
 const SUPPORTED_CASE_FORMATS = ['upper', 'lower', 'title', 'capitalise'] as const;
 
 /**
- * Gets a text field value with optional case formatting.
+ * Gets a text field value from metadata with optional case formatting.
+ *
+ * @param metadata - Source file metadata containing field values
+ * @param fieldName - Field name to look up (e.g., "filename", "basename")
+ * @param formatModifier - Optional case format (e.g., "upper", "lower", "title")
+ * @returns Formatted field value, or null if field name is not recognised
  */
 function getTextFieldValue(
 	metadata: SourceFileMetadata,
@@ -91,7 +98,11 @@ function getTextFieldValue(
 }
 
 /**
- * Gets the size field value with optional format.
+ * Gets the file size value from metadata with optional unit format.
+ *
+ * @param metadata - Source file metadata containing sizeInBytes
+ * @param formatModifier - Optional size format (e.g., "auto", "bytes", "kb", "mb", "gb")
+ * @returns Formatted size string, empty string if size is unavailable, or null on error
  */
 function getSizeFieldValue(metadata: SourceFileMetadata, formatModifier?: string): string | null {
 	if (metadata.sizeInBytes === undefined) {
@@ -103,7 +114,11 @@ function getSizeFieldValue(metadata: SourceFileMetadata, formatModifier?: string
 }
 
 /**
- * Gets a date field value with optional format.
+ * Gets a date/time value formatted from a millisecond timestamp.
+ *
+ * @param timestampMs - Unix timestamp in milliseconds, or undefined if unavailable
+ * @param formatModifier - Optional date format (e.g., "short", "long", "iso", "relative")
+ * @returns Formatted date string, empty string if timestamp is unavailable, or null on error
  */
 function getDateFieldValue(timestampMs: number | undefined, formatModifier?: string): string | null {
 	if (timestampMs === undefined) {

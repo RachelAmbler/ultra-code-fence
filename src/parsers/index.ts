@@ -28,7 +28,6 @@ export type {
 } from './line-extractor';
 
 export {
-	extractBetweenMarkers,
 	extractBetweenMarkersWithOptions,
 	extractLines,
 	extractLineRange,

@@ -209,6 +209,32 @@ function setupTitleClickHandler(app: App, titleElement: HTMLDivElement, clickabl
 // =============================================================================
 
 /**
+ * Renders markdown text into a div element with the given CSS class.
+ *
+ * Shared helper used by both inline descriptions and tooltip descriptions
+ * to avoid duplicating the MarkdownRenderer.render() call pattern.
+ *
+ * @param app - Obsidian App instance
+ * @param text - Markdown text to render
+ * @param className - CSS class for the container div
+ * @param containingNotePath - Path of containing note for wiki links
+ * @param component - Component for markdown rendering lifecycle
+ * @returns Rendered div element
+ */
+async function renderMarkdownDiv(
+	app: App,
+	text: string,
+	className: string,
+	containingNotePath: string,
+	component: Component
+): Promise<HTMLDivElement> {
+	const div = document.createElement('div');
+	div.className = className;
+	await MarkdownRenderer.render(app, text, div, containingNotePath, component);
+	return div;
+}
+
+/**
  * Creates a description element displayed below the title.
  *
  * @param app - Obsidian App instance
@@ -223,18 +249,7 @@ export async function createDescriptionElement(
 	containingNotePath: string,
 	component: Component
 ): Promise<HTMLDivElement> {
-	const descriptionElement = document.createElement('div');
-	descriptionElement.className = CSS_CLASSES.description;
-
-	await MarkdownRenderer.render(
-		app,
-		descriptionText,
-		descriptionElement,
-		containingNotePath,
-		component
-	);
-
-	return descriptionElement;
+	return renderMarkdownDiv(app, descriptionText, CSS_CLASSES.description, containingNotePath, component);
 }
 
 /**
@@ -255,19 +270,11 @@ export async function createTooltipDescriptionElement(
 	const tooltipContainer = document.createElement('div');
 	tooltipContainer.className = CSS_CLASSES.tooltipContainer;
 
-	const tooltipContent = document.createElement('div');
-	tooltipContent.className = CSS_CLASSES.tooltipContent;
-
-	await MarkdownRenderer.render(
-		app,
-		descriptionText,
-		tooltipContent,
-		containingNotePath,
-		component
+	const tooltipContent = await renderMarkdownDiv(
+		app, descriptionText, CSS_CLASSES.tooltipContent, containingNotePath, component
 	);
 
 	tooltipContainer.appendChild(tooltipContent);
-
 	return tooltipContainer;
 }
 

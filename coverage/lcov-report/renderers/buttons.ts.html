@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">10.46% </span>
+                <span class="strong">10.34% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>9/86</span>
+                <span class='fraction'>9/87</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">10.58% </span>
+                <span class="strong">10.46% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>9/85</span>
+                <span class='fraction'>9/86</span>
             </div>
         
             
@@ -392,7 +392,13 @@
 <a name='L327'></a><a href='#L327'>327</a>
 <a name='L328'></a><a href='#L328'>328</a>
 <a name='L329'></a><a href='#L329'>329</a>
-<a name='L330'></a><a href='#L330'>330</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L330'></a><a href='#L330'>330</a>
+<a name='L331'></a><a href='#L331'>331</a>
+<a name='L332'></a><a href='#L332'>332</a>
+<a name='L333'></a><a href='#L333'>333</a>
+<a name='L334'></a><a href='#L334'>334</a>
+<a name='L335'></a><a href='#L335'>335</a>
+<a name='L336'></a><a href='#L336'>336</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -553,10 +559,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -569,6 +571,15 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -583,6 +594,7 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -879,14 +891,19 @@ export function <span class="fstat-no" title="function not covered" >addCopyButt
 // =============================================================================
 &nbsp;
 /**
- * Creates the "show more" button text.
+ * Creates the "show more" button text with a chevron icon.
+ *
+ * @param hiddenLineCount - Number of lines hidden by the fold
+ * @returns HTML string with SVG icon and line count label
  */
 function <span class="fstat-no" title="function not covered" >buildExpandButtonContent(h</span>iddenLineCount: number): string {
 <span class="cstat-no" title="statement not covered" >	return `${CHEVRON_DOWN_SVG}&lt;span&gt;Show more (${hiddenLineCount} more lines)&lt;/span&gt;`;</span>
 }
 &nbsp;
 /**
- * Creates the "show less" button text.
+ * Creates the "show less" button text with a chevron icon.
+ *
+ * @returns HTML string with SVG icon and "Show less" label
  */
 function <span class="fstat-no" title="function not covered" >buildCollapseButtonContent(): string {</span>
 <span class="cstat-no" title="statement not covered" >	return `${CHEVRON_UP_SVG}&lt;span&gt;Show less&lt;/span&gt;`;</span>
@@ -914,7 +931,8 @@ export function <span class="fstat-no" title="function not covered" >addFoldButt
 	// Calculate folded height based on line height
 	const computedStyle = <span class="cstat-no" title="statement not covered" >getComputedStyle(codeElement);</span>
 	const lineHeight = <span class="cstat-no" title="statement not covered" >parseFloat(computedStyle.lineHeight) || 20;</span>
-	const foldedHeight = (<span class="cstat-no" title="statement not covered" >visibleLinesWhenFolded * lineHeight) + 16; // Add padding</span>
+	const FOLD_PADDING_PX = <span class="cstat-no" title="statement not covered" >16;</span>
+	const foldedHeight = (<span class="cstat-no" title="statement not covered" >visibleLinesWhenFolded * lineHeight) + FOLD_PADDING_PX;</span>
 &nbsp;
 	// Start in folded state
 <span class="cstat-no" title="statement not covered" >	preElement.classList.add(CSS_CLASSES.folded);</span>
@@ -1057,7 +1075,7 @@ export function <span class="fstat-no" title="function not covered" >addCodeBloc
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-02-08T19:35:55.460Z
+                at 2026-02-09T10:18:46.610Z
             </div>
         <script src="../prettify.js"></script>
         <script>

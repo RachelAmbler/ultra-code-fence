@@ -13,16 +13,8 @@ import {
 	getCommandOutputStylesFromSettings,
 	mergeCommandOutputStyles,
 } from '../../src/renderers/command-output';
-import type { CommandOutputStyles, PluginSettings } from '../../src/types';
-import { DEFAULT_SETTINGS } from '../../src/constants/defaults';
-
-// =============================================================================
-// Helpers
-// =============================================================================
-
-function testSettings(overrides?: Partial<PluginSettings>): PluginSettings {
-	return { ...DEFAULT_SETTINGS, ...overrides };
-}
+import type { CommandOutputStyles } from '../../src/types';
+import { testSettings } from '../helpers/test-settings';
 
 function testStyles(overrides?: Partial<CommandOutputStyles>): CommandOutputStyles {
 	return {

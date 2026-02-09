@@ -16,6 +16,7 @@ export {
 	getIconColour,
 	getIconLabel,
 	getIconEmoji,
+	COMMAND_OUTPUT_ICON,
 } from './icons';
 
 export {

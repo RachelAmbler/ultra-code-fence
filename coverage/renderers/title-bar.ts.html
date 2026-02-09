@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/92</span>
+                <span class='fraction'>0/91</span>
             </div>
         
             
@@ -39,14 +39,14 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/10</span>
+                <span class='fraction'>0/11</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/92</span>
+                <span class='fraction'>0/91</span>
             </div>
         
             
@@ -435,7 +435,14 @@
 <a name='L370'></a><a href='#L370'>370</a>
 <a name='L371'></a><a href='#L371'>371</a>
 <a name='L372'></a><a href='#L372'>372</a>
-<a name='L373'></a><a href='#L373'>373</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L373'></a><a href='#L373'>373</a>
+<a name='L374'></a><a href='#L374'>374</a>
+<a name='L375'></a><a href='#L375'>375</a>
+<a name='L376'></a><a href='#L376'>376</a>
+<a name='L377'></a><a href='#L377'>377</a>
+<a name='L378'></a><a href='#L378'>378</a>
+<a name='L379'></a><a href='#L379'>379</a>
+<a name='L380'></a><a href='#L380'>380</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -660,9 +667,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -671,7 +683,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -682,6 +693,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -689,13 +701,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -704,7 +712,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -1018,6 +1032,32 @@ function <span class="fstat-no" title="function not covered" >setupTitleClickHan
 // =============================================================================
 &nbsp;
 /**
+ * Renders markdown text into a div element with the given CSS class.
+ *
+ * Shared helper used by both inline descriptions and tooltip descriptions
+ * to avoid duplicating the MarkdownRenderer.render() call pattern.
+ *
+ * @param app - Obsidian App instance
+ * @param text - Markdown text to render
+ * @param className - CSS class for the container div
+ * @param containingNotePath - Path of containing note for wiki links
+ * @param component - Component for markdown rendering lifecycle
+ * @returns Rendered div element
+ */
+async function <span class="fstat-no" title="function not covered" >renderMarkdownDiv(</span>
+	app: App,
+	text: string,
+	className: string,
+	containingNotePath: string,
+	component: Component
+): Promise&lt;HTMLDivElement&gt; {
+	const div = <span class="cstat-no" title="statement not covered" >document.createElement('div');</span>
+<span class="cstat-no" title="statement not covered" >	div.className = className;</span>
+<span class="cstat-no" title="statement not covered" >	await MarkdownRenderer.render(app, text, div, containingNotePath, component);</span>
+<span class="cstat-no" title="statement not covered" >	return div;</span>
+}
+&nbsp;
+/**
  * Creates a description element displayed below the title.
  *
  * @param app - Obsidian App instance
@@ -1032,18 +1072,7 @@ export async function <span class="fstat-no" title="function not covered" >creat
 	containingNotePath: string,
 	component: Component
 ): Promise&lt;HTMLDivElement&gt; {
-	const descriptionElement = <span class="cstat-no" title="statement not covered" >document.createElement('div');</span>
-<span class="cstat-no" title="statement not covered" >	descriptionElement.className = CSS_CLASSES.description;</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >	await MarkdownRenderer.render(</span>
-		app,
-		descriptionText,
-		descriptionElement,
-		containingNotePath,
-		component
-	);
-&nbsp;
-<span class="cstat-no" title="statement not covered" >	return descriptionElement;</span>
+<span class="cstat-no" title="statement not covered" >	return renderMarkdownDiv(app, descriptionText, CSS_CLASSES.description, containingNotePath, component);</span>
 }
 &nbsp;
 /**
@@ -1064,19 +1093,11 @@ export async function <span class="fstat-no" title="function not covered" >creat
 	const tooltipContainer = <span class="cstat-no" title="statement not covered" >document.createElement('div');</span>
 <span class="cstat-no" title="statement not covered" >	tooltipContainer.className = CSS_CLASSES.tooltipContainer;</span>
 &nbsp;
-	const tooltipContent = <span class="cstat-no" title="statement not covered" >document.createElement('div');</span>
-<span class="cstat-no" title="statement not covered" >	tooltipContent.className = CSS_CLASSES.tooltipContent;</span>
-&nbsp;
-<span class="cstat-no" title="statement not covered" >	await MarkdownRenderer.render(</span>
-		app,
-		descriptionText,
-		tooltipContent,
-		containingNotePath,
-		component
+	const tooltipContent = <span class="cstat-no" title="statement not covered" >await renderMarkdownDiv(</span>
+		app, descriptionText, CSS_CLASSES.tooltipContent, containingNotePath, component
 	);
 &nbsp;
 <span class="cstat-no" title="statement not covered" >	tooltipContainer.appendChild(tooltipContent);</span>
-&nbsp;
 <span class="cstat-no" title="statement not covered" >	return tooltipContainer;</span>
 }
 &nbsp;
@@ -1186,7 +1207,7 @@ export async function <span class="fstat-no" title="function not covered" >build
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-02-08T19:35:55.427Z
+                at 2026-02-09T10:18:46.573Z
             </div>
         <script src="../prettify.js"></script>
         <script>

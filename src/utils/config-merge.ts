@@ -7,11 +7,6 @@
 
 import type {
 	ParsedYamlConfig,
-	YamlMetaConfig,
-	YamlRenderDisplayConfig,
-	YamlFilterConfig,
-	YamlCalloutConfig,
-	YamlRenderCmdoutConfig,
 } from '../types';
 
 /**

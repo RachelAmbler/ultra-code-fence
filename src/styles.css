@@ -707,12 +707,6 @@ pre.ucf-scrollable::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(180deg, #9ca3af, #7c8594);
 }
 
-/* Firefox scrollbar */
-pre.ucf-scrollable {
-    scrollbar-width: auto;
-    scrollbar-color: #7c8594 rgba(0, 0, 0, 0.4);
-}
-
 /* Light theme adjustments */
 .theme-light pre.ucf-scrollable::-webkit-scrollbar-track {
     background: rgba(0, 0, 0, 0.15);
@@ -763,18 +757,6 @@ pre.ucf-scrollable {
 /* Each line in cmdout must be a block element */
 .ucf-cmdout-pre .ucf-cmdout-line {
     display: block !important;
-}
-
-.ucf-cmdout-pre .ucf-cmdout-prompt {
-    /* Prompt styling - defaults can be overridden inline */
-}
-
-.ucf-cmdout-pre .ucf-cmdout-command {
-    /* Command styling - defaults can be overridden inline */
-}
-
-.ucf-cmdout-pre .ucf-cmdout-output {
-    /* Output styling - defaults can be overridden inline */
 }
 
 /* ============================================================================
@@ -1337,7 +1319,7 @@ pre.ucf-scrollable {
     color: var(--text-on-accent, #fff);
 }
 
-/* Popover content (hidden by default, toggled via JS) */
+/* Popover content (hidden by default, toggled via JS class) */
 .ucf-callout-popover {
     display: none;
     position: absolute;
@@ -1371,6 +1353,36 @@ pre.ucf-scrollable {
 
 .theme-dark .ucf-callout-popover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.ucf-callout-popover.ucf-popover-visible {
+    display: block;
+}
+
+/* Hidden config block (ufence-ufence page defaults) */
+.ucf-config-block {
+    display: none;
+}
+
+/* ============================================================================
+   Settings UI - Presets
+   ============================================================================ */
+
+.ucf-preset-entry {
+    margin-bottom: 1.5em;
+}
+
+.ucf-preset-editor {
+    margin-bottom: 0.5em;
+}
+
+.ucf-preset-buttons {
+    display: flex;
+    gap: 0.5em;
+}
+
+.ucf-preset-delete {
+    color: var(--text-error, #e74c3c);
 }
 
 /* ============================================================================

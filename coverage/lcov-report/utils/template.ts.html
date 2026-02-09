@@ -267,7 +267,22 @@
 <a name='L202'></a><a href='#L202'>202</a>
 <a name='L203'></a><a href='#L203'>203</a>
 <a name='L204'></a><a href='#L204'>204</a>
-<a name='L205'></a><a href='#L205'>205</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L205'></a><a href='#L205'>205</a>
+<a name='L206'></a><a href='#L206'>206</a>
+<a name='L207'></a><a href='#L207'>207</a>
+<a name='L208'></a><a href='#L208'>208</a>
+<a name='L209'></a><a href='#L209'>209</a>
+<a name='L210'></a><a href='#L210'>210</a>
+<a name='L211'></a><a href='#L211'>211</a>
+<a name='L212'></a><a href='#L212'>212</a>
+<a name='L213'></a><a href='#L213'>213</a>
+<a name='L214'></a><a href='#L214'>214</a>
+<a name='L215'></a><a href='#L215'>215</a>
+<a name='L216'></a><a href='#L216'>216</a>
+<a name='L217'></a><a href='#L217'>217</a>
+<a name='L218'></a><a href='#L218'>218</a>
+<a name='L219'></a><a href='#L219'>219</a>
+<a name='L220'></a><a href='#L220'>220</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -323,12 +338,19 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -363,12 +385,20 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -525,17 +555,24 @@ function parseTemplateVariable(variableString: string): ParsedTemplateVariable {
 // =============================================================================
 &nbsp;
 /**
- * Text field names that support case formatting.
+ * Template variable names that map to text-based file metadata fields.
+ * Each supports optional case formatting via a colon modifier (e.g., {filename:upper}).
  */
 const TEXT_FIELD_NAMES = ['filename', 'basename', 'extension', 'fullpath', 'parentfolder'] as const;
 &nbsp;
 /**
- * Case formats supported by text fields.
+ * Recognised case format modifiers for text template variables.
+ * Used to validate the modifier portion of patterns like {filename:upper}.
  */
 const SUPPORTED_CASE_FORMATS = ['upper', 'lower', 'title', 'capitalise'] as const;
 &nbsp;
 /**
- * Gets a text field value with optional case formatting.
+ * Gets a text field value from metadata with optional case formatting.
+ *
+ * @param metadata - Source file metadata containing field values
+ * @param fieldName - Field name to look up (e.g., "filename", "basename")
+ * @param formatModifier - Optional case format (e.g., "upper", "lower", "title")
+ * @returns Formatted field value, or null if field name is not recognised
  */
 function getTextFieldValue(
 	metadata: SourceFileMetadata,
@@ -564,7 +601,11 @@ function getTextFieldValue(
 }
 &nbsp;
 /**
- * Gets the size field value with optional format.
+ * Gets the file size value from metadata with optional unit format.
+ *
+ * @param metadata - Source file metadata containing sizeInBytes
+ * @param formatModifier - Optional size format (e.g., "auto", "bytes", "kb", "mb", "gb")
+ * @returns Formatted size string, empty string if size is unavailable, or null on error
  */
 function getSizeFieldValue(metadata: SourceFileMetadata, formatModifier?: string): string | null {
 	if (metadata.sizeInBytes === undefined) {
@@ -576,7 +617,11 @@ function getSizeFieldValue(metadata: SourceFileMetadata, formatModifier?: string
 }
 &nbsp;
 /**
- * Gets a date field value with optional format.
+ * Gets a date/time value formatted from a millisecond timestamp.
+ *
+ * @param timestampMs - Unix timestamp in milliseconds, or undefined if unavailable
+ * @param formatModifier - Optional date format (e.g., "short", "long", "iso", "relative")
+ * @returns Formatted date string, empty string if timestamp is unavailable, or null on error
  */
 function getDateFieldValue(timestampMs: number | undefined, formatModifier?: string): string | null {
 	if (timestampMs === undefined) {
@@ -682,7 +727,7 @@ export function containsTemplateVariables(templateString: string): boolean {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-02-08T19:35:55.460Z
+                at 2026-02-09T10:18:46.610Z
             </div>
         <script src="../prettify.js"></script>
         <script>

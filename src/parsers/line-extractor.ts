@@ -17,10 +17,10 @@ import type { ResolvedBlockConfig } from '../types';
  */
 export interface MarkerExtractionResult {
 	/** Extracted content, or null if extraction failed */
-	extractedContent: string | null;
+	content: string | null;
 
 	/** Error message if extraction failed, null on success */
-	errorMessage: string | null;
+	error: string | null;
 }
 
 /**
@@ -62,7 +62,7 @@ export function extractBetweenMarkersWithOptions(
 	const { inclusive = false } = options;
 
 	if (!startMarker || !endMarker) {
-		return { extractedContent: null, errorMessage: 'Both start and end markers must be non-empty' };
+		return { content: null, error: 'Both start and end markers must be non-empty' };
 	}
 
 	const lines = sourceCode.split('\n');
@@ -80,11 +80,11 @@ export function extractBetweenMarkersWithOptions(
 	}
 
 	if (startIndex === -1) {
-		return { extractedContent: null, errorMessage: `Start marker "${startMarker}" not found in file` };
+		return { content: null, error: `Start marker "${startMarker}" not found in file` };
 	}
 
 	if (endIndex === -1) {
-		return { extractedContent: null, errorMessage: `End marker "${endMarker}" not found after start marker` };
+		return { content: null, error: `End marker "${endMarker}" not found after start marker` };
 	}
 
 	// Extract lines based on inclusive flag
@@ -105,32 +105,7 @@ export function extractBetweenMarkersWithOptions(
 		}
 	}
 
-	return { extractedContent: extractedLines.join('\n'), errorMessage: null };
-}
-
-/**
- * Legacy function for backward compatibility.
- * Extracts content between markers (exclusive by default).
- *
- * @deprecated Use extractBetweenMarkersWithOptions for new code
- */
-export function extractBetweenMarkers(sourceCode: string, markersSpec: string): MarkerExtractionResult {
-	if (!markersSpec?.trim()) {
-		return { extractedContent: null, errorMessage: 'No markers specified' };
-	}
-
-	const markers = markersSpec.split(',').map(m => m.trim());
-
-	if (markers.length < 2) {
-		return {
-			extractedContent: null,
-			errorMessage: 'MARKERS requires both start and end marker (e.g., MARKERS: "start,end")',
-		};
-	}
-
-	const [startMarker, endMarker] = markers;
-
-	return extractBetweenMarkersWithOptions(sourceCode, startMarker, endMarker, { inclusive: false });
+	return { content: extractedLines.join('\n'), error: null };
 }
 
 // =============================================================================
@@ -387,11 +362,11 @@ export function applyFilterChain(
 			{ inclusive: config.filterByMarks.inclusive }
 		);
 
-		if (result.errorMessage) {
-			return { content: '', error: result.errorMessage };
+		if (result.error) {
+			return { content: '', error: result.error };
 		}
 
-		content = result.extractedContent ?? '';
+		content = result.content ?? '';
 	}
 
 	return { content, error: null };

@@ -15,7 +15,7 @@
  * - Popover: trigger appended inside line content; hidden content on <pre>
  */
 
-import type { ResolvedCalloutConfig, ResolvedCalloutEntry } from '../types';
+import type { ResolvedCalloutConfig } from '../types';
 import { CSS_CLASSES } from '../constants';
 import {
 	groupCalloutsByLine,
@@ -254,6 +254,8 @@ function setupPopoverInteractions(preElement: HTMLElement): void {
 	const triggers = Array.from(preElement.querySelectorAll(`.${CSS_CLASSES.calloutTrigger}`));
 	const popovers = Array.from(preElement.querySelectorAll(`.${CSS_CLASSES.calloutPopover}`));
 
+	const VISIBLE_CLASS = 'ucf-popover-visible';
+
 	for (const trigger of triggers) {
 		const id = trigger.getAttribute('data-callout-id');
 		const popover = popovers.find(p => p.getAttribute('data-callout-id') === id) as HTMLElement;
@@ -261,12 +263,14 @@ function setupPopoverInteractions(preElement: HTMLElement): void {
 		if (popover) {
 			trigger.addEventListener('click', (e) => {
 				e.stopPropagation();
-				const isVisible = popover.style.display !== 'none' && popover.style.display !== '';
+				const isVisible = popover.classList.contains(VISIBLE_CLASS);
 				// Hide all other popovers first
 				for (const p of popovers) {
-					(p as HTMLElement).style.display = 'none';
+					(p as HTMLElement).classList.remove(VISIBLE_CLASS);
 				}
-				popover.style.display = isVisible ? 'none' : 'block';
+				if (!isVisible) {
+					popover.classList.add(VISIBLE_CLASS);
+				}
 			});
 		}
 	}
@@ -274,7 +278,7 @@ function setupPopoverInteractions(preElement: HTMLElement): void {
 	// Close popovers when clicking outside
 	preElement.addEventListener('click', () => {
 		for (const p of popovers) {
-			(p as HTMLElement).style.display = 'none';
+			(p as HTMLElement).classList.remove(VISIBLE_CLASS);
 		}
 	});
 }

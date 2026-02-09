@@ -49,7 +49,8 @@ export function resolvePreset(
 		// Strip META.PRESET from page config before merging (prevent cascading)
 		let cleanPageConfig = pageConfig;
 		if (pageConfig.META?.PRESET) {
-			const { PRESET, ...restMeta } = pageConfig.META;
+			const restMeta = { ...pageConfig.META };
+			delete restMeta.PRESET;
 			cleanPageConfig = {
 				...pageConfig,
 				META: Object.keys(restMeta).length > 0 ? restMeta : undefined,
@@ -68,7 +69,8 @@ export function resolvePreset(
 
 	// Strip PRESET from final merged META (prevent cascading)
 	if (result.META) {
-		const { PRESET, ...restMeta } = result.META;
+		const restMeta = { ...result.META };
+		delete restMeta.PRESET;
 		result.META = Object.keys(restMeta).length > 0 ? restMeta : undefined;
 	}
 

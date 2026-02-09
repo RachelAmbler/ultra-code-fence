@@ -19,6 +19,9 @@ node_modules/
 # Build output
 main.js
 
+# Test coverage reports
+coverage/
+
 # OS files
 .DS_Store
 Thumbs.db

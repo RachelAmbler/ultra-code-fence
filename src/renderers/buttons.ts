@@ -156,14 +156,19 @@ export function addCopyButton(preElement: HTMLPreElement, options?: CopyButtonOp
 // =============================================================================
 
 /**
- * Creates the "show more" button text.
+ * Creates the "show more" button text with a chevron icon.
+ *
+ * @param hiddenLineCount - Number of lines hidden by the fold
+ * @returns HTML string with SVG icon and line count label
  */
 function buildExpandButtonContent(hiddenLineCount: number): string {
 	return `${CHEVRON_DOWN_SVG}<span>Show more (${hiddenLineCount} more lines)</span>`;
 }
 
 /**
- * Creates the "show less" button text.
+ * Creates the "show less" button text with a chevron icon.
+ *
+ * @returns HTML string with SVG icon and "Show less" label
  */
 function buildCollapseButtonContent(): string {
 	return `${CHEVRON_UP_SVG}<span>Show less</span>`;
@@ -191,7 +196,8 @@ export function addFoldButton(
 	// Calculate folded height based on line height
 	const computedStyle = getComputedStyle(codeElement);
 	const lineHeight = parseFloat(computedStyle.lineHeight) || 20;
-	const foldedHeight = (visibleLinesWhenFolded * lineHeight) + 16; // Add padding
+	const FOLD_PADDING_PX = 16;
+	const foldedHeight = (visibleLinesWhenFolded * lineHeight) + FOLD_PADDING_PX;
 
 	// Start in folded state
 	preElement.classList.add(CSS_CLASSES.folded);

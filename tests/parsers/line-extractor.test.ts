@@ -1,15 +1,14 @@
 /**
  * Tests for src/parsers/line-extractor.ts
  *
- * Covers: extractBetweenMarkersWithOptions, extractBetweenMarkers,
- *         extractLines, parseLineSpec, extractLineRange, countLines,
+ * Covers: extractBetweenMarkersWithOptions, extractLines,
+ *         parseLineSpec, extractLineRange, countLines,
  *         trimTrailingEmptyLines, applyFilterChain
  */
 
 import { describe, it, expect } from 'vitest';
 import {
 	extractBetweenMarkersWithOptions,
-	extractBetweenMarkers,
 	extractLines,
 	extractLineRange,
 	countLines,
@@ -79,21 +78,21 @@ function testConfig(
 describe('extractBetweenMarkersWithOptions', () => {
 	it('extracts content between markers (exclusive)', () => {
 		const result = extractBetweenMarkersWithOptions(SAMPLE_CODE, '// BEGIN', '// END');
-		expect(result.extractedContent).toBe('code A\ncode B');
-		expect(result.errorMessage).toBeNull();
+		expect(result.content).toBe('code A\ncode B');
+		expect(result.error).toBeNull();
 	});
 
 	it('trims leading and trailing blank lines in exclusive mode', () => {
 		const result = extractBetweenMarkersWithOptions(SAMPLE_CODE, '// BEGIN', '// END');
 		// Lines 5 and 8 are blank, should be trimmed
-		expect(result.extractedContent).toBe('code A\ncode B');
+		expect(result.content).toBe('code A\ncode B');
 	});
 
 	it('includes marker lines when inclusive', () => {
 		const result = extractBetweenMarkersWithOptions(
 			SAMPLE_CODE, '// BEGIN', '// END', { inclusive: true }
 		);
-		expect(result.extractedContent).toBe('// BEGIN\n\ncode A\ncode B\n\n// END');
+		expect(result.content).toBe('// BEGIN\n\ncode A\ncode B\n\n// END');
 	});
 
 	it('does not trim blank lines in inclusive mode', () => {
@@ -101,80 +100,49 @@ describe('extractBetweenMarkersWithOptions', () => {
 			SAMPLE_CODE, '// BEGIN', '// END', { inclusive: true }
 		);
 		// Blank lines adjacent to markers should be preserved
-		expect(result.extractedContent).toContain('\n\ncode A');
+		expect(result.content).toContain('\n\ncode A');
 	});
 
 	it('returns error when start marker not found', () => {
 		const result = extractBetweenMarkersWithOptions(SAMPLE_CODE, '// MISSING', '// END');
-		expect(result.extractedContent).toBeNull();
-		expect(result.errorMessage).toContain('Start marker');
+		expect(result.content).toBeNull();
+		expect(result.error).toContain('Start marker');
 	});
 
 	it('returns error when end marker not found', () => {
 		const result = extractBetweenMarkersWithOptions(SAMPLE_CODE, '// BEGIN', '// MISSING');
-		expect(result.extractedContent).toBeNull();
-		expect(result.errorMessage).toContain('End marker');
+		expect(result.content).toBeNull();
+		expect(result.error).toContain('End marker');
 	});
 
 	it('returns error for empty start marker', () => {
 		const result = extractBetweenMarkersWithOptions(SAMPLE_CODE, '', '// END');
-		expect(result.extractedContent).toBeNull();
-		expect(result.errorMessage).toContain('non-empty');
+		expect(result.content).toBeNull();
+		expect(result.error).toContain('non-empty');
 	});
 
 	it('returns error for empty end marker', () => {
 		const result = extractBetweenMarkersWithOptions(SAMPLE_CODE, '// BEGIN', '');
-		expect(result.extractedContent).toBeNull();
-		expect(result.errorMessage).toContain('non-empty');
+		expect(result.content).toBeNull();
+		expect(result.error).toContain('non-empty');
 	});
 
 	it('matches partial line content', () => {
 		const code = 'foo BEGIN bar\ncontent\nfoo END bar';
 		const result = extractBetweenMarkersWithOptions(code, 'BEGIN', 'END');
-		expect(result.extractedContent).toBe('content');
+		expect(result.content).toBe('content');
 	});
 
 	it('returns empty string when markers are adjacent', () => {
 		const code = '// BEGIN\n// END';
 		const result = extractBetweenMarkersWithOptions(code, '// BEGIN', '// END');
-		expect(result.extractedContent).toBe('');
+		expect(result.content).toBe('');
 	});
 
 	it('finds first occurrence of start and nearest end after it', () => {
 		const code = '// BEGIN\nfirst\n// END\n// BEGIN\nsecond\n// END';
 		const result = extractBetweenMarkersWithOptions(code, '// BEGIN', '// END');
-		expect(result.extractedContent).toBe('first');
-	});
-});
-
-// =============================================================================
-// extractBetweenMarkers (legacy)
-// =============================================================================
-
-describe('extractBetweenMarkers', () => {
-	it('parses comma-separated markers', () => {
-		const result = extractBetweenMarkers(SAMPLE_CODE, '// BEGIN, // END');
-		expect(result.extractedContent).toBe('code A\ncode B');
-	});
-
-	it('returns error for empty spec', () => {
-		const result = extractBetweenMarkers(SAMPLE_CODE, '');
-		expect(result.errorMessage).toContain('No markers');
-	});
-
-	it('returns error for whitespace-only spec', () => {
-		const result = extractBetweenMarkers(SAMPLE_CODE, '   ');
-		expect(result.errorMessage).toContain('No markers');
-	});
-
-	it('returns error for single marker (no comma)', () => {
-		const result = extractBetweenMarkers(SAMPLE_CODE, '// BEGIN');
-		expect(result.errorMessage).toContain('start and end marker');
-	});
-
-	it('trims whitespace around markers', () => {
-		const result = extractBetweenMarkers(SAMPLE_CODE, '  // BEGIN  ,  // END  ');
-		expect(result.extractedContent).toBe('code A\ncode B');
+		expect(result.content).toBe('first');
 	});
 });
 

@@ -16,13 +16,17 @@
 >   TITLE: "Lesson Example"
 > ```
 > Then the blocks below will inherit those defaults automatically.
+>
+> **Note:** After editing the `ufence-ufence` block or changing a preset in Settings, use the **Force Refresh** command (Command palette → *Ultra Code Fence: Force refresh all code blocks*) to update existing blocks on the page. Preset changes via the Settings UI apply automatically on Save.
 
 ### 31a. Page-level preset (invisible config block)
 
-Sets a default preset for all ufence blocks on this page (unless overridden):
+Sets defaults for all ufence blocks on this page (unless overridden). Only one `ufence-ufence` block per page is supported. After editing, run **Force Refresh** to apply changes:
 
 ```ufence-ufence
-PRESET: "teaching"
+RENDER:
+   ZEBRA: true
+   LINES: true
 ```
 
 ### 31b. Block inherits page preset
@@ -85,15 +89,9 @@ console.log(greet("World"));
 
 ### 31e. Page-level inline defaults (no named preset)
 
-Instead of referencing a named preset, you can put config directly into a `ufence-ufence` block. Every ufence block on the page will inherit these defaults.
+The page-level `ufence-ufence` block in 31a above sets inline defaults (ZEBRA + LINES) for every ufence block on this page. Only one `ufence-ufence` block is allowed per page — the first one wins.
 
-```ufence-ufence
-RENDER:
-  ZEBRA: true
-  LINES: true
-```
-
-This block should have zebra stripes and line numbers from the inline page defaults above:
+This block should have zebra stripes and line numbers from the page-level config:
 
 ```ufence-go
 ~~~
@@ -109,21 +107,17 @@ func main() {
 }
 ```
 
-### 31f. Combined: named preset + inline overrides
+### 31f. Block-level preset with overrides
 
-You can also combine a named preset reference with inline config. The inline config overrides the preset, and block-level config overrides everything.
-
-```ufence-ufence
-PRESET: "teaching"
-RENDER:
-  ZEBRA: false
-```
-
-This block inherits "teaching" (line numbers, fold 20, title) but ZEBRA is turned off by the inline page override:
+A block can reference a named preset and override individual values. Here we use the "teaching" preset but turn ZEBRA off at the block level:
 
 ```ufence-rust
+META:
+  PRESET: "teaching"
+RENDER:
+  ZEBRA: false
 ~~~
-// teaching preset + inline override (ZEBRA: false)
+// teaching preset + block-level override (ZEBRA: false)
 // Should have: line numbers, fold at 20, title "Lesson Example", but NO zebra
 fn main() {
     let numbers: Vec<i32> = (1..=10).collect();
