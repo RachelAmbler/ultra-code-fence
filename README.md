@@ -1,5 +1,10 @@
 # Ultra Code Fence
 
+[![CI](https://github.com/RachelAmbler/ultra-code-fence/actions/workflows/ci.yml/badge.svg)](https://github.com/RachelAmbler/ultra-code-fence/actions/workflows/ci.yml)
+[![Coverage](https://raw.githubusercontent.com/RachelAmbler/ultra-code-fence/main/.github/badges/coverage.svg)](https://github.com/RachelAmbler/ultra-code-fence/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Obsidian](https://img.shields.io/badge/Obsidian-plugin-7C3AED.svg)](https://obsidian.md)
+
 ![Ultra Code Fence](Assets/social-preview.png)
 
 Ultra Code Fence extends Obsidian's standard fenced code blocks with advanced embedding, formatting, and display capabilities.

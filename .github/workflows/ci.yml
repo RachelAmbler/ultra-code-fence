@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  ci:
+    name: Lint, Test & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm run test:coverage
+
+      - name: Build
+        run: node esbuild.config.mjs production
+
+      - name: Upload coverage
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 30
+
+      - name: Generate coverage badge
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          COVERAGE=$(node -e "
+            const fs = require('fs');
+            const lcov = fs.readFileSync('coverage/lcov.info', 'utf8');
+            const lines = lcov.split('\n');
+            let hit = 0, found = 0;
+            for (const line of lines) {
+              if (line.startsWith('LH:')) hit += parseInt(line.slice(3));
+              if (line.startsWith('LF:')) found += parseInt(line.slice(3));
+            }
+            console.log(found > 0 ? Math.round(hit / found * 100) : 0);
+          ")
+          echo "COVERAGE_PCT=${COVERAGE}" >> $GITHUB_ENV
+          mkdir -p .github/badges
+          # Thresholds reflect that DOM/UI code (~50% of codebase) cannot be
+          # unit-tested without a browser environment. Parsers, utils, and
+          # services are thoroughly covered; renderers and UI are excluded.
+          if [ "$COVERAGE" -ge 60 ]; then
+            COLOR="brightgreen"
+          elif [ "$COVERAGE" -ge 50 ]; then
+            COLOR="green"
+          elif [ "$COVERAGE" -ge 40 ]; then
+            COLOR="yellowgreen"
+          elif [ "$COVERAGE" -ge 30 ]; then
+            COLOR="yellow"
+          else
+            COLOR="red"
+          fi
+          curl -s "https://img.shields.io/badge/coverage-${COVERAGE}%25-${COLOR}" > .github/badges/coverage.svg
+
+      - name: Commit coverage badge
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .github/badges/coverage.svg
+          git diff --staged --quiet || git commit -m "Update coverage badge [skip ci]"
+          git push
