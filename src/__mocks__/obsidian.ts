@@ -141,8 +141,8 @@ export class PluginSettingTab {
 function _chainStub(): Record<string, unknown> {
 	const self: Record<string, unknown> = {};
 	const proxy: Record<string, unknown> = new Proxy(self, {
-		get(_target, prop) {
-			if (prop in self) return self[prop];
+		get(_target, prop: string | symbol) {
+			if (typeof prop === 'string' && prop in self) return self[prop];
 			// Any unknown property returns a function that returns the proxy
 			return (..._args: unknown[]) => proxy;
 		},
