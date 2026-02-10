@@ -68,14 +68,24 @@ jobs:
           # Write to file to preserve newlines
           printf "$body" > /tmp/release-notes.md
 
-      - name: Create release
+      - name: Create or update release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           tag="${GITHUB_REF#refs/tags/}"
 
-          gh release create "$tag" \
-            --title="$tag" \
-            --draft \
-            --notes-file /tmp/release-notes.md \
-            main.js manifest.json styles.css
+          # If a release already exists (e.g. created via GitHub UI), update it
+          if gh release view "$tag" &>/dev/null; then
+            gh release upload "$tag" --clobber \
+              main.js manifest.json styles.css
+            gh release edit "$tag" \
+              --title="$tag" \
+              --draft \
+              --notes-file /tmp/release-notes.md
+          else
+            gh release create "$tag" \
+              --title="$tag" \
+              --draft \
+              --notes-file /tmp/release-notes.md \
+              main.js manifest.json styles.css
+          fi
