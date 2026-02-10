@@ -1,4 +1,3 @@
-
 name: Release Obsidian plugin
 
 on:
@@ -7,35 +6,46 @@ on:
       - "*"
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Use Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: "18.x"
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
 
       - name: Build plugin
         run: |
-          npm install --force
           npm run build
           cp src/styles.css styles.css
 
-      - name: Generate release notes from issues
-        id: notes
+      - name: Validate build artifacts
+        run: |
+          for file in main.js manifest.json styles.css; do
+            if [ ! -f "$file" ]; then
+              echo "ERROR: Missing artifact: $file"
+              exit 1
+            fi
+            echo "OK: $file ($(wc -c < "$file") bytes)"
+          done
+
+      - name: Generate release notes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           tag="${GITHUB_REF#refs/tags/}"
 
-          # Find the previous tag
-          prev_tag=$(git tag --sort=-v:refname | grep -v "^${tag}$" | head -1)
+          # Find the previous tag (if any)
+          prev_tag=$(git tag --sort=-v:refname | grep -v "^${tag}$" | head -1 || true)
 
           if [ -n "$prev_tag" ]; then
             range="${prev_tag}..${tag}"
@@ -45,19 +55,22 @@ jobs:
 
           echo "Scanning commits in ${range} for issue references..."
 
-          # Extract unique issue numbers referenced in commit messages
-          issues=$(git log "$range" --pretty=format:"%s %b" \
-            | grep -oE '#[0-9]+' \
-            | sort -t'#' -k2 -n -u \
-            | tr -d '#')
+          # Extract unique issue numbers from commit messages
+          # grep || true prevents exit code 1 when no matches found
+          issue_nums=$(git log "$range" --pretty=format:"%s %b" \
+            | grep -oE '#[0-9]+' || true)
+
+          # Deduplicate and strip the # prefix
+          issue_nums=$(echo "$issue_nums" | sort -u -t'#' -k1 -n | tr -d '#' | xargs)
 
           body=""
-          for num in $issues; do
-            # Fetch the issue title from GitHub (skip if not found)
-            title=$(gh issue view "$num" --json title,stateReason \
-              --jq 'select(.stateReason == "COMPLETED" or .stateReason == null) | .title' 2>/dev/null || true)
+          for num in $issue_nums; do
+            title=$(gh issue view "$num" \
+              --json title,stateReason \
+              --jq 'select(.stateReason == "COMPLETED" or .stateReason == null) | .title' \
+              2>/dev/null || true)
             if [ -n "$title" ]; then
-              body="${body}- ${title} (#${num})\n"
+              body="${body}- ${title} (#${num})"$'\n'
             fi
           done
 
@@ -65,25 +78,26 @@ jobs:
             body="No issues referenced in commits since last release."
           fi
 
-          # Write to file to preserve newlines
-          printf "$body" > /tmp/release-notes.md
+          printf '%s' "$body" > /tmp/release-notes.md
+          echo "--- Release notes ---"
+          cat /tmp/release-notes.md
+          echo "---------------------"
 
-      - name: Create or update release
+      - name: Publish release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           tag="${GITHUB_REF#refs/tags/}"
 
-          # If a release already exists (e.g. created via GitHub UI), update it
+          # If a release already exists (e.g. created via GitHub UI), delete it
+          # so we can create a fresh one with artifacts attached
           if gh release view "$tag" &>/dev/null; then
-            gh release upload "$tag" --clobber \
-              main.js manifest.json styles.css
-            gh release edit "$tag" \
-              --title="$tag" \
-              --notes-file /tmp/release-notes.md
-          else
-            gh release create "$tag" \
-              --title="$tag" \
-              --notes-file /tmp/release-notes.md \
-              main.js manifest.json styles.css
+            echo "Deleting existing release for ${tag}..."
+            gh release delete "$tag" --yes
           fi
+
+          echo "Creating release ${tag}..."
+          gh release create "$tag" \
+            --title="$tag" \
+            --notes-file /tmp/release-notes.md \
+            main.js manifest.json styles.css
