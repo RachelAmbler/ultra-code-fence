@@ -1,9 +1,8 @@
 name: Release Obsidian plugin
 
 on:
-  push:
-    tags:
-      - "*"
+  release:
+    types: [published]
 
 jobs:
   release:
@@ -13,8 +12,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
@@ -28,80 +25,10 @@ jobs:
           npm run build
           cp src/styles.css styles.css
 
-      - name: Validate build artifacts
-        run: |
-          for file in main.js manifest.json styles.css; do
-            if [ ! -f "$file" ]; then
-              echo "ERROR: Missing artifact: $file"
-              exit 1
-            fi
-            echo "OK: $file ($(wc -c < "$file") bytes)"
-          done
-
-      - name: Generate release notes
+      - name: Upload artifacts to release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          tag="${GITHUB_REF#refs/tags/}"
-
-          # Find the previous tag (if any)
-          prev_tag=$(git tag --sort=-v:refname | grep -v "^${tag}$" | head -1 || true)
-
-          if [ -n "$prev_tag" ]; then
-            range="${prev_tag}..${tag}"
-          else
-            range="$tag"
-          fi
-
-          echo "Scanning commits in ${range} for issue references..."
-
-          # Extract unique issue numbers from commit messages
-          # grep || true prevents exit code 1 when no matches found
-          issue_nums=$(git log "$range" --pretty=format:"%s %b" \
-            | grep -oE '#[0-9]+' || true)
-
-          # Deduplicate and strip the # prefix
-          issue_nums=$(echo "$issue_nums" | sort -u -t'#' -k1 -n | tr -d '#' | xargs)
-
-          body=""
-          for num in $issue_nums; do
-            title=$(gh issue view "$num" \
-              --json title,stateReason \
-              --jq 'select(.stateReason == "COMPLETED" or .stateReason == null) | .title' \
-              2>/dev/null || true)
-            if [ -n "$title" ]; then
-              body="${body}- ${title} (#${num})"$'\n'
-            fi
-          done
-
-          if [ -z "$body" ]; then
-            body="No issues referenced in commits since last release."
-          fi
-
-          printf '%s' "$body" > /tmp/release-notes.md
-          echo "--- Release notes ---"
-          cat /tmp/release-notes.md
-          echo "---------------------"
-
-      - name: Publish release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          tag="${GITHUB_REF#refs/tags/}"
-
-          if gh release view "$tag" &>/dev/null; then
-            # Release exists (created via GitHub UI) — upload artifacts and update notes
-            echo "Updating existing release ${tag}..."
-            gh release upload "$tag" --clobber \
-              main.js manifest.json styles.css
-            gh release edit "$tag" \
-              --title="$tag" \
-              --notes-file /tmp/release-notes.md
-          else
-            # No release exists (tag pushed via CLI) — create one
-            echo "Creating release ${tag}..."
-            gh release create "$tag" \
-              --title="$tag" \
-              --notes-file /tmp/release-notes.md \
-              main.js manifest.json styles.css
-          fi
+          gh release upload "${{ github.event.release.tag_name }}" \
+            --clobber \
+            main.js manifest.json styles.css
