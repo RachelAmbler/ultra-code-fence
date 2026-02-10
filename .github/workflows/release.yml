@@ -13,6 +13,8 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Use Node.js
         uses: actions/setup-node@v3
@@ -25,6 +27,47 @@ jobs:
           npm run build
           cp src/styles.css styles.css
 
+      - name: Generate release notes from issues
+        id: notes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag="${GITHUB_REF#refs/tags/}"
+
+          # Find the previous tag
+          prev_tag=$(git tag --sort=-v:refname | grep -v "^${tag}$" | head -1)
+
+          if [ -n "$prev_tag" ]; then
+            range="${prev_tag}..${tag}"
+          else
+            range="$tag"
+          fi
+
+          echo "Scanning commits in ${range} for issue references..."
+
+          # Extract unique issue numbers referenced in commit messages
+          issues=$(git log "$range" --pretty=format:"%s %b" \
+            | grep -oE '#[0-9]+' \
+            | sort -t'#' -k2 -n -u \
+            | tr -d '#')
+
+          body=""
+          for num in $issues; do
+            # Fetch the issue title from GitHub (skip if not found)
+            title=$(gh issue view "$num" --json title,stateReason \
+              --jq 'select(.stateReason == "COMPLETED" or .stateReason == null) | .title' 2>/dev/null || true)
+            if [ -n "$title" ]; then
+              body="${body}- ${title} (#${num})\n"
+            fi
+          done
+
+          if [ -z "$body" ]; then
+            body="No issues referenced in commits since last release."
+          fi
+
+          # Write to file to preserve newlines
+          printf "$body" > /tmp/release-notes.md
+
       - name: Create release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -34,4 +77,5 @@ jobs:
           gh release create "$tag" \
             --title="$tag" \
             --draft \
+            --notes-file /tmp/release-notes.md \
             main.js manifest.json styles.css
