@@ -1,8 +1,9 @@
 name: Release Obsidian plugin
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - "*"
 
 jobs:
   release:
@@ -12,6 +13,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
@@ -25,10 +28,72 @@ jobs:
           npm run build
           cp src/styles.css styles.css
 
-      - name: Upload artifacts to release
+      - name: Generate release notes
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload "${{ github.event.release.tag_name }}" \
-            --clobber \
-            main.js manifest.json styles.css
+          tag="${{ github.ref_name }}"
+
+          # Find the previous tag (if any)
+          prev_tag=$(git tag --sort=-v:refname | grep -v "^${tag}$" | head -1 || true)
+
+          if [ -n "$prev_tag" ]; then
+            range="${prev_tag}..${tag}"
+          else
+            range="$tag"
+          fi
+
+          echo "Scanning commits in ${range} for issue references..."
+
+          # Extract unique issue numbers from commit messages
+          issue_nums=$(git log "$range" --pretty=format:"%s %b" \
+            | grep -oE '#[0-9]+' || true)
+
+          # Deduplicate and strip the # prefix
+          issue_nums=$(echo "$issue_nums" | sort -u -t'#' -k1 -n | tr -d '#' | xargs)
+
+          body=""
+          for num in $issue_nums; do
+            title=$(gh issue view "$num" \
+              --json title,stateReason \
+              --jq 'select(.stateReason == "COMPLETED" or .stateReason == null) | .title' \
+              2>/dev/null || true)
+            if [ -n "$title" ]; then
+              body="${body}- ${title} (#${num})"$'\n'
+            fi
+          done
+
+          if [ -z "$body" ]; then
+            body="No issues referenced in commits since last release."
+          fi
+
+          printf '%s' "$body" > /tmp/release-notes.md
+          echo "--- Release notes ---"
+          cat /tmp/release-notes.md
+          echo "---------------------"
+
+      - name: Publish release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag="${{ github.ref_name }}"
+
+          if gh release view "$tag" &>/dev/null; then
+            # Draft release exists (created via GitHub UI)
+            # Upload artifacts then publish it
+            echo "Uploading artifacts to draft release ${tag}..."
+            gh release upload "$tag" --clobber \
+              main.js manifest.json styles.css
+            echo "Updating release notes..."
+            gh release edit "$tag" --notes-file /tmp/release-notes.md
+            echo "Publishing release ${tag}..."
+            gh release edit "$tag" --draft=false
+          else
+            # No release exists (tag pushed via CLI)
+            # Create a published release with artifacts
+            echo "Creating release ${tag}..."
+            gh release create "$tag" \
+              --title="$tag" \
+              --notes-file /tmp/release-notes.md \
+              main.js manifest.json styles.css
+          fi
