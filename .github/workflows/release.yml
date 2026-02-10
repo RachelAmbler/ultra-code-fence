@@ -80,12 +80,10 @@ jobs:
               main.js manifest.json styles.css
             gh release edit "$tag" \
               --title="$tag" \
-              --draft \
               --notes-file /tmp/release-notes.md
           else
             gh release create "$tag" \
               --title="$tag" \
-              --draft \
               --notes-file /tmp/release-notes.md \
               main.js manifest.json styles.css
           fi
