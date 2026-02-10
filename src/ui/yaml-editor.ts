@@ -19,6 +19,7 @@
 import { parseYaml } from 'obsidian';
 import { highlightYaml } from './yaml-highlighter';
 import { validateYamlSchema, formatWarnings } from './yaml-validator';
+import { parseHtmlFragment } from '../utils/dom';
 
 // =============================================================================
 // Types
@@ -101,13 +102,20 @@ export function createYamlEditor(
 
 	function updateHighlight(): void {
 		const value = textarea.value;
-		if (value.trim() === '') {
-			code.innerHTML = '';
-		} else {
-			code.innerHTML = highlightYaml(value);
+
+		// Clear code element
+		while (code.firstChild) {
+			code.removeChild(code.firstChild);
 		}
+
+		if (value.trim() !== '') {
+			const highlightedHtml = highlightYaml(value);
+			const fragment = parseHtmlFragment(highlightedHtml);
+			code.appendChild(fragment);
+		}
+
 		// Append a trailing newline so the pre doesn't collapse the last line
-		code.innerHTML += '\n';
+		code.appendChild(document.createTextNode('\n'));
 	}
 
 	function validateYaml(): void {
@@ -120,7 +128,7 @@ export function createYamlEditor(
 		}
 
 		try {
-			const parsed = parseYaml(value);
+			const parsed: unknown = parseYaml(value);
 			if (parsed === null || parsed === undefined) {
 				setStatus('Empty YAML', 'invalid');
 			} else if (typeof parsed !== 'object') {

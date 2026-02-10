@@ -203,7 +203,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 
 		new Setting(containerElement)
 			.setName('Default path prefix')
-			.setDesc('Prepended to PATH if not starting with vault:// or http')
+			.setDesc('prepended to PATH if not starting with vault:// or http')
 			.addText(textInput => textInput
 				.setPlaceholder('vault://Assets/Scripts/')
 				.setValue(this.plugin.settings.defaultPathPrefix)
@@ -218,24 +218,21 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 		this.createSectionHeader(containerElement, 'Template Variables', 'Use these in the Title template:');
 
 		const helpGrid = containerElement.createEl('div', { cls: 'ucf-help-grid' });
-		helpGrid.innerHTML = `
-			<div class="ucf-help-group">
-				<div class="ucf-help-label">File info</div>
-				<code>{filename}</code> <code>{basename}</code> <code>{extension}</code> <code>{parentfolder}</code>
-			</div>
-			<div class="ucf-help-group">
-				<div class="ucf-help-label">Size</div>
-				<code>{size}</code> <code>{size:kb}</code> <code>{size:mb}</code>
-			</div>
-			<div class="ucf-help-group">
-				<div class="ucf-help-label">Dates</div>
-				<code>{modified:relative}</code> <code>{modified:short}</code> <code>{modified:iso}</code>
-			</div>
-			<div class="ucf-help-group">
-				<div class="ucf-help-label">Formatting</div>
-				<code>{filename:upper}</code> <code>{filename:lower}</code> <code>{filename:title}</code>
-			</div>
-		`;
+		const groups = [
+			{ label: 'File info', codes: ['{filename}', '{basename}', '{extension}', '{parentfolder}'] },
+			{ label: 'Size', codes: ['{size}', '{size:kb}', '{size:mb}'] },
+			{ label: 'Dates', codes: ['{modified:relative}', '{modified:short}', '{modified:iso}'] },
+			{ label: 'Formatting', codes: ['{filename:upper}', '{filename:lower}', '{filename:title}'] },
+		];
+
+		for (const group of groups) {
+			const groupDiv = helpGrid.createEl('div', { cls: 'ucf-help-group' });
+			groupDiv.createEl('div', { text: group.label, cls: 'ucf-help-label' });
+			for (const code of group.codes) {
+				groupDiv.createEl('code', { text: code });
+				groupDiv.appendChild(document.createTextNode(' '));
+			}
+		}
 	}
 
 	// ===========================================================================
@@ -253,7 +250,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 
 		new Setting(containerElement)
 			.setName('Style')
-			.setDesc('Override: RENDER.STYLE: "infobar"')
+			.setDesc('Override: render.style: "infobar"')
 			.addDropdown(dropdown => dropdown
 				.addOption('tab', 'Tab')
 				.addOption('integrated', 'Integrated')
@@ -284,7 +281,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 
 		new Setting(containerElement)
 			.setName('Display mode')
-			.setDesc('Override: META.DESC: "your text here"')
+			.setDesc('Override: meta.desc: "your text here"')
 			.addDropdown(dropdown => dropdown
 				.addOption('below', 'Below title')
 				.addOption('tooltip', 'Tooltip on hover')
@@ -342,7 +339,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 
 		new Setting(containerElement)
 			.setName('Line numbers')
-			.setDesc('Override: RENDER.LINES: true')
+			.setDesc('Override: render.lines: true')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.showLineNumbers)
 				.onChange(async (value) => {
@@ -352,7 +349,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 
 		new Setting(containerElement)
 			.setName('Zebra stripes')
-			.setDesc('Override: RENDER.ZEBRA: true')
+			.setDesc('Override: render.zebra: true')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.showZebraStripes)
 				.onChange(async (value) => {
@@ -362,7 +359,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 
 		new Setting(containerElement)
 			.setName('Copy button')
-			.setDesc('Override: RENDER.COPY: true')
+			.setDesc('Override: render.copy: true')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.showCopyButton)
 				.onChange(async (value) => {
@@ -387,7 +384,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 
 		new Setting(containerElement)
 			.setName('Default fold lines')
-			.setDesc('0 = disabled, 1+ = fold to N lines. Override: RENDER.FOLD: 10')
+			.setDesc('0 = disabled, 1+ = fold to N lines. Override: render.fold: 10')
 			.addText(textInput => textInput
 				.setPlaceholder('0')
 				.setValue(String(this.plugin.settings.foldLines))
@@ -401,7 +398,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 
 		new Setting(containerElement)
 			.setName('Default scroll lines')
-			.setDesc('0 = disabled, 1+ = scroll after N lines. Override: RENDER.SCROLL: 20. Ignored if FOLD is active.')
+			.setDesc('0 = disabled, 1+ = scroll after N lines. Override: render.scroll: 20. Ignored if fold is active.')
 			.addText(textInput => textInput
 				.setPlaceholder('0')
 				.setValue(String(this.plugin.settings.scrollLines))
@@ -415,7 +412,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 
 		new Setting(containerElement)
 			.setName('Print behaviour')
-			.setDesc('How folded/scrolled code blocks behave when printing. Override: RENDER.PRINT: expand')
+			.setDesc('How folded/scrolled code blocks behave when printing. Override: render.print: expand')
 			.addDropdown(dropdown => dropdown
 				.addOption('expand', 'Expand (show full code)')
 				.addOption('asis', 'As displayed')
@@ -582,7 +579,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 
 		new Setting(containerElement)
 			.setName('Enable ufence-code processor')
-			.setDesc('Allows using ufence-code with RENDER.LANG property to specify language')
+			.setDesc('Allows using ufence-code with render.lang property to specify language')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.enableGenericProcessor)
 				.onChange(async (value) => {
@@ -719,8 +716,8 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 				.setName('Icon folder')
 				.setDesc('Folder with icon files (python.svg, bash.png, etc.)')
 				.addText(textInput => textInput
-					// eslint-disable-next-line obsidianmd/ui/sentence-case
-					.setPlaceholder('Assets/Icons')
+				// eslint-disable-next-line obsidianmd/ui/sentence-case
+				.setPlaceholder('assets/icons')
 					.setValue(this.plugin.settings.customIconFolder)
 					.onChange(async (value) => {
 						this.plugin.settings.customIconFolder = value;

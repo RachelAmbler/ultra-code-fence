@@ -94,7 +94,6 @@ The page-level `ufence-ufence` block in 31a above sets inline defaults (ZEBRA + 
 This block should have zebra stripes and line numbers from the page-level config:
 
 ```ufence-go
-~~~
 // Inherited inline page defaults: ZEBRA + LINES
 package main
 

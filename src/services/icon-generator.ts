@@ -15,9 +15,7 @@ import {
 	CSS_CLASSES,
 	ICON_IMAGE_EXTENSIONS,
 } from '../constants';
-
-// =============================================================================
-// SVG Generation
+import { setSvgContent } from '../utils/dom';
 // =============================================================================
 
 /**
@@ -230,7 +228,7 @@ function buildFilledBadgeIcon(
 	const colour = getIconColour(languageKey);
 	const svgMarkup = generateFilledBadgeSvg(label, colour);
 
-	iconContainer.innerHTML = svgMarkup;
+	setSvgContent(iconContainer, svgMarkup);
 	iconContainer.classList.add(CSS_CLASSES.iconSvg);
 
 	return iconContainer;
@@ -247,7 +245,7 @@ function buildOutlineBadgeIcon(
 	const label = getIconLabel(languageKey, extension);
 	const svgMarkup = generateOutlineBadgeSvg(label);
 
-	iconContainer.innerHTML = svgMarkup;
+	setSvgContent(iconContainer, svgMarkup);
 	iconContainer.classList.add(CSS_CLASSES.iconSvg, CSS_CLASSES.iconOutline);
 
 	return iconContainer;

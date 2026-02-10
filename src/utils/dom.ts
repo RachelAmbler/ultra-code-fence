@@ -91,7 +91,9 @@ export function wrapCodeLinesInDom(codeElement: HTMLElement, options: LineWrappi
 	}
 
 	// Clear the code element and rebuild with wrapped lines
-	codeElement.innerHTML = '';
+	while (codeElement.firstChild) {
+		codeElement.removeChild(codeElement.firstChild);
+	}
 
 	lines.forEach((lineNodes, index) => {
 		const lineNumber = startingLineNumber + index;
@@ -116,7 +118,7 @@ export function wrapCodeLinesInDom(codeElement: HTMLElement, options: LineWrappi
 
 		if (lineNodes.length === 0) {
 			// Empty line - use non-breaking space to maintain height
-			contentSpan.innerHTML = '&nbsp;';
+			contentSpan.appendChild(document.createTextNode('\u00a0'));
 		} else {
 			lineNodes.forEach(node => contentSpan.appendChild(node));
 		}
@@ -373,4 +375,57 @@ export function createCodeBlockContainer(
  */
 export function extractCodeText(codeElement: HTMLElement): string {
 	return codeElement.textContent || '';
+}
+
+// =============================================================================
+// HTML Parsing and Element Creation
+// =============================================================================
+
+/**
+ * Sets SVG content on an element by parsing an SVG string.
+ *
+ * Clears the element and appends the parsed SVG as a child node.
+ *
+ * @param element - The element to set SVG content on
+ * @param svgString - The SVG string to parse and append
+ */
+export function setSvgContent(element: HTMLElement, svgString: string): void {
+	// Clear existing children
+	while (element.firstChild) {
+		element.removeChild(element.firstChild);
+	}
+
+	const parser = new DOMParser();
+	// Use HTML parser mode to handle SVG parsing in jsdom
+	const doc = parser.parseFromString(`<div>${svgString}</div>`, 'text/html');
+	const svg = doc.body.firstElementChild;
+
+	if (svg) {
+		element.appendChild(element.ownerDocument.importNode(svg, true));
+	}
+}
+
+/**
+ * Creates a DOM element from an HTML string.
+ *
+ * @param html - The HTML string to parse
+ * @returns The first element from the parsed HTML, or null if none
+ */
+export function createElementFromHtml(html: string): Element | null {
+	const parser = new DOMParser();
+	const doc = parser.parseFromString(html, 'text/html');
+	return doc.body.firstElementChild;
+}
+
+/**
+ * Parses an HTML string into a DocumentFragment.
+ *
+ * Uses Range.createContextualFragment to avoid innerHTML entirely.
+ *
+ * @param html - The HTML string to parse
+ * @returns A DocumentFragment containing the parsed elements
+ */
+export function parseHtmlFragment(html: string): DocumentFragment {
+	const range = document.createRange();
+	return range.createContextualFragment(html);
 }

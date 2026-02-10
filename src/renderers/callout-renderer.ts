@@ -17,6 +17,7 @@
 
 import type { ResolvedCalloutConfig } from '../types';
 import { CSS_CLASSES } from '../constants';
+import { createElementFromHtml } from '../utils/dom';
 import {
 	groupCalloutsByLine,
 	buildInlineCalloutHTML,
@@ -121,9 +122,7 @@ export function injectCallouts(
 	// Append footnote section if we have any
 	if (footnoteEntries.length > 0) {
 		const sectionHTML = buildFootnoteSectionHTML(footnoteEntries);
-		const wrapper = document.createElement('div');
-		wrapper.innerHTML = sectionHTML;
-		const sectionEl = wrapper.firstElementChild;
+		const sectionEl = createElementFromHtml(sectionHTML);
 		if (sectionEl) {
 			containerElement.appendChild(sectionEl);
 		}
@@ -159,9 +158,7 @@ function injectInlineCallout(
 	style: 'standard' | 'border' = 'standard'
 ): void {
 	const html = buildInlineCalloutHTML(text, type, style);
-	const wrapper = document.createElement('div');
-	wrapper.innerHTML = html;
-	const calloutEl = wrapper.firstElementChild;
+	const calloutEl = createElementFromHtml(html);
 
 	if (calloutEl) {
 		// Insert after the line element (as sibling in the code element)
@@ -185,9 +182,7 @@ function injectInlineCallout(
  */
 function injectFootnoteRef(lineContent: Element, calloutNumber: number): void {
 	const refHTML = buildFootnoteRefHTML(calloutNumber);
-	const wrapper = document.createElement('span');
-	wrapper.innerHTML = refHTML;
-	const refEl = wrapper.firstElementChild;
+	const refEl = createElementFromHtml(refHTML);
 	if (refEl) {
 		lineContent.appendChild(refEl);
 	}
@@ -218,18 +213,14 @@ function injectPopoverTrigger(
 ): HTMLElement | null {
 	// Add trigger to line content
 	const triggerHTML = buildPopoverTriggerHTML(calloutNumber);
-	const triggerWrapper = document.createElement('span');
-	triggerWrapper.innerHTML = triggerHTML;
-	const triggerEl = triggerWrapper.firstElementChild;
+	const triggerEl = createElementFromHtml(triggerHTML);
 	if (triggerEl) {
 		lineContent.appendChild(triggerEl);
 	}
 
 	// Add popover content to pre element
 	const contentHTML = buildPopoverContentHTML(text, type, calloutNumber);
-	const contentWrapper = document.createElement('div');
-	contentWrapper.innerHTML = contentHTML;
-	const contentEl = contentWrapper.firstElementChild as HTMLElement;
+	const contentEl = createElementFromHtml(contentHTML) as HTMLElement;
 	if (contentEl) {
 		preElement.appendChild(contentEl);
 		return contentEl;

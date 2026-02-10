@@ -16,7 +16,7 @@ import type { PluginSettings } from '../types';
  */
 export const DEFAULT_SETTINGS: PluginSettings = {
 	// Language support - common programming languages
-	supportedLanguages: 'c,cpp,java,python,go,ruby,javascript,js,typescript,ts,shell,sh,bash,sql',
+	supportedLanguages: 'c,cpp,cs,java,kotlin,swift,python,go,ruby,rust,php,r,javascript,js,typescript,ts,shell,sh,bash,powershell,sql,lua,dart,scala,perl,haskell,zig,elixir,yaml,json,xml,html,css,toml',
 
 	// Title bar colours (used when useThemeColours is false)
 	titleBarBackgroundColour: '#282c34',

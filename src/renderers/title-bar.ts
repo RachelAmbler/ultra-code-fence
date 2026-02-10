@@ -50,12 +50,12 @@ export interface TitleBarCreationOptions {
  * @param component - Component for markdown rendering lifecycle
  * @returns Title element ready for insertion
  */
-export async function createTitleBarElement(
+export function createTitleBarElement(
 	app: App,
 	settings: PluginSettings,
 	options: TitleBarCreationOptions,
 	_component: Component
-): Promise<HTMLDivElement> {
+): HTMLDivElement {
 	const { titleText, clickablePath, titleBarStyle, fileMetadata, language } = options;
 
 	const titleElement = document.createElement('div');
@@ -340,7 +340,7 @@ export async function buildTitleContainer(
 	}
 
 	// Create title element
-	const titleElement = await createTitleBarElement(app, settings, options, component);
+	const titleElement = createTitleBarElement(app, settings, options, component);
 	container.appendChild(titleElement);
 
 	// Handle description

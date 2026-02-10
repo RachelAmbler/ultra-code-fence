@@ -9,6 +9,7 @@ import { App, MarkdownRenderer, Component } from 'obsidian';
 import type { CommandOutputStyles, PluginSettings } from '../types';
 import { CSS_CLASSES, styleClass, COMMAND_OUTPUT_ICON } from '../constants';
 import { escapeHtml, buildStyleString, addScrollBehaviour } from '../utils';
+import { parseHtmlFragment } from '../utils/dom';
 import { addCopyButton } from './buttons';
 
 // =============================================================================
@@ -152,7 +153,8 @@ function createPreCodeStructure(processedHtml: string): HTMLPreElement {
 	preElement.className = `${CSS_CLASSES.codeBlock} ${CSS_CLASSES.cmdoutPre}`;
 
 	const codeElement = document.createElement('code');
-	codeElement.innerHTML = processedHtml;
+	const fragment = parseHtmlFragment(processedHtml);
+	codeElement.appendChild(fragment);
 
 	preElement.appendChild(codeElement);
 

@@ -118,7 +118,7 @@ export function validateYamlSchema(parsed: unknown): YamlWarning[] {
 				const entries = sectionObj[subKey];
 				if (Array.isArray(entries)) {
 					for (let i = 0; i < entries.length; i++) {
-						const entry = entries[i];
+						const entry: unknown = entries[i];
 						if (entry && typeof entry === 'object' && !Array.isArray(entry)) {
 							const entryObj = entry as Record<string, unknown>;
 							for (const entryKey of Object.keys(entryObj)) {

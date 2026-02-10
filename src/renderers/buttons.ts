@@ -8,6 +8,7 @@
 import { Platform } from 'obsidian';
 import { CSS_CLASSES, COPY_SUCCESS_DURATION_MS } from '../constants';
 import { extractCodeText } from '../utils';
+import { setSvgContent } from '../utils/dom';
 
 // =============================================================================
 // SVG Icons
@@ -91,7 +92,7 @@ export function addCopyButton(preElement: HTMLPreElement, options?: CopyButtonOp
 	const copyButton = document.createElement('button');
 	copyButton.className = CSS_CLASSES.copyButton;
 	copyButton.setAttribute('aria-label', 'Copy code');
-	copyButton.innerHTML = COPY_ICON_SVG;
+	setSvgContent(copyButton, COPY_ICON_SVG);
 
 	// Build tooltip showing available copy modes
 	const tooltipParts: string[] = [];
@@ -138,12 +139,12 @@ export function addCopyButton(preElement: HTMLPreElement, options?: CopyButtonOp
 
 			// Show success state
 			copyButton.classList.add(CSS_CLASSES.copied);
-			copyButton.innerHTML = CHECKMARK_ICON_SVG;
+			setSvgContent(copyButton, CHECKMARK_ICON_SVG);
 
 			// Reset after delay
 			setTimeout(() => {
 				copyButton.classList.remove(CSS_CLASSES.copied);
-				copyButton.innerHTML = COPY_ICON_SVG;
+				setSvgContent(copyButton, COPY_ICON_SVG);
 			}, COPY_SUCCESS_DURATION_MS);
 		}
 	});
@@ -156,22 +157,48 @@ export function addCopyButton(preElement: HTMLPreElement, options?: CopyButtonOp
 // =============================================================================
 
 /**
- * Creates the "show more" button text with a chevron icon.
+ * Creates the "show more" button content with a chevron icon.
  *
  * @param hiddenLineCount - Number of lines hidden by the fold
- * @returns HTML string with SVG icon and line count label
+ * @returns DocumentFragment with SVG icon and line count label
  */
-function buildExpandButtonContent(hiddenLineCount: number): string {
-	return `${CHEVRON_DOWN_SVG}<span>Show more (${hiddenLineCount} more lines)</span>`;
+function buildExpandButtonContent(hiddenLineCount: number): DocumentFragment {
+	const fragment = document.createDocumentFragment();
+
+	const parser = new DOMParser();
+	const svgDoc = parser.parseFromString(CHEVRON_DOWN_SVG, 'image/svg+xml');
+	const svg = svgDoc.documentElement;
+	if (svg && svg.nodeName.toLowerCase() === 'svg') {
+		fragment.appendChild(fragment.ownerDocument.importNode(svg, true));
+	}
+
+	const span = document.createElement('span');
+	span.textContent = `Show more (${hiddenLineCount} more lines)`;
+	fragment.appendChild(span);
+
+	return fragment;
 }
 
 /**
- * Creates the "show less" button text with a chevron icon.
+ * Creates the "show less" button content with a chevron icon.
  *
- * @returns HTML string with SVG icon and "Show less" label
+ * @returns DocumentFragment with SVG icon and "Show less" label
  */
-function buildCollapseButtonContent(): string {
-	return `${CHEVRON_UP_SVG}<span>Show less</span>`;
+function buildCollapseButtonContent(): DocumentFragment {
+	const fragment = document.createDocumentFragment();
+
+	const parser = new DOMParser();
+	const svgDoc = parser.parseFromString(CHEVRON_UP_SVG, 'image/svg+xml');
+	const svg = svgDoc.documentElement;
+	if (svg && svg.nodeName.toLowerCase() === 'svg') {
+		fragment.appendChild(fragment.ownerDocument.importNode(svg, true));
+	}
+
+	const span = document.createElement('span');
+	span.textContent = 'Show less';
+	fragment.appendChild(span);
+
+	return fragment;
 }
 
 /**
@@ -213,7 +240,7 @@ export function addFoldButton(
 	// Create fold button
 	const foldButton = document.createElement('button');
 	foldButton.className = CSS_CLASSES.foldButton;
-	foldButton.innerHTML = buildExpandButtonContent(hiddenLineCount);
+	foldButton.appendChild(buildExpandButtonContent(hiddenLineCount));
 
 	foldButton.addEventListener('click', (event) => {
 		event.preventDefault();
@@ -221,10 +248,15 @@ export function addFoldButton(
 
 		const isFolded = preElement.classList.toggle(CSS_CLASSES.folded);
 
+		// Clear previous content
+		while (foldButton.firstChild) {
+			foldButton.removeChild(foldButton.firstChild);
+		}
+
 		if (isFolded) {
-			foldButton.innerHTML = buildExpandButtonContent(hiddenLineCount);
+			foldButton.appendChild(buildExpandButtonContent(hiddenLineCount));
 		} else {
-			foldButton.innerHTML = buildCollapseButtonContent();
+			foldButton.appendChild(buildCollapseButtonContent());
 		}
 	});
 
@@ -258,7 +290,7 @@ export function addDownloadButton(preElement: HTMLPreElement, onDownload: Downlo
 	downloadButton.className = CSS_CLASSES.downloadButton;
 	downloadButton.setAttribute('aria-label', 'Download code');
 	downloadButton.setAttribute('title', 'Save to file');
-	downloadButton.innerHTML = DOWNLOAD_ICON_SVG;
+	setSvgContent(downloadButton, DOWNLOAD_ICON_SVG);
 
 	downloadButton.addEventListener('click', async (event) => {
 		event.preventDefault();

@@ -154,7 +154,7 @@ export default class UltraCodeFence extends Plugin {
 
 		// Register markdown post-processor for reading mode
 		this.registerMarkdownPostProcessor((element, context) => {
-			this.processReadingModeBlock(element, context);
+		void this.processReadingModeBlock(element, context);
 		});
 
 		// Register language-specific processors (ufence-{lang})
@@ -179,7 +179,7 @@ export default class UltraCodeFence extends Plugin {
 				const view = this.app.workspace.getActiveViewOfType(MarkdownView);
 				if (!view?.file) return;
 
-				this.refreshBlocksForPath(view.file.path);
+				void this.refreshBlocksForPath(view.file.path);
 			},
 		});
 
@@ -218,7 +218,8 @@ export default class UltraCodeFence extends Plugin {
 	 * newly added settings always have a value after upgrade.
 	 */
 	async loadSettings(): Promise<void> {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		const stored = (await this.loadData()) as Partial<PluginSettings> | null;
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, stored ?? {});
 	}
 
 	/**
@@ -314,7 +315,7 @@ export default class UltraCodeFence extends Plugin {
 			'ufence-ufence',
 			(content, element, _context) => {
 				try {
-					const raw = parseYaml(content);
+					const raw: unknown = parseYaml(content);
 					if (raw && typeof raw === 'object') {
 						const record = raw as Record<string, unknown>;
 						normaliseConfigRecord(record);
@@ -403,7 +404,7 @@ export default class UltraCodeFence extends Plugin {
 		if (!match) return undefined;
 
 		try {
-			const raw = parseYaml(match[1]);
+			const raw: unknown = parseYaml(match[1]);
 			if (raw && typeof raw === 'object') {
 				const record = raw as Record<string, unknown>;
 				normaliseConfigRecord(record);

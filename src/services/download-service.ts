@@ -80,15 +80,15 @@ async function downloadDesktop(
 	settings: PluginSettings,
 	saveSettings: () => Promise<void>
 ): Promise<void> {
-	// Dynamic requires for Node/Electron modules
+	// Dynamic requires for Node/Electron modules (desktop only)
 	const fs = require('fs') as typeof import('fs');
-	const path = require('path') as typeof import('path');
+	const pathModule = require('path') as typeof import('path');
 	const { remote } = require('electron');
 
 	// Build default path from remembered directory + suggested filename
 	const lastDir = settings.downloadPathHistory[notePath] || '';
 	const defaultPath = lastDir
-		? path.join(lastDir, suggestedFilename)
+		? pathModule.join(lastDir, suggestedFilename)
 		: suggestedFilename;
 
 	const result = await remote.dialog.showSaveDialog({
@@ -106,7 +106,7 @@ async function downloadDesktop(
 	fs.writeFileSync(result.filePath, codeText, 'utf-8');
 
 	// Remember the directory for this note
-	settings.downloadPathHistory[notePath] = path.dirname(result.filePath);
+	settings.downloadPathHistory[notePath] = pathModule.dirname(result.filePath);
 	await saveSettings();
 }
 

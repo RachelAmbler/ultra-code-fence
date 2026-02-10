@@ -68,7 +68,7 @@ import {
  * // console.log("Hello");
  */
 export function parseBlockContent(rawContent: string): ParsedBlockContent {
-	const hasEmbeddedCode = rawContent.includes(INLINE_CODE_SEPARATOR_END);
+	const hasEmbeddedCode = rawContent.includes(INLINE_CODE_SEPARATOR_END) || rawContent.startsWith('~~~');
 
 	if (hasEmbeddedCode) {
 		return parseEmbeddedCodeBlock(rawContent);
@@ -195,7 +195,7 @@ export function resolveNumber(yamlValue: unknown, defaultValue: number): number 
 
 	const parsed = typeof yamlValue === 'number'
 		? yamlValue
-		: parseInt(String(yamlValue), 10);
+		: typeof yamlValue === 'string' ? parseInt(yamlValue, 10) : NaN;
 
 	return isNaN(parsed) ? defaultValue : parsed;
 }
@@ -212,7 +212,14 @@ export function resolveString(yamlValue: unknown, defaultValue: string): string 
 		return defaultValue;
 	}
 
-	return String(yamlValue);
+	if (typeof yamlValue === 'string') {
+		return yamlValue;
+	}
+
+	// Convert all other types using String()
+	const stringValue = String(yamlValue);
+	// Empty string result should use defaultValue
+	return stringValue === '' ? defaultValue : stringValue;
 }
 
 // =============================================================================
@@ -529,7 +536,9 @@ export function parseNestedYamlConfig(yamlProps: Record<string, unknown>): Parse
 		FILTER: parseFilterSection(yamlProps),
 		CALLOUT: parseCalloutSection(yamlProps),
 		// Top-level PROMPT for cmdout blocks
-		PROMPT: yamlProps[YAML_PROMPT] !== undefined ? String(yamlProps[YAML_PROMPT]) : undefined,
+		PROMPT: yamlProps[YAML_PROMPT] !== undefined
+		? (typeof yamlProps[YAML_PROMPT] === 'string' ? yamlProps[YAML_PROMPT] : String(yamlProps[YAML_PROMPT] as number | boolean))
+		: undefined,
 		// RENDER section for cmdout styling (stored separately as RENDER_CMDOUT)
 		RENDER_CMDOUT: parseRenderCmdoutSection(yamlProps),
 	};
@@ -663,8 +672,8 @@ export function resolveCalloutConfig(
 
 	const displayMode = (parsed.DISPLAY ?? 'inline') as 'inline' | 'footnote' | 'popover';
 	const rawPrintDisplay = parsed.PRINT_DISPLAY ?? 'inline';
-	const printDisplayMode = (rawPrintDisplay === 'footnote' ? 'footnote' : 'inline') as 'inline' | 'footnote';
-	const style = (parsed.STYLE === 'border' ? 'border' : 'standard') as 'standard' | 'border';
+	const printDisplayMode = rawPrintDisplay === 'footnote' ? 'footnote' : 'inline';
+	const style = parsed.STYLE === 'border' ? 'border' : 'standard';
 	const sourceLines = sourceCode.split('\n');
 
 	const resolvedEntries = parsed.ENTRIES
