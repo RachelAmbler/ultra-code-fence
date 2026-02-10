@@ -3,7 +3,7 @@
 [![CI](https://github.com/RachelAmbler/ultra-code-fence/actions/workflows/ci.yml/badge.svg)](https://github.com/RachelAmbler/ultra-code-fence/actions/workflows/ci.yml)
 [![Coverage](https://raw.githubusercontent.com/RachelAmbler/ultra-code-fence/main/.github/badges/coverage.svg)](https://github.com/RachelAmbler/ultra-code-fence/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Obsidian](https://img.shields.io/badge/Obsidian-plugin-7C3AED.svg)](https://obsidian.md)
+[![Obsidian](https://img.shields.io/static/v1?label=Obsidian&message=plugin&color=7C3AED&logo=obsidian&logoColor=white)](https://obsidian.md)
 
 ![Ultra Code Fence](Assets/social-preview.png)
 
