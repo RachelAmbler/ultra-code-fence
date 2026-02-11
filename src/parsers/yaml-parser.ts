@@ -604,11 +604,14 @@ export function resolveBlockConfig(
 		showLineNumbers: parsed.RENDER?.LINES ?? settings.showLineNumbers,
 		showCopyButton: parsed.RENDER?.COPY ?? settings.showCopyButton,
 		shiftCopyJoin: parsed.RENDER?.SHIFT_COPY_JOIN
-			?? settings.languageCopyJoinDefaults[defaultLanguage].shiftJoin,
+			?? settings.languageCopyJoinDefaults[defaultLanguage]?.shiftJoin
+			?? '',
 		altCopyJoin: parsed.RENDER?.ALT_COPY_JOIN
-			?? settings.languageCopyJoinDefaults[defaultLanguage].altJoin,
+			?? settings.languageCopyJoinDefaults[defaultLanguage]?.altJoin
+			?? '',
 		joinIgnoreRegex: parsed.RENDER?.JOIN_IGNORE_REGEX
-			?? settings.languageCopyJoinDefaults[defaultLanguage].joinIgnoreRegex,
+			?? settings.languageCopyJoinDefaults[defaultLanguage]?.joinIgnoreRegex
+			?? '',
 
 		// FILTER section - BY_LINES
 		filterByLines: {

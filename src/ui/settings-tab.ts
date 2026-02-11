@@ -460,6 +460,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 
 		for (const lang of configuredLangs) {
 			const stored = this.plugin.settings.languageCopyJoinDefaults[lang];
+			if (!stored) continue;
 			const row = tbody.createEl('tr');
 
 			// Language name (read-only)
@@ -474,7 +475,8 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 				attr: { placeholder: '&&' },
 			});
 			shiftInput.addEventListener('change', () => {
-				this.plugin.settings.languageCopyJoinDefaults[lang].shiftJoin = shiftInput.value;
+				const entry = this.plugin.settings.languageCopyJoinDefaults[lang];
+				if (entry) entry.shiftJoin = shiftInput.value;
 				void this.plugin.saveSettings();
 			});
 
@@ -487,7 +489,8 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 				attr: { placeholder: ';' },
 			});
 			altInput.addEventListener('change', () => {
-				this.plugin.settings.languageCopyJoinDefaults[lang].altJoin = altInput.value;
+				const entry = this.plugin.settings.languageCopyJoinDefaults[lang];
+				if (entry) entry.altJoin = altInput.value;
 				void this.plugin.saveSettings();
 			});
 
@@ -500,7 +503,8 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 				attr: { placeholder: '^\\s*#' },
 			});
 			ignoreInput.addEventListener('change', () => {
-				this.plugin.settings.languageCopyJoinDefaults[lang].joinIgnoreRegex = ignoreInput.value;
+				const entry = this.plugin.settings.languageCopyJoinDefaults[lang];
+				if (entry) entry.joinIgnoreRegex = ignoreInput.value;
 				void this.plugin.saveSettings();
 			});
 

@@ -150,7 +150,7 @@ export interface PluginSettings {
 	outputTextItalic: boolean;
 
 	/** Per-language copy join operators keyed by language ID */
-	languageCopyJoinDefaults: Record<string, { shiftJoin: string; altJoin: string; joinIgnoreRegex: string }>;
+	languageCopyJoinDefaults: Record<string, { shiftJoin: string; altJoin: string; joinIgnoreRegex: string } | undefined>;
 
 	/** Show download button on code blocks */
 	showDownloadButton: boolean;
