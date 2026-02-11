@@ -29,6 +29,12 @@ export default tseslint.config(
 					'Rachel Ambler',
 					'ARACS Thoughtworks',
 					'Obsidian',
+					'JavaScript',
+					'Python',
+					'Bash',
+					'python',
+					'bash'
+
 				],
 				acronyms: [
 					'SQL', 'HTML', 'CSS', 'URL', 'OK',

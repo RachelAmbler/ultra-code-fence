@@ -188,7 +188,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 			.setName('Supported languages')
 			.setDesc('Comma-separated list. Creates ufence-{lang} code blocks.')
 			.addText(textInput => textInput
-				.setPlaceholder('Python, javascript, bash, ...')
+				.setPlaceholder('Python, JavaScript, Bash, ...')
 				.setValue(this.plugin.settings.supportedLanguages)
 				.onChange((value) => {
 					this.plugin.settings.supportedLanguages = value;
@@ -713,7 +713,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 		if (this.plugin.settings.fileIconStyle === 'custom') {
 			new Setting(containerElement)
 				.setName('Icon folder')
-				.setDesc('Folder with icon files (python.svg, bash.png, etc.)')
+				.setDesc('Folder with icon files named by language, such as lang.svg or lang.png')
 				.addText(textInput => textInput
 				.setPlaceholder('Assets/icons')
 					.setValue(this.plugin.settings.customIconFolder)
