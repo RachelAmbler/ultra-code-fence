@@ -98,7 +98,7 @@ describe('display', () => {
 		const buttons = Array.from(tabsDiv?.querySelectorAll('button') ?? []);
 		const labels = buttons.map((btn) => btn.textContent);
 
-		expect(labels).toEqual(['General', 'Title', 'Code', 'Inline', 'Cmd Output', 'Appearance', 'Presets']);
+		expect(labels).toEqual(['General', 'Title', 'Code', 'Inline', 'Cmd output', 'Appearance', 'Presets']);
 	});
 
 	it('first tab button (General) has ucf-tab-active class', () => {

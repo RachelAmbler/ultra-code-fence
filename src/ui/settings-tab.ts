@@ -77,7 +77,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 			{ tabId: 'title', tabLabel: 'Title' },
 			{ tabId: 'code', tabLabel: 'Code' },
 			{ tabId: 'inline', tabLabel: 'Inline' },
-			{ tabId: 'cmdout', tabLabel: 'Cmd Output' },
+			{ tabId: 'cmdout', tabLabel: 'Cmd output' },
 			{ tabId: 'appearance', tabLabel: 'Appearance' },
 			{ tabId: 'presets', tabLabel: 'Presets' },
 		];
@@ -198,7 +198,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 		this.createSectionDivider(containerElement);
 
 		// Path section
-		this.createSectionHeader(containerElement, 'File Paths');
+		this.createSectionHeader(containerElement, 'File paths');
 
 		new Setting(containerElement)
 			.setName('Default path prefix')
@@ -214,7 +214,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 		this.createSectionDivider(containerElement);
 
 		// Help section
-		this.createSectionHeader(containerElement, 'Template Variables', 'Use these in the Title template:');
+		this.createSectionHeader(containerElement, 'Template variables', 'Use these in the title template:');
 
 		const helpGrid = containerElement.createEl('div', { cls: 'ucf-help-grid' });
 		const groups = [
@@ -245,7 +245,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 		});
 
 		// Title section
-		this.createSectionHeader(containerElement, 'Title Bar');
+		this.createSectionHeader(containerElement, 'Title bar');
 
 		new Setting(containerElement)
 			.setName('Style')
@@ -425,7 +425,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 		const altModLabel = (Platform.isMacOS || Platform.isIosApp) ? '⌘' : 'Alt';
 		this.createSectionHeader(
 			containerElement,
-			'Copy Join',
+			'Copy join',
 			`Configure modifier+click copy behaviour per language. Shift+click and ${altModLabel}+click join lines with the specified operator. Ignore regex strips matching lines before joining.`
 		);
 
@@ -450,7 +450,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 		const headerRow = thead.createEl('tr');
 		headerRow.createEl('th', { text: 'Lang', cls: 'ucf-cj-col-lang' });
 		headerRow.createEl('th', { text: '⇧ click', cls: 'ucf-cj-col-op' });
-		headerRow.createEl('th', { text: `${altModLabel} Click`, cls: 'ucf-cj-col-op' });
+		headerRow.createEl('th', { text: `${altModLabel} click`, cls: 'ucf-cj-col-op' });
 		headerRow.createEl('th', { text: 'Ignore', cls: 'ucf-cj-col-ignore' });
 		headerRow.createEl('th', { text: '', cls: 'ucf-cj-col-action' });
 
@@ -576,7 +576,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 		});
 
 		// Generic ufence section
-		this.createSectionHeader(containerElement, 'Generic Embed');
+		this.createSectionHeader(containerElement, 'Generic embed');
 
 		new Setting(containerElement)
 			.setName('Enable ufence-code processor')
@@ -692,7 +692,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 
 	private renderAppearanceTab(containerElement: HTMLElement): void {
 		// Icons section
-		this.createSectionHeader(containerElement, 'File Icons');
+		this.createSectionHeader(containerElement, 'File icons');
 
 		new Setting(containerElement)
 			.setName('Icon style')
@@ -787,7 +787,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 		const names = Object.keys(presets).sort();
 
 		if (names.length > 0) {
-			this.createSectionHeader(containerElement, 'Saved Presets');
+			this.createSectionHeader(containerElement, 'Saved presets');
 
 			for (const name of names) {
 				this.renderPresetEntry(containerElement, name, presets[name]);
@@ -797,7 +797,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 		}
 
 		// Add new preset
-		this.createSectionHeader(containerElement, 'Add New Preset');
+		this.createSectionHeader(containerElement, 'Add new preset');
 
 		let newName = '';
 		let newYaml = '';
