@@ -70,7 +70,7 @@ export class WhatsNewModal extends Modal {
 		// Credits
 		const credits = contentEl.createEl('div', { cls: CSS_CLASSES.credits });
 		credits.createEl('p', {
-			text: '© 2026 - Rachel Ambler (ARACS Thoughtworks) All Rights Reserved.',
+			text: '© 2026 - Rachel Ambler (ARACS Thoughtworks). All rights reserved.',
 		});
 
 		// Close button

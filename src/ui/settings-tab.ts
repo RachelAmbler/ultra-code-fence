@@ -698,7 +698,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 			.setName('Icon style')
 			.addDropdown(dropdown => dropdown
 				.addOption('emoji', 'Emoji (📜 🐍 🗃️)')
-				.addOption('text', 'Text labels (SH, PY, SQL)')
+				.addOption('text', 'Text labels (sh, py, SQL)')
 				.addOption('filled', 'Filled boxes (coloured)')
 				.addOption('outline', 'Outline boxes (theme-aware)')
 				.addOption('custom', 'Custom (from folder)')

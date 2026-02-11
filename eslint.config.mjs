@@ -29,10 +29,9 @@ export default tseslint.config(
 					'Rachel Ambler',
 					'ARACS Thoughtworks',
 					'Obsidian',
-					'All Rights Reserved',
 				],
 				acronyms: [
-					'SH', 'PY', 'SQL', 'HTML', 'CSS', 'URL', 'OK',
+					'SQL', 'HTML', 'CSS', 'URL', 'OK',
 				],
 				enforceCamelCaseLower: true,
 			}],
