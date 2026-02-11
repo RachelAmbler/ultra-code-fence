@@ -185,7 +185,7 @@ function createLinkIndicatorElement(): HTMLSpanElement {
 function setupTitleClickHandler(app: App, titleElement: HTMLDivElement, clickablePath: string): void {
 	titleElement.setAttribute('title', `Click to open: ${clickablePath}`);
 
-	titleElement.addEventListener('click', async (event) => {
+	titleElement.addEventListener('click', (event) => {
 		event.preventDefault();
 
 		if (clickablePath.startsWith('https://') || clickablePath.startsWith('http://')) {
@@ -198,7 +198,7 @@ function setupTitleClickHandler(app: App, titleElement: HTMLDivElement, clickabl
 			if (file instanceof TFile) {
 				// Ctrl/Cmd+click opens in new pane
 				const openInNewPane = event.ctrlKey || event.metaKey;
-				await app.workspace.getLeaf(openInNewPane).openFile(file);
+				void app.workspace.getLeaf(openInNewPane).openFile(file);
 			}
 		}
 	});
@@ -358,7 +358,7 @@ export async function buildTitleContainer(
 			const tooltipElement = await createTooltipDescriptionElement(
 				app,
 				options.descriptionText,
-				options.containingNotePath || '',
+				options.containingNotePath ?? '',
 				component
 			);
 			titleElement.appendChild(tooltipElement);
@@ -368,7 +368,7 @@ export async function buildTitleContainer(
 			const descriptionElement = await createDescriptionElement(
 				app,
 				options.descriptionText,
-				options.containingNotePath || '',
+				options.containingNotePath ?? '',
 				component
 			);
 			container.appendChild(descriptionElement);

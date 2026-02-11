@@ -232,9 +232,9 @@ describe('createEmbeddedCodeMetadata', () => {
 		expect(meta.basename).toBe('inline');
 	});
 
-	it('falls back to "inline" when title is empty string', () => {
+	it('preserves empty string title when explicitly provided', () => {
 		const meta = createEmbeddedCodeMetadata('', 'js');
-		expect(meta.filename).toBe('inline');
+		expect(meta.filename).toBe('');
 	});
 
 	it('sets fullPath and parentFolder to empty strings', () => {

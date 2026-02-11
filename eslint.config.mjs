@@ -5,7 +5,8 @@ export default tseslint.config(
 	{
 		files: ['src/**/*.ts'],
 		extends: [
-			...tseslint.configs.recommended,
+			...tseslint.configs.strictTypeChecked,
+			...tseslint.configs.stylisticTypeChecked,
 		],
 		plugins: {
 			obsidianmd,
@@ -33,19 +34,8 @@ export default tseslint.config(
 				acronyms: [
 					'SH', 'PY', 'SQL', 'HTML', 'CSS', 'URL', 'OK',
 				],
-				ignoreRegex: [
-					'Override:',            // YAML override documentation in descriptions
-					'[A-Z]{2,}\\.[A-Z]',   // YAML property paths (RENDER.STYLE, META.DESC)
-					'\\bPATH\\b',          // References to the PATH YAML property
-					'©',                    // Copyright notices
-					'://',                  // URL-like paths in placeholders
-					'e\\.g\\.',            // Abbreviation "e.g." in placeholders
-				],
 				enforceCamelCaseLower: true,
 			}],
-
-			// Allow require() for Node/Electron dynamic imports
-			'@typescript-eslint/no-require-imports': 'off',
 
 			// Allow _prefixed names for intentionally unused params/catches
 			'@typescript-eslint/no-unused-vars': ['error', {

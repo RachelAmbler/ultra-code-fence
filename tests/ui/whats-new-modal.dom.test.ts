@@ -11,7 +11,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { setupObsidianDom, App } from '../../src/__mocks__/obsidian';
+import { setupObsidianDom, App } from '../../__mocks__/obsidian';
 import { WhatsNewModal, showWhatsNewIfUpdated } from '../../src/ui/whats-new-modal';
 import type { ReleaseNotesData, ChangelogItem } from '../../src/types';
 

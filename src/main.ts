@@ -80,7 +80,7 @@ interface AttachTitleBarConfig {
 	altCopyJoin?: string;
 	joinIgnoreRegex?: string;
 	showDownloadButton?: boolean;
-	onDownload?: (codeText: string) => Promise<void>;
+	onDownload?: (codeText: string) => void;
 }
 
 // =============================================================================
@@ -101,12 +101,12 @@ interface AttachTitleBarConfig {
  * downstream resolution logic only needs to look in one place.
  */
 function normaliseConfigRecord(record: Record<string, unknown>): void {
-	if (record['PRESET'] !== undefined) {
-		if (!record['META'] || typeof record['META'] !== 'object') {
-			record['META'] = {};
+	if (record.PRESET !== undefined) {
+		if (!record.META || typeof record.META !== 'object') {
+			record.META = {};
 		}
-		(record['META'] as Record<string, unknown>)['PRESET'] = record['PRESET'];
-		delete record['PRESET'];
+		(record.META as Record<string, unknown>).PRESET = record.PRESET;
+		delete record.PRESET;
 	}
 }
 
@@ -130,12 +130,12 @@ export default class UltraCodeFence extends Plugin {
 	 * page, stale DOM entries are filtered by `isConnected` at refresh
 	 * time so detached blocks never accumulate.
 	 */
-	private renderedBlocks = new Map<string, Array<{
+	private renderedBlocks = new Map<string, {
 		container: HTMLElement;
 		rawContent: string;
 		context: MarkdownPostProcessorContext;
 		defaultLanguage: string;
-	}>>();
+	}[]>();
 
 	/**
 	 * Called when the plugin is loaded.
@@ -490,7 +490,7 @@ export default class UltraCodeFence extends Plugin {
 		if (!this.renderedBlocks.has(path)) {
 			this.renderedBlocks.set(path, []);
 		}
-		this.renderedBlocks.get(path)!.push({
+		this.renderedBlocks.get(path)?.push({
 			container: containerElement,
 			rawContent,
 			context: processorContext,
@@ -524,7 +524,7 @@ export default class UltraCodeFence extends Plugin {
 
 		// Determine source
 		if (parsedBlock.hasEmbeddedCode) {
-			sourceCode = parsedBlock.embeddedCode || '';
+			sourceCode = parsedBlock.embeddedCode ?? '';
 			fileMetadata = createEmbeddedCodeMetadata(config.titleTemplate, config.language);
 		} else {
 			if (!config.sourcePath) {
@@ -535,12 +535,12 @@ export default class UltraCodeFence extends Plugin {
 			const loadResult = await loadSource(this.app, config.sourcePath);
 
 			if (!loadResult.succeeded) {
-				await this.renderErrorMessage(containerElement, loadResult.errorMessage || 'failed to load source');
+				await this.renderErrorMessage(containerElement, loadResult.errorMessage ?? 'failed to load source');
 				return;
 			}
 
 			sourceCode = loadResult.sourceCode;
-			fileMetadata = loadResult.fileMetadata!;
+			fileMetadata = loadResult.fileMetadata ?? createEmbeddedCodeMetadata('', config.language);
 		}
 
 		// Apply filter chain (BY_LINES first, then BY_MARKS)
@@ -607,22 +607,21 @@ export default class UltraCodeFence extends Plugin {
 		}
 
 		// Build download callback — prefer source filename over display title
-		const downloadName = fileMetadata?.filename || displayTitle || '';
+		const downloadName = fileMetadata.filename || displayTitle || '';
 		const suggestedFilename = buildSuggestedFilename(downloadName, config.language);
-		const notePath = processorContext.sourcePath;
 		const onDownload = this.settings.showDownloadButton
-			? async (codeText: string) => {
-				await downloadCodeToFile(codeText, suggestedFilename, notePath, this.settings, () => this.saveSettings());
+			? (codeText: string) => {
+				downloadCodeToFile(codeText, suggestedFilename);
 			}
 			: undefined;
 
 		// Add title or just buttons
 		if (!shouldHideTitle && displayTitle) {
-			const clickablePath = parsedBlock.hasEmbeddedCode
+			const clickablePath = parsedBlock.hasEmbeddedCode || !config.sourcePath
 				? undefined
-				: (isRemotePath(config.sourcePath!)
-					? config.sourcePath!
-					: config.sourcePath!.replace(/^vault:\/\//, ''));
+				: (isRemotePath(config.sourcePath)
+					? config.sourcePath
+					: config.sourcePath.replace(/^vault:\/\//, ''));
 
 			await this.attachTitleBarToCodeBlock(containerElement, {
 				titleText: displayTitle,
@@ -678,7 +677,7 @@ export default class UltraCodeFence extends Plugin {
 		// Parse content
 		try {
 			const parsedBlock = parseBlockContent(rawContent);
-			outputCode = parsedBlock.hasEmbeddedCode ? (parsedBlock.embeddedCode || '') : rawContent;
+			outputCode = parsedBlock.hasEmbeddedCode ? (parsedBlock.embeddedCode ?? '') : rawContent;
 
 			// Parse nested YAML configuration and resolve with defaults
 			const yamlConfig = parseNestedYamlConfig(parsedBlock.yamlProperties);
@@ -734,7 +733,7 @@ export default class UltraCodeFence extends Plugin {
 		const firstLine = markdownView.editor.getLine(sectionInfo.lineStart);
 
 		// Extract title from code fence
-		const titleMatch = firstLine.match(/TITLE:\s*"([^"]*)"/i);
+		const titleMatch = /TITLE:\s*"([^"]*)"/i.exec(firstLine);
 		if (!titleMatch) return;
 
 		const extractedTitle = titleMatch[1];
@@ -742,14 +741,14 @@ export default class UltraCodeFence extends Plugin {
 
 		// Extract style
 		let titleBarStyle = this.settings.defaultTitleBarStyle;
-		const styleMatch = firstLine.match(/STYLE:\s*"([^"]*)"/i);
+		const styleMatch = /STYLE:\s*"([^"]*)"/i.exec(firstLine);
 		if (styleMatch) {
 			titleBarStyle = styleMatch[1].toLowerCase() as TitleBarStyle;
 		}
 
 		// Extract description
 		let descriptionText: string | undefined;
-		const descMatch = firstLine.match(/(?:DESCRIPTION|DESC):\s*"([^"]*)"/i);
+		const descMatch = /(?:DESCRIPTION|DESC):\s*"([^"]*)"/i.exec(firstLine);
 		if (descMatch) {
 			descriptionText = descMatch[1];
 		}

@@ -140,10 +140,11 @@ describe('resolveString', () => {
 		expect(resolveString(false, '')).toBe('false');
 	});
 
-	it('converts objects and arrays via String()', () => {
-		expect(resolveString({}, '')).toBe('[object Object]');
+	it('returns default for objects and arrays instead of [object Object]', () => {
+		expect(resolveString({}, '')).toBe('');
+		expect(resolveString({}, 'fallback')).toBe('fallback');
 		expect(resolveString([], '')).toBe('');
-		expect(resolveString([1, 2, 3], '')).toBe('1,2,3');
+		expect(resolveString([1, 2, 3], '')).toBe('');
 	});
 });
 
@@ -698,7 +699,12 @@ describe('resolveBlockConfig', () => {
 				LANG: 'python',
 			},
 		};
-		const result = resolveBlockConfig(parsed, testSettings(), 'text');
+		const settings = testSettings({
+			languageCopyJoinDefaults: {
+				text: { shiftJoin: '', altJoin: '', joinIgnoreRegex: '' },
+			},
+		});
+		const result = resolveBlockConfig(parsed, settings, 'text');
 		expect(result.sourcePath).toBe('vault://file.py');
 		expect(result.titleTemplate).toBe('My File');
 		expect(result.descriptionText).toBe('Description');
@@ -717,6 +723,9 @@ describe('resolveBlockConfig', () => {
 			showLineNumbers: true,
 			foldLines: 10,
 			scrollLines: 5,
+			languageCopyJoinDefaults: {
+				javascript: { shiftJoin: '', altJoin: '', joinIgnoreRegex: '' },
+			},
 		});
 		const result = resolveBlockConfig({}, settings, 'javascript');
 		expect(result.titleBarStyle).toBe('minimal');
@@ -727,12 +736,22 @@ describe('resolveBlockConfig', () => {
 	});
 
 	it('uses defaultLanguage when LANG not in YAML', () => {
-		const result = resolveBlockConfig({ RENDER: {} }, testSettings(), 'rust');
+		const settings = testSettings({
+			languageCopyJoinDefaults: {
+				rust: { shiftJoin: '', altJoin: '', joinIgnoreRegex: '' },
+			},
+		});
+		const result = resolveBlockConfig({ RENDER: {} }, settings, 'rust');
 		expect(result.language).toBe('rust');
 	});
 
 	it('defaults META to empty/null when missing', () => {
-		const result = resolveBlockConfig({}, testSettings(), 'text');
+		const settings = testSettings({
+			languageCopyJoinDefaults: {
+				text: { shiftJoin: '', altJoin: '', joinIgnoreRegex: '' },
+			},
+		});
+		const result = resolveBlockConfig({}, settings, 'text');
 		expect(result.sourcePath).toBeNull();
 		expect(result.titleTemplate).toBe('');
 		expect(result.descriptionText).toBe('');
@@ -744,7 +763,12 @@ describe('resolveBlockConfig', () => {
 				BY_LINES: { RANGE: [10, 20], INCLUSIVE: false },
 			},
 		};
-		const result = resolveBlockConfig(parsed, testSettings(), 'text');
+		const settings = testSettings({
+			languageCopyJoinDefaults: {
+				text: { shiftJoin: '', altJoin: '', joinIgnoreRegex: '' },
+			},
+		});
+		const result = resolveBlockConfig(parsed, settings, 'text');
 		expect(result.filterByLines.enabled).toBe(true);
 		expect(result.filterByLines.start).toBe(10);
 		expect(result.filterByLines.end).toBe(20);
@@ -757,7 +781,12 @@ describe('resolveBlockConfig', () => {
 				BY_LINES: { RANGE: 'invalid' },
 			},
 		};
-		const result = resolveBlockConfig(parsed, testSettings(), 'text');
+		const settings = testSettings({
+			languageCopyJoinDefaults: {
+				text: { shiftJoin: '', altJoin: '', joinIgnoreRegex: '' },
+			},
+		});
+		const result = resolveBlockConfig(parsed, settings, 'text');
 		expect(result.filterByLines.enabled).toBe(false);
 		expect(result.filterByLines.start).toBe(0);
 		expect(result.filterByLines.end).toBe(0);
@@ -769,7 +798,12 @@ describe('resolveBlockConfig', () => {
 				BY_MARKS: { START: '// BEGIN', END: '// END', INCLUSIVE: true },
 			},
 		};
-		const result = resolveBlockConfig(parsed, testSettings(), 'text');
+		const settings = testSettings({
+			languageCopyJoinDefaults: {
+				text: { shiftJoin: '', altJoin: '', joinIgnoreRegex: '' },
+			},
+		});
+		const result = resolveBlockConfig(parsed, settings, 'text');
 		expect(result.filterByMarks.enabled).toBe(true);
 		expect(result.filterByMarks.startMarker).toBe('// BEGIN');
 		expect(result.filterByMarks.endMarker).toBe('// END');
@@ -777,15 +811,20 @@ describe('resolveBlockConfig', () => {
 	});
 
 	it('disables BY_MARKS when START or END missing', () => {
+		const settings = testSettings({
+			languageCopyJoinDefaults: {
+				text: { shiftJoin: '', altJoin: '', joinIgnoreRegex: '' },
+			},
+		});
 		const onlyStart: ParsedYamlConfig = {
 			FILTER: { BY_MARKS: { START: '// BEGIN' } },
 		};
-		expect(resolveBlockConfig(onlyStart, testSettings(), 'text').filterByMarks.enabled).toBe(false);
+		expect(resolveBlockConfig(onlyStart, settings, 'text').filterByMarks.enabled).toBe(false);
 
 		const onlyEnd: ParsedYamlConfig = {
 			FILTER: { BY_MARKS: { END: '// END' } },
 		};
-		expect(resolveBlockConfig(onlyEnd, testSettings(), 'text').filterByMarks.enabled).toBe(false);
+		expect(resolveBlockConfig(onlyEnd, settings, 'text').filterByMarks.enabled).toBe(false);
 	});
 
 	it('defaults INCLUSIVE to true when not specified', () => {
@@ -795,7 +834,12 @@ describe('resolveBlockConfig', () => {
 				BY_MARKS: { START: 'A', END: 'B' },
 			},
 		};
-		const result = resolveBlockConfig(parsed, testSettings(), 'text');
+		const settings = testSettings({
+			languageCopyJoinDefaults: {
+				text: { shiftJoin: '', altJoin: '', joinIgnoreRegex: '' },
+			},
+		});
+		const result = resolveBlockConfig(parsed, settings, 'text');
 		expect(result.filterByLines.inclusive).toBe(true);
 		expect(result.filterByMarks.inclusive).toBe(true);
 	});
@@ -827,14 +871,24 @@ describe('resolveBlockConfig', () => {
 	});
 
 	it('falls back to empty string when no join defaults configured', () => {
-		const result = resolveBlockConfig({}, testSettings(), 'unknown');
+		const settings = testSettings({
+			languageCopyJoinDefaults: {
+				unknown: { shiftJoin: '', altJoin: '', joinIgnoreRegex: '' },
+			},
+		});
+		const result = resolveBlockConfig({}, settings, 'unknown');
 		expect(result.shiftCopyJoin).toBe('');
 		expect(result.altCopyJoin).toBe('');
 		expect(result.joinIgnoreRegex).toBe('');
 	});
 
 	it('defaults filter to disabled when no FILTER section', () => {
-		const result = resolveBlockConfig({}, testSettings(), 'text');
+		const settings = testSettings({
+			languageCopyJoinDefaults: {
+				text: { shiftJoin: '', altJoin: '', joinIgnoreRegex: '' },
+			},
+		});
+		const result = resolveBlockConfig({}, settings, 'text');
 		expect(result.filterByLines.enabled).toBe(false);
 		expect(result.filterByLines.start).toBe(0);
 		expect(result.filterByLines.end).toBe(0);
@@ -847,7 +901,12 @@ describe('resolveBlockConfig', () => {
 		const parsed: ParsedYamlConfig = {
 			RENDER: { PRINT: 'asis' },
 		};
-		const result = resolveBlockConfig(parsed, testSettings(), 'text');
+		const settings = testSettings({
+			languageCopyJoinDefaults: {
+				text: { shiftJoin: '', altJoin: '', joinIgnoreRegex: '' },
+			},
+		});
+		const result = resolveBlockConfig(parsed, settings, 'text');
 		expect(result.printBehaviour).toBe('asis');
 	});
 
@@ -855,17 +914,34 @@ describe('resolveBlockConfig', () => {
 		const parsed: ParsedYamlConfig = {
 			RENDER: { PRINT: 'expand' },
 		};
-		const result = resolveBlockConfig(parsed, testSettings({ printBehaviour: 'asis' }), 'text');
+		const settings = testSettings({
+			printBehaviour: 'asis',
+			languageCopyJoinDefaults: {
+				text: { shiftJoin: '', altJoin: '', joinIgnoreRegex: '' },
+			},
+		});
+		const result = resolveBlockConfig(parsed, settings, 'text');
 		expect(result.printBehaviour).toBe('expand');
 	});
 
 	it('falls back to settings printBehaviour when PRINT not in YAML', () => {
-		const result = resolveBlockConfig({}, testSettings({ printBehaviour: 'asis' }), 'text');
+		const settings = testSettings({
+			printBehaviour: 'asis',
+			languageCopyJoinDefaults: {
+				text: { shiftJoin: '', altJoin: '', joinIgnoreRegex: '' },
+			},
+		});
+		const result = resolveBlockConfig({}, settings, 'text');
 		expect(result.printBehaviour).toBe('asis');
 	});
 
 	it('defaults printBehaviour to "expand" with default settings', () => {
-		const result = resolveBlockConfig({}, testSettings(), 'text');
+		const settings = testSettings({
+			languageCopyJoinDefaults: {
+				text: { shiftJoin: '', altJoin: '', joinIgnoreRegex: '' },
+			},
+		});
+		const result = resolveBlockConfig({}, settings, 'text');
 		expect(result.printBehaviour).toBe('expand');
 	});
 });

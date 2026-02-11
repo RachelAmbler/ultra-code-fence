@@ -29,7 +29,7 @@ export function addScrollBehaviour(preElement: HTMLPreElement, maxVisibleLines: 
 
 	// Calculate height based on line count (1.4em per line is a good estimate)
 	const maxHeightEm = maxVisibleLines * LINE_HEIGHT_MULTIPLIER;
-	preElement.style.setProperty('--ucf-scroll-height', `${maxHeightEm}em`);
+	preElement.style.setProperty('--ucf-scroll-height', `${String(maxHeightEm)}em`);
 
 	// Create scroll indicator (gradient fade at bottom)
 	const scrollIndicator = document.createElement('div');
@@ -145,7 +145,7 @@ function extractLinesFromElement(element: HTMLElement): Node[][] {
 
 	function processNode(node: Node): void {
 		if (node.nodeType === Node.TEXT_NODE) {
-			const text = node.textContent || '';
+			const text = node.textContent ?? '';
 			const parts = text.split('\n');
 
 			parts.forEach((part, partIndex) => {
@@ -188,7 +188,7 @@ function extractLinesFromElement(element: HTMLElement): Node[][] {
 
 		elem.childNodes.forEach(child => {
 			if (child.nodeType === Node.TEXT_NODE) {
-				const text = child.textContent || '';
+				const text = child.textContent ?? '';
 				const parts = text.split('\n');
 
 				parts.forEach((part, partIndex) => {
@@ -213,7 +213,7 @@ function extractLinesFromElement(element: HTMLElement): Node[][] {
 					// For simplicity, process as if unwrapped (loses one level of nesting)
 					child.childNodes.forEach(grandchild => {
 						if (grandchild.nodeType === Node.TEXT_NODE) {
-							const gtext = grandchild.textContent || '';
+							const gtext = grandchild.textContent ?? '';
 							const gparts = gtext.split('\n');
 
 							gparts.forEach((gpart, gpartIndex) => {
@@ -235,7 +235,7 @@ function extractLinesFromElement(element: HTMLElement): Node[][] {
 		});
 	}
 
-	element.childNodes.forEach(child => processNode(child));
+	element.childNodes.forEach(child => { processNode(child); });
 
 	return lines;
 }
@@ -246,7 +246,7 @@ function extractLinesFromElement(element: HTMLElement): Node[][] {
 function isLineEmpty(nodes: Node[]): boolean {
 	if (nodes.length === 0) return true;
 
-	const text = nodes.map(n => n.textContent || '').join('');
+	const text = nodes.map(n => n.textContent ?? '').join('');
 	return text === '';
 }
 
@@ -319,8 +319,8 @@ export function findPreElement(containerElement: HTMLElement): HTMLPreElement | 
  * @param containerElement - Container to clean
  */
 export function removeExistingTitleElements(containerElement: HTMLElement): void {
-	containerElement.querySelectorAll(`.${CSS_CLASSES.title}`).forEach(el => el.remove());
-	containerElement.querySelectorAll(`.${CSS_CLASSES.description}`).forEach(el => el.remove());
+	containerElement.querySelectorAll(`.${CSS_CLASSES.title}`).forEach(el => { el.remove(); });
+	containerElement.querySelectorAll(`.${CSS_CLASSES.description}`).forEach(el => { el.remove(); });
 	containerElement.querySelectorAll(`.${CSS_CLASSES.container}`).forEach(el => {
 		if (el !== containerElement) el.remove();
 	});
@@ -396,11 +396,10 @@ export function setSvgContent(element: HTMLElement, svgString: string): void {
 	}
 
 	const parser = new DOMParser();
-	// Use HTML parser mode to handle SVG parsing in jsdom
-	const doc = parser.parseFromString(`<div>${svgString}</div>`, 'text/html');
-	const svg = doc.body.firstElementChild;
+	const doc = parser.parseFromString(svgString, 'image/svg+xml');
+	const svg = doc.documentElement;
 
-	if (svg) {
+	if (svg.nodeName.toLowerCase() === 'svg') {
 		element.appendChild(element.ownerDocument.importNode(svg, true));
 	}
 }
@@ -412,9 +411,8 @@ export function setSvgContent(element: HTMLElement, svgString: string): void {
  * @returns The first element from the parsed HTML, or null if none
  */
 export function createElementFromHtml(html: string): Element | null {
-	const parser = new DOMParser();
-	const doc = parser.parseFromString(html, 'text/html');
-	return doc.body.firstElementChild;
+	const fragment = parseHtmlFragment(html);
+	return fragment.firstElementChild;
 }
 
 /**

@@ -67,7 +67,7 @@ export function injectCallouts(
 	// Track per-mode counters (footnote/popover still use numbering; inline uses type icons)
 	let footnoteCounter = 1;
 	let popoverCounter = 1;
-	const footnoteEntries: Array<{ text: string; number: number }> = [];
+	const footnoteEntries: { text: string; number: number }[] = [];
 	const popoverElements: HTMLElement[] = [];
 
 	// Process each line that has callout entries, in line order
@@ -75,9 +75,10 @@ export function injectCallouts(
 
 	for (const lineNum of sortedLineNumbers) {
 		const lineElement = lines[lineNum - 1]; // 0-based index
-		if (!lineElement) continue;
+		if (!(lineElement instanceof HTMLElement)) continue;
 
-		const entries = calloutsByLine.get(lineNum)!;
+		const entries = calloutsByLine.get(lineNum);
+		if (!entries) continue;
 		const lineContent = lineElement.querySelector(`.${CSS_CLASSES.lineContent}`);
 
 		// Handle REPLACE: replace line content with callout text
@@ -220,10 +221,10 @@ function injectPopoverTrigger(
 
 	// Add popover content to pre element
 	const contentHTML = buildPopoverContentHTML(text, type, calloutNumber);
-	const contentEl = createElementFromHtml(contentHTML) as HTMLElement;
+	const contentEl = createElementFromHtml(contentHTML);
 	if (contentEl) {
 		preElement.appendChild(contentEl);
-		return contentEl;
+		return contentEl as HTMLElement;
 	}
 
 	return null;
@@ -249,7 +250,7 @@ function setupPopoverInteractions(preElement: HTMLElement): void {
 
 	for (const trigger of triggers) {
 		const id = trigger.getAttribute('data-callout-id');
-		const popover = popovers.find(p => p.getAttribute('data-callout-id') === id) as HTMLElement;
+		const popover = popovers.find(p => p.getAttribute('data-callout-id') === id);
 
 		if (popover) {
 			trigger.addEventListener('click', (e) => {

@@ -68,12 +68,12 @@ export function deepMergeYamlConfigs(
 	override: ParsedYamlConfig
 ): ParsedYamlConfig {
 	// Handle empty cases
-	if (!base || Object.keys(base).length === 0) {
-		return override || {};
+	if (Object.keys(base).length === 0) {
+		return override;
 	}
 
-	if (!override || Object.keys(override).length === 0) {
-		return base || {};
+	if (Object.keys(override).length === 0) {
+		return base;
 	}
 
 	const result: ParsedYamlConfig = {};

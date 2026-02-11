@@ -11,7 +11,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { setupObsidianDom } from '../../src/__mocks__/obsidian';
+import { setupObsidianDom } from '../../__mocks__/obsidian';
 import { createYamlEditor } from '../../src/ui/yaml-editor';
 import { validateYamlSchema, formatWarnings } from '../../src/ui/yaml-validator';
 

@@ -109,7 +109,7 @@ function getSizeFieldValue(metadata: SourceFileMetadata, formatModifier?: string
 		return '';
 	}
 
-	const sizeFormat = (formatModifier || 'auto') as FileSizeFormat;
+	const sizeFormat = (formatModifier ?? 'auto') as FileSizeFormat;
 	return formatFileSize(metadata.sizeInBytes, sizeFormat);
 }
 
@@ -125,7 +125,7 @@ function getDateFieldValue(timestampMs: number | undefined, formatModifier?: str
 		return '';
 	}
 
-	const dateFormat = (formatModifier || 'long') as DateDisplayFormat;
+	const dateFormat = (formatModifier ?? 'long') as DateDisplayFormat;
 	return formatTimestamp(timestampMs, dateFormat);
 }
 
@@ -202,7 +202,7 @@ function resolveTemplateVariable(
  */
 export function replaceTemplateVariables(templateString: string, metadata: SourceFileMetadata): string {
 	// Match {variable} or {variable:format}
-	return templateString.replace(/\{([^}]+)}/g, (match, variableString) => {
+	return templateString.replace(/\{([^}]+)}/g, (_match: string, variableString: string) => {
 		const { variableName, formatModifier } = parseTemplateVariable(variableString);
 		return resolveTemplateVariable(variableName, formatModifier, metadata);
 	});

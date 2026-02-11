@@ -16,7 +16,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { App, TFile } from '../../src/__mocks__/obsidian';
+import { App, TFile } from '../../__mocks__/obsidian';
 import { createIconElement, createIconFromSettings, type IconCreationOptions } from '../../src/services/icon-generator';
 import { CSS_CLASSES } from '../../src/constants';
 import { testSettings } from '../helpers/test-settings';

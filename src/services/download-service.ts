@@ -1,12 +1,9 @@
 /**
  * Ultra Code Fence - Download Service
  *
- * Handles saving code block content to files. Uses Node.js fs and
- * Electron's dialog on desktop, with a Blob/anchor fallback on mobile.
+ * Handles saving code block content to files using a Blob/anchor approach
+ * that works on all platforms (desktop and mobile).
  */
-
-import { Platform } from 'obsidian';
-import type { PluginSettings } from '../types';
 
 /**
  * Builds a suggested filename from the resolved title and language.
@@ -38,82 +35,18 @@ export function buildSuggestedFilename(resolvedTitle: string, language: string):
 }
 
 /**
- * Downloads code content to a file.
+ * Downloads code content to a file via Blob and anchor element.
  *
- * On desktop: shows a native OS save dialog via Electron, writes with Node's fs,
- * and remembers the chosen directory per note path.
- *
- * On mobile: creates a Blob and triggers a browser download.
+ * Creates a temporary download link and triggers a browser download.
+ * Works on all platforms (desktop and mobile).
  *
  * @param codeText - The code content to save
- * @param suggestedFilename - Default filename for the save dialog
- * @param notePath - Path of the containing note (for remembering save directory)
- * @param settings - Plugin settings
- * @param saveSettings - Callback to persist settings changes
+ * @param suggestedFilename - Default filename for the download
  */
-export async function downloadCodeToFile(
+export function downloadCodeToFile(
 	codeText: string,
 	suggestedFilename: string,
-	notePath: string,
-	settings: PluginSettings,
-	saveSettings: () => Promise<void>
-): Promise<void> {
-	if (Platform.isDesktopApp) {
-		try {
-			await downloadDesktop(codeText, suggestedFilename, notePath, settings, saveSettings);
-			return;
-		} catch {
-			// Electron APIs unavailable — fall through to mobile/HTML5 approach
-		}
-	}
-
-	downloadMobile(codeText, suggestedFilename);
-}
-
-/**
- * Desktop download via Electron's native save dialog and Node's fs.
- */
-async function downloadDesktop(
-	codeText: string,
-	suggestedFilename: string,
-	notePath: string,
-	settings: PluginSettings,
-	saveSettings: () => Promise<void>
-): Promise<void> {
-	// Dynamic requires for Node/Electron modules (desktop only)
-	const fs = require('fs') as typeof import('fs');
-	const pathModule = require('path') as typeof import('path');
-	const { remote } = require('electron');
-
-	// Build default path from remembered directory + suggested filename
-	const lastDir = settings.downloadPathHistory[notePath] || '';
-	const defaultPath = lastDir
-		? pathModule.join(lastDir, suggestedFilename)
-		: suggestedFilename;
-
-	const result = await remote.dialog.showSaveDialog({
-		defaultPath,
-		filters: [
-			{ name: 'All Files', extensions: ['*'] },
-		],
-	});
-
-	if (result.canceled || !result.filePath) {
-		return;
-	}
-
-	// Write the file
-	fs.writeFileSync(result.filePath, codeText, 'utf-8');
-
-	// Remember the directory for this note
-	settings.downloadPathHistory[notePath] = pathModule.dirname(result.filePath);
-	await saveSettings();
-}
-
-/**
- * Mobile/fallback download via Blob and anchor element.
- */
-function downloadMobile(codeText: string, suggestedFilename: string): void {
+): void {
 	const blob = new Blob([codeText], { type: 'text/plain;charset=utf-8' });
 	const url = URL.createObjectURL(blob);
 

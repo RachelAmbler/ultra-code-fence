@@ -11,7 +11,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { App, Component, MarkdownRenderer, setupObsidianDom } from '../../src/__mocks__/obsidian';
+import { App, Component, MarkdownRenderer, setupObsidianDom } from '../../__mocks__/obsidian';
 import {
 	createDescriptionElement,
 	createTooltipDescriptionElement,

@@ -58,12 +58,12 @@ export class WhatsNewModal extends Modal {
 		});
 
 		// New features section
-		if (this.releaseNotes.new?.length > 0) {
+		if (this.releaseNotes.new.length > 0) {
 			this.renderChangelogSection(contentEl, 'New', CSS_CLASSES.changelogNew, this.releaseNotes.new);
 		}
 
 		// Bug fixes section
-		if (this.releaseNotes.fixed?.length > 0) {
+		if (this.releaseNotes.fixed.length > 0) {
 			this.renderChangelogSection(contentEl, 'Fixed', CSS_CLASSES.changelogFixed, this.releaseNotes.fixed);
 		}
 
@@ -79,7 +79,7 @@ export class WhatsNewModal extends Modal {
 			text: 'Got it!',
 			cls: 'mod-cta',
 		});
-		closeButton.addEventListener('click', () => this.close());
+		closeButton.addEventListener('click', () => { this.close(); });
 	}
 
 	/**
@@ -129,8 +129,8 @@ export class WhatsNewModal extends Modal {
 				}
 
 				const issueLink = listItem.createEl('a', {
-					text: `#${issueNumber}`,
-					href: `${this.releaseNotes.repo}/issues/${issueNumber}`,
+					text: `#${String(issueNumber)}`,
+					href: `${this.releaseNotes.repo}/issues/${String(issueNumber)}`,
 					cls: 'ucf-issue-link',
 				});
 				issueLink.setAttr('target', '_blank');
@@ -168,7 +168,7 @@ export function showWhatsNewIfUpdated(
 	currentVersion: string,
 	lastSeenVersion: string,
 	releaseNotes: ReleaseNotesData,
-	delayMs: number = 1000
+	delayMs = 1000
 ): boolean {
 	if (lastSeenVersion === currentVersion) {
 		return false;

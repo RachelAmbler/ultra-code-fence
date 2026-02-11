@@ -37,7 +37,8 @@ export function groupCalloutsByLine(config: ResolvedCalloutConfig): Map<number, 
 			if (!groups.has(lineNum)) {
 				groups.set(lineNum, []);
 			}
-			groups.get(lineNum)!.push(entry);
+			const group = groups.get(lineNum);
+			if (group) group.push(entry);
 		}
 	}
 
@@ -92,7 +93,7 @@ export function buildInlineCalloutHTML(text: string, type: string, style: 'stand
  * @returns HTML string for the superscript reference
  */
 export function buildFootnoteRefHTML(calloutNumber: number): string {
-	return `<sup class="${CSS_CLASSES.calloutRef}">${calloutNumber}</sup>`;
+	return `<sup class="${CSS_CLASSES.calloutRef}">${String(calloutNumber)}</sup>`;
 }
 
 /**
@@ -107,7 +108,7 @@ export function buildFootnoteRefHTML(calloutNumber: number): string {
  */
 export function buildFootnoteEntryHTML(text: string, calloutNumber: number): string {
 	const formattedText = formatCalloutMarkdown(text);
-	return `<div class="${CSS_CLASSES.calloutEntry}"><span class="${CSS_CLASSES.calloutNumber}">${calloutNumber}.</span> <span class="${CSS_CLASSES.calloutText}">${formattedText}</span></div>`;
+	return `<div class="${CSS_CLASSES.calloutEntry}"><span class="${CSS_CLASSES.calloutNumber}">${String(calloutNumber)}.</span> <span class="${CSS_CLASSES.calloutText}">${formattedText}</span></div>`;
 }
 
 /**
@@ -116,7 +117,7 @@ export function buildFootnoteEntryHTML(text: string, calloutNumber: number): str
  * @param entries - Array of footnote entries with text and number
  * @returns HTML string for the complete footnote section
  */
-export function buildFootnoteSectionHTML(entries: Array<{ text: string; number: number }>): string {
+export function buildFootnoteSectionHTML(entries: { text: string; number: number }[]): string {
 	const footnotes = entries
 		.map(({ text, number }) => buildFootnoteEntryHTML(text, number))
 		.join('\n');
@@ -138,7 +139,7 @@ export function buildFootnoteSectionHTML(entries: Array<{ text: string; number: 
  * @returns HTML string for the trigger element
  */
 export function buildPopoverTriggerHTML(calloutNumber: number): string {
-	return `<span class="${CSS_CLASSES.calloutTrigger}" data-callout-id="${calloutNumber}">𝘖</span>`;
+	return `<span class="${CSS_CLASSES.calloutTrigger}" data-callout-id="${String(calloutNumber)}">𝘖</span>`;
 }
 
 /**
@@ -155,7 +156,7 @@ export function buildPopoverTriggerHTML(calloutNumber: number): string {
 export function buildPopoverContentHTML(text: string, type: string, calloutNumber: number): string {
 	const color = getCalloutColor(type);
 	const formattedText = formatCalloutMarkdown(text);
-	return `<div class="${CSS_CLASSES.calloutPopover}" data-callout-id="${calloutNumber}" style="border-left-color: ${color}"><span class="${CSS_CLASSES.calloutText}">${formattedText}</span></div>`;
+	return `<div class="${CSS_CLASSES.calloutPopover}" data-callout-id="${String(calloutNumber)}" style="border-left-color: ${color}"><span class="${CSS_CLASSES.calloutText}">${formattedText}</span></div>`;
 }
 
 // =============================================================================

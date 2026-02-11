@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { setupObsidianDom, App } from '../../src/__mocks__/obsidian';
+import { setupObsidianDom, App } from '../../__mocks__/obsidian';
 import { UltraCodeFenceSettingTab, type SettingsPlugin } from '../../src/ui/settings-tab';
 import { testSettings } from '../helpers/test-settings';
 import type { PluginSettings } from '../../src/types';
@@ -139,7 +139,7 @@ describe('display', () => {
 		const contentDiv = tab.containerEl.querySelector('.ucf-tab-content');
 		const introText = contentDiv?.querySelector('.ucf-tab-intro');
 
-		expect(introText?.textContent).toContain('Create named YAML presets');
+		expect(introText?.textContent).toContain('Create named presets');
 	});
 });
 
@@ -457,7 +457,7 @@ describe('Presets tab', () => {
 	it('has intro text about presets with ucf-tab-intro class', () => {
 		const introText = tab.containerEl.querySelector('.ucf-tab-content .ucf-tab-intro');
 		expect(introText).toBeTruthy();
-		expect(introText?.textContent).toContain('Create named YAML presets');
+		expect(introText?.textContent).toContain('Create named presets');
 	});
 
 	it('with no presets, no ucf-preset-entry elements appear', () => {

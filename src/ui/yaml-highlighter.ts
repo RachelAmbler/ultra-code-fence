@@ -80,14 +80,14 @@ function highlightLine(line: string): string {
 	}
 
 	// List item line:  "  - value" or "  - KEY: value"
-	const listMatch = line.match(/^(\s*)(- )(.*)/);
+	const listMatch = /^(\s*)(- )(.*)/.exec(line);
 	if (listMatch) {
 		const [, indent, dash, rest] = listMatch;
 		return escapeHtml(indent) + span(CSS.punctuation, escapeHtml(dash)) + highlightValueOrKeyValue(rest);
 	}
 
 	// Key-value line:  "KEY: value" or "  KEY: value"
-	const kvMatch = line.match(/^(\s*)([\w][\w\s]*?)(\s*:\s*)(.*)/);
+	const kvMatch = /^(\s*)([\w][\w\s]*?)(\s*:\s*)(.*)/.exec(line);
 	if (kvMatch) {
 		const [, indent, key, colon, value] = kvMatch;
 		const escapedIndent = escapeHtml(indent);
@@ -106,7 +106,7 @@ function highlightLine(line: string): string {
  */
 function highlightValueOrKeyValue(text: string): string {
 	// Check if it's a nested key-value after the dash
-	const kvMatch = text.match(/^([\w][\w\s]*?)(\s*:\s*)(.*)/);
+	const kvMatch = /^([\w][\w\s]*?)(\s*:\s*)(.*)/.exec(text);
 	if (kvMatch) {
 		const [, key, colon, value] = kvMatch;
 		return span(CSS.key, escapeHtml(key)) + span(CSS.punctuation, escapeHtml(colon)) + highlightValue(value);

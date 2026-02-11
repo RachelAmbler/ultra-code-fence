@@ -63,7 +63,7 @@ export function formatFileSize(sizeInBytes: number, sizeFormat: FileSizeFormat =
 
 	switch (sizeFormat) {
 		case 'bytes':
-			return `${sizeInBytes} B`;
+			return `${String(sizeInBytes)} B`;
 
 		case 'kb':
 			return `${(sizeInBytes / 1024).toFixed(1)} KB`;
@@ -111,12 +111,12 @@ export function calculateRelativeTime(timestampMs: number): string {
 	const months = Math.floor(days / 30);
 	const years = Math.floor(days / 365);
 
-	if (years > 0) return `${years} year${years > 1 ? 's' : ''} ago`;
-	if (months > 0) return `${months} month${months > 1 ? 's' : ''} ago`;
-	if (weeks > 0) return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
-	if (days > 0) return `${days} day${days > 1 ? 's' : ''} ago`;
-	if (hours > 0) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-	if (minutes > 0) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+	if (years > 0) return `${String(years)} year${years > 1 ? 's' : ''} ago`;
+	if (months > 0) return `${String(months)} month${months > 1 ? 's' : ''} ago`;
+	if (weeks > 0) return `${String(weeks)} week${weeks > 1 ? 's' : ''} ago`;
+	if (days > 0) return `${String(days)} day${days > 1 ? 's' : ''} ago`;
+	if (hours > 0) return `${String(hours)} hour${hours > 1 ? 's' : ''} ago`;
+	if (minutes > 0) return `${String(minutes)} minute${minutes > 1 ? 's' : ''} ago`;
 
 	return 'just now';
 }

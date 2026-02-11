@@ -9,7 +9,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { setupObsidianDom } from '../../src/__mocks__/obsidian';
+import { setupObsidianDom } from '../../__mocks__/obsidian';
 import {
 	addScrollBehaviour,
 	wrapCodeLinesInDom,

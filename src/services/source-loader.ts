@@ -225,7 +225,7 @@ export function extractFileMetadata(
  * @returns Metadata object for embedded code
  */
 export function createEmbeddedCodeMetadata(title: string | undefined, language: string): SourceFileMetadata {
-	const displayName = title || 'inline';
+	const displayName = title ?? 'inline';
 
 	return {
 		filename: displayName,

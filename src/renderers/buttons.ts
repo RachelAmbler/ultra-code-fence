@@ -71,7 +71,7 @@ export function joinCodeLines(codeText: string, joinOperator: string, ignoreRege
 		.split('\n')
 		.map(line => line.trim())
 		.filter(line => line.length > 0)
-		.filter(line => !ignoreRegex || !ignoreRegex.test(line))
+		.filter(line => !ignoreRegex?.test(line))
 		.join(` ${joinOperator} `);
 }
 
@@ -107,7 +107,7 @@ export function addCopyButton(preElement: HTMLPreElement, options?: CopyButtonOp
 		copyButton.setAttribute('title', tooltipParts.join('\n'));
 	}
 
-	copyButton.addEventListener('click', async (event) => {
+	copyButton.addEventListener('click', (event) => {
 		event.preventDefault();
 		event.stopPropagation();
 
@@ -135,17 +135,17 @@ export function addCopyButton(preElement: HTMLPreElement, options?: CopyButtonOp
 				codeText = joinCodeLines(codeText, options.altCopyJoin, ignoreRegex);
 			}
 
-			await navigator.clipboard.writeText(codeText);
+			void navigator.clipboard.writeText(codeText).then(() => {
+				// Show success state
+				copyButton.classList.add(CSS_CLASSES.copied);
+				setSvgContent(copyButton, CHECKMARK_ICON_SVG);
 
-			// Show success state
-			copyButton.classList.add(CSS_CLASSES.copied);
-			setSvgContent(copyButton, CHECKMARK_ICON_SVG);
-
-			// Reset after delay
-			setTimeout(() => {
-				copyButton.classList.remove(CSS_CLASSES.copied);
-				setSvgContent(copyButton, COPY_ICON_SVG);
-			}, COPY_SUCCESS_DURATION_MS);
+				// Reset after delay
+				setTimeout(() => {
+					copyButton.classList.remove(CSS_CLASSES.copied);
+					setSvgContent(copyButton, COPY_ICON_SVG);
+				}, COPY_SUCCESS_DURATION_MS);
+			});
 		}
 	});
 
@@ -168,12 +168,12 @@ function buildExpandButtonContent(hiddenLineCount: number): DocumentFragment {
 	const parser = new DOMParser();
 	const svgDoc = parser.parseFromString(CHEVRON_DOWN_SVG, 'image/svg+xml');
 	const svg = svgDoc.documentElement;
-	if (svg && svg.nodeName.toLowerCase() === 'svg') {
+	if (svg.nodeName.toLowerCase() === 'svg') {
 		fragment.appendChild(fragment.ownerDocument.importNode(svg, true));
 	}
 
 	const span = document.createElement('span');
-	span.textContent = `Show more (${hiddenLineCount} more lines)`;
+	span.textContent = `Show more (${String(hiddenLineCount)} more lines)`;
 	fragment.appendChild(span);
 
 	return fragment;
@@ -190,7 +190,7 @@ function buildCollapseButtonContent(): DocumentFragment {
 	const parser = new DOMParser();
 	const svgDoc = parser.parseFromString(CHEVRON_UP_SVG, 'image/svg+xml');
 	const svg = svgDoc.documentElement;
-	if (svg && svg.nodeName.toLowerCase() === 'svg') {
+	if (svg.nodeName.toLowerCase() === 'svg') {
 		fragment.appendChild(fragment.ownerDocument.importNode(svg, true));
 	}
 
@@ -228,7 +228,7 @@ export function addFoldButton(
 
 	// Start in folded state
 	preElement.classList.add(CSS_CLASSES.folded);
-	preElement.style.setProperty('--ucf-folded-height', `${foldedHeight}px`);
+	preElement.style.setProperty('--ucf-folded-height', `${String(foldedHeight)}px`);
 
 	// Calculate hidden lines
 	const hiddenLineCount = totalLineCount - visibleLinesWhenFolded;
@@ -271,10 +271,9 @@ export function addFoldButton(
 /**
  * Callback invoked when the download button is clicked.
  *
- * The caller provides the actual download logic (platform detection,
- * save dialog, etc.) via this callback.
+ * The caller provides the actual download logic via this callback.
  */
-export type DownloadCallback = (codeText: string) => Promise<void>;
+export type DownloadCallback = (codeText: string) => void;
 
 /**
  * Creates and attaches a download button to a pre element.
@@ -292,7 +291,7 @@ export function addDownloadButton(preElement: HTMLPreElement, onDownload: Downlo
 	downloadButton.setAttribute('title', 'Save to file');
 	setSvgContent(downloadButton, DOWNLOAD_ICON_SVG);
 
-	downloadButton.addEventListener('click', async (event) => {
+	downloadButton.addEventListener('click', (event) => {
 		event.preventDefault();
 		event.stopPropagation();
 
@@ -300,7 +299,7 @@ export function addDownloadButton(preElement: HTMLPreElement, onDownload: Downlo
 
 		if (codeElement) {
 			const codeText = extractCodeText(codeElement);
-			await onDownload(codeText);
+			onDownload(codeText);
 		}
 	});
 

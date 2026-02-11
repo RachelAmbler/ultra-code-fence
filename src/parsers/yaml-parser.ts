@@ -78,7 +78,7 @@ export function parseBlockContent(rawContent: string): ParsedBlockContent {
 	try {
 		const yamlProperties = parseYaml(rawContent) as Record<string, unknown>;
 
-		if (yamlProperties && typeof yamlProperties === 'object' && hasKnownYamlSections(yamlProperties)) {
+		if (typeof yamlProperties === 'object' && hasKnownYamlSections(yamlProperties)) {
 			return {
 				yamlProperties,
 				embeddedCode: null,
@@ -121,7 +121,7 @@ function parseEmbeddedCodeBlock(rawContent: string): ParsedBlockContent {
 		: {};
 
 	return {
-		yamlProperties: yamlProperties ?? {},
+		yamlProperties,
 		embeddedCode,
 		hasEmbeddedCode: true,
 	};
@@ -216,10 +216,26 @@ export function resolveString(yamlValue: unknown, defaultValue: string): string 
 		return yamlValue;
 	}
 
-	// Convert all other types using String()
-	const stringValue = String(yamlValue);
-	// Empty string result should use defaultValue
-	return stringValue === '' ? defaultValue : stringValue;
+	// Only convert primitive types — objects/arrays would produce "[object Object]"
+	if (typeof yamlValue === 'number' || typeof yamlValue === 'boolean') {
+		return String(yamlValue);
+	}
+
+	return defaultValue;
+}
+
+/**
+ * Safely converts an unknown YAML value to a string, returning undefined
+ * for non-primitive types (objects, arrays) instead of "[object Object]".
+ *
+ * @param value - Value from parsed YAML
+ * @returns String representation or undefined if not a primitive
+ */
+function safeString(value: unknown): string | undefined {
+	if (value === undefined || value === null) return undefined;
+	if (typeof value === 'string') return value;
+	if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+	return undefined;
 }
 
 // =============================================================================
@@ -284,10 +300,10 @@ export function parseMetaSection(yamlProps: Record<string, unknown>): YamlMetaCo
 	const meta = getSection(yamlProps, YAML_SECTIONS.meta);
 
 	return {
-		PATH: meta[YAML_META.path] !== undefined ? String(meta[YAML_META.path]) : undefined,
-		TITLE: meta[YAML_META.title] !== undefined ? String(meta[YAML_META.title]) : undefined,
-		DESC: meta[YAML_META.desc] !== undefined ? String(meta[YAML_META.desc]) : undefined,
-		PRESET: meta[YAML_META.preset] !== undefined ? String(meta[YAML_META.preset]) : undefined,
+		PATH: safeString(meta[YAML_META.path]),
+		TITLE: safeString(meta[YAML_META.title]),
+		DESC: safeString(meta[YAML_META.desc]),
+		PRESET: safeString(meta[YAML_META.preset]),
 	};
 }
 
@@ -316,25 +332,13 @@ export function parseRenderDisplaySection(yamlProps: Record<string, unknown>): Y
 		COPY: render[YAML_RENDER_DISPLAY.copy] !== undefined
 			? resolveBoolean(render[YAML_RENDER_DISPLAY.copy], true)
 			: undefined,
-		STYLE: render[YAML_RENDER_DISPLAY.style] !== undefined
-			? String(render[YAML_RENDER_DISPLAY.style]).toLowerCase()
-			: undefined,
-		LANG: render[YAML_RENDER_DISPLAY.lang] !== undefined
-			? String(render[YAML_RENDER_DISPLAY.lang])
-			: undefined,
-		SHIFT_COPY_JOIN: render[YAML_RENDER_DISPLAY.shiftCopyJoin] !== undefined
-			? String(render[YAML_RENDER_DISPLAY.shiftCopyJoin])
-			: undefined,
+		STYLE: safeString(render[YAML_RENDER_DISPLAY.style])?.toLowerCase(),
+		LANG: safeString(render[YAML_RENDER_DISPLAY.lang]),
+		SHIFT_COPY_JOIN: safeString(render[YAML_RENDER_DISPLAY.shiftCopyJoin]),
 		// ALT_COPY_JOIN and CMD_COPY_JOIN are synonymous
-		ALT_COPY_JOIN: (render[YAML_RENDER_DISPLAY.altCopyJoin] ?? render[YAML_RENDER_DISPLAY.cmdCopyJoin]) !== undefined
-			? String(render[YAML_RENDER_DISPLAY.altCopyJoin] ?? render[YAML_RENDER_DISPLAY.cmdCopyJoin])
-			: undefined,
-		JOIN_IGNORE_REGEX: render[YAML_RENDER_DISPLAY.joinIgnoreRegex] !== undefined
-			? String(render[YAML_RENDER_DISPLAY.joinIgnoreRegex])
-			: undefined,
-		PRINT: render[YAML_RENDER_DISPLAY.print] !== undefined
-			? String(render[YAML_RENDER_DISPLAY.print]).toLowerCase()
-			: undefined,
+		ALT_COPY_JOIN: safeString(render[YAML_RENDER_DISPLAY.altCopyJoin] ?? render[YAML_RENDER_DISPLAY.cmdCopyJoin]),
+		JOIN_IGNORE_REGEX: safeString(render[YAML_RENDER_DISPLAY.joinIgnoreRegex]),
+		PRINT: safeString(render[YAML_RENDER_DISPLAY.print])?.toLowerCase(),
 	};
 }
 
@@ -396,12 +400,8 @@ export function parseFilterSection(yamlProps: Record<string, unknown>): YamlFilt
 	if (byMarks && typeof byMarks === 'object' && !Array.isArray(byMarks)) {
 		const byMarksObj = byMarks as Record<string, unknown>;
 		result.BY_MARKS = {
-			START: byMarksObj[YAML_FILTER_BY_MARKS.start] !== undefined
-				? String(byMarksObj[YAML_FILTER_BY_MARKS.start])
-				: undefined,
-			END: byMarksObj[YAML_FILTER_BY_MARKS.end] !== undefined
-				? String(byMarksObj[YAML_FILTER_BY_MARKS.end])
-				: undefined,
+			START: safeString(byMarksObj[YAML_FILTER_BY_MARKS.start]),
+			END: safeString(byMarksObj[YAML_FILTER_BY_MARKS.end]),
 			INCLUSIVE: byMarksObj[YAML_FILTER_BY_MARKS.inclusive] !== undefined
 				? resolveBoolean(byMarksObj[YAML_FILTER_BY_MARKS.inclusive], true)
 				: undefined,
@@ -425,18 +425,21 @@ export function parseCalloutSection(yamlProps: Record<string, unknown>): YamlCal
 	const result: YamlCalloutConfig = {};
 
 	// Parse DISPLAY mode
-	if (callout[YAML_CALLOUT.display] !== undefined) {
-		result.DISPLAY = String(callout[YAML_CALLOUT.display]).toLowerCase();
+	const displayStr = safeString(callout[YAML_CALLOUT.display]);
+	if (displayStr !== undefined) {
+		result.DISPLAY = displayStr.toLowerCase();
 	}
 
 	// Parse PRINT_DISPLAY mode
-	if (callout[YAML_CALLOUT.printDisplay] !== undefined) {
-		result.PRINT_DISPLAY = String(callout[YAML_CALLOUT.printDisplay]).toLowerCase();
+	const printDisplayStr = safeString(callout[YAML_CALLOUT.printDisplay]);
+	if (printDisplayStr !== undefined) {
+		result.PRINT_DISPLAY = printDisplayStr.toLowerCase();
 	}
 
 	// Parse STYLE
-	if (callout[YAML_CALLOUT.style] !== undefined) {
-		result.STYLE = String(callout[YAML_CALLOUT.style]).toLowerCase();
+	const styleStr = safeString(callout[YAML_CALLOUT.style]);
+	if (styleStr !== undefined) {
+		result.STYLE = styleStr.toLowerCase();
 	}
 
 	// Parse ENTRIES array
@@ -453,7 +456,7 @@ export function parseCalloutSection(yamlProps: Record<string, unknown>): YamlCal
 				}
 
 				if (entry[YAML_CALLOUT_ENTRY.mark] !== undefined) {
-					parsed.MARK = String(entry[YAML_CALLOUT_ENTRY.mark]);
+					parsed.MARK = safeString(entry[YAML_CALLOUT_ENTRY.mark]) ?? '';
 				}
 
 				if (entry[YAML_CALLOUT_ENTRY.lines] !== undefined) {
@@ -461,7 +464,7 @@ export function parseCalloutSection(yamlProps: Record<string, unknown>): YamlCal
 				}
 
 				if (entry[YAML_CALLOUT_ENTRY.text] !== undefined) {
-					parsed.TEXT = String(entry[YAML_CALLOUT_ENTRY.text]);
+					parsed.TEXT = safeString(entry[YAML_CALLOUT_ENTRY.text]) ?? '';
 				}
 
 				if (entry[YAML_CALLOUT_ENTRY.replace] !== undefined) {
@@ -469,11 +472,11 @@ export function parseCalloutSection(yamlProps: Record<string, unknown>): YamlCal
 				}
 
 				if (entry[YAML_CALLOUT_ENTRY.display] !== undefined) {
-					parsed.DISPLAY = String(entry[YAML_CALLOUT_ENTRY.display]).toLowerCase();
+					parsed.DISPLAY = safeString(entry[YAML_CALLOUT_ENTRY.display])?.toLowerCase();
 				}
 
 				if (entry[YAML_CALLOUT_ENTRY.type] !== undefined) {
-					parsed.TYPE = String(entry[YAML_CALLOUT_ENTRY.type]);
+					parsed.TYPE = safeString(entry[YAML_CALLOUT_ENTRY.type]);
 				}
 
 				return parsed;
@@ -495,9 +498,7 @@ function parseTextStyleSubsection(styleObj: Record<string, unknown> | undefined)
 	}
 
 	return {
-		COLOUR: styleObj[YAML_TEXT_STYLE.colour] !== undefined
-			? String(styleObj[YAML_TEXT_STYLE.colour])
-			: undefined,
+		COLOUR: safeString(styleObj[YAML_TEXT_STYLE.colour]),
 		BOLD: styleObj[YAML_TEXT_STYLE.bold] !== undefined
 			? resolveBoolean(styleObj[YAML_TEXT_STYLE.bold], false)
 			: undefined,
@@ -536,9 +537,7 @@ export function parseNestedYamlConfig(yamlProps: Record<string, unknown>): Parse
 		FILTER: parseFilterSection(yamlProps),
 		CALLOUT: parseCalloutSection(yamlProps),
 		// Top-level PROMPT for cmdout blocks
-		PROMPT: yamlProps[YAML_PROMPT] !== undefined
-		? (typeof yamlProps[YAML_PROMPT] === 'string' ? yamlProps[YAML_PROMPT] : String(yamlProps[YAML_PROMPT] as number | boolean))
-		: undefined,
+		PROMPT: safeString(yamlProps[YAML_PROMPT]),
 		// RENDER section for cmdout styling (stored separately as RENDER_CMDOUT)
 		RENDER_CMDOUT: parseRenderCmdoutSection(yamlProps),
 	};
@@ -554,13 +553,13 @@ export function parseNestedYamlConfig(yamlProps: Record<string, unknown>): Parse
  * @returns Parsed YAML configuration, or empty config on failure
  */
 export function parsePresetYaml(yamlString: string): ParsedYamlConfig {
-	if (!yamlString || !yamlString.trim()) {
+	if (!yamlString.trim()) {
 		return {};
 	}
 
 	try {
 		const yamlProps = parseYaml(yamlString) as Record<string, unknown>;
-		if (!yamlProps || typeof yamlProps !== 'object') {
+		if (typeof yamlProps !== 'object') {
 			return {};
 		}
 		return parseNestedYamlConfig(yamlProps);
@@ -588,7 +587,7 @@ export function resolveBlockConfig(
 		: null;
 
 	// Determine if BY_MARKS is enabled (both start and end required)
-	const byMarksEnabled = !!(parsed.FILTER?.BY_MARKS?.START && parsed.FILTER?.BY_MARKS?.END);
+	const byMarksEnabled = !!(parsed.FILTER?.BY_MARKS?.START) && !!(parsed.FILTER.BY_MARKS.END);
 
 	return {
 		// META section
@@ -597,7 +596,7 @@ export function resolveBlockConfig(
 		descriptionText: parsed.META?.DESC ?? '',
 
 		// RENDER section
-		titleBarStyle: (parsed.RENDER?.STYLE as TitleBarStyle) ?? settings.defaultTitleBarStyle,
+		titleBarStyle: (parsed.RENDER?.STYLE ?? settings.defaultTitleBarStyle) as TitleBarStyle,
 		language: parsed.RENDER?.LANG ?? defaultLanguage,
 		foldLines: parsed.RENDER?.FOLD ?? settings.foldLines,
 		scrollLines: parsed.RENDER?.SCROLL ?? settings.scrollLines,
@@ -605,14 +604,11 @@ export function resolveBlockConfig(
 		showLineNumbers: parsed.RENDER?.LINES ?? settings.showLineNumbers,
 		showCopyButton: parsed.RENDER?.COPY ?? settings.showCopyButton,
 		shiftCopyJoin: parsed.RENDER?.SHIFT_COPY_JOIN
-			?? settings.languageCopyJoinDefaults[defaultLanguage]?.shiftJoin
-			?? '',
+			?? settings.languageCopyJoinDefaults[defaultLanguage].shiftJoin,
 		altCopyJoin: parsed.RENDER?.ALT_COPY_JOIN
-			?? settings.languageCopyJoinDefaults[defaultLanguage]?.altJoin
-			?? '',
+			?? settings.languageCopyJoinDefaults[defaultLanguage].altJoin,
 		joinIgnoreRegex: parsed.RENDER?.JOIN_IGNORE_REGEX
-			?? settings.languageCopyJoinDefaults[defaultLanguage]?.joinIgnoreRegex
-			?? '',
+			?? settings.languageCopyJoinDefaults[defaultLanguage].joinIgnoreRegex,
 
 		// FILTER section - BY_LINES
 		filterByLines: {
@@ -660,7 +656,7 @@ export function resolveCalloutConfig(
 	sourceCode: string,
 	totalLineCount: number
 ): ResolvedCalloutConfig {
-	if (!parsed || !parsed.ENTRIES || parsed.ENTRIES.length === 0) {
+	if (!parsed?.ENTRIES || parsed.ENTRIES.length === 0) {
 		return {
 			enabled: false,
 			displayMode: 'inline',
@@ -715,7 +711,8 @@ function resolveCalloutEntry(
 	}
 	// Try MARK (search for marker string in source code)
 	else if (entry.MARK !== undefined) {
-		const lineIndex = sourceLines.findIndex(line => line.includes(entry.MARK!));
+		const mark = entry.MARK;
+		const lineIndex = sourceLines.findIndex(line => line.includes(mark));
 		if (lineIndex >= 0) {
 			targetLines = [lineIndex + 1]; // Convert 0-based to 1-based
 		}
@@ -738,7 +735,7 @@ function resolveCalloutEntry(
 	return {
 		enabled: targetLines.length > 0,
 		targetLines,
-		text: entry.TEXT || '',
+		text: entry.TEXT ?? '',
 		replace: entry.REPLACE ?? false,
 		displayMode: entryDisplayMode,
 		type,

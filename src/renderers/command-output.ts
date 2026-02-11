@@ -250,7 +250,7 @@ export async function renderCommandOutput(
 				app,
 				options.descriptionText,
 				descriptionElement,
-				options.containingNotePath || '',
+				options.containingNotePath ?? '',
 				component
 			);
 

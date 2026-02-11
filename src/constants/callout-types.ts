@@ -104,7 +104,7 @@ export function normalizeCalloutType(rawType: string): string {
  */
 export function getCalloutColor(type: string): string {
     const rgb = CALLOUT_TYPE_COLORS[type] ?? CALLOUT_TYPE_COLORS.note;
-    return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
+    return `rgb(${String(rgb[0])}, ${String(rgb[1])}, ${String(rgb[2])})`;
 }
 
 /**

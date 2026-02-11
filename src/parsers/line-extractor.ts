@@ -134,7 +134,7 @@ export function extractBetweenMarkersWithOptions(
  * extractLines(code, "1-3,8-10") // Lines 1-3, then "...", then 8-10
  */
 export function extractLines(sourceCode: string, linesSpec: string): string {
-	if (!linesSpec?.trim()) {
+	if (!linesSpec.trim()) {
 		return sourceCode;
 	}
 

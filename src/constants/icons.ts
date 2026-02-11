@@ -288,8 +288,20 @@ export function getIconColour(key: string | undefined): string {
  * @returns Short text label
  */
 export function getIconLabel(key: string | undefined, fallback?: string): string {
-	if (!key) return fallback?.toUpperCase() ?? DEFAULT_ICON_LABEL;
-	return ICON_LABELS[key.toLowerCase()] ?? fallback?.toUpperCase() ?? DEFAULT_ICON_LABEL;
+	if (!key) {
+		if (fallback) {
+			return fallback.toUpperCase();
+		}
+		return DEFAULT_ICON_LABEL;
+	}
+	const label = ICON_LABELS[key.toLowerCase()];
+	if (label) {
+		return label;
+	}
+	if (fallback) {
+		return fallback.toUpperCase();
+	}
+	return DEFAULT_ICON_LABEL;
 }
 
 /**

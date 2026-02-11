@@ -3,17 +3,15 @@
 /**
  * Tests for src/services/download-service.ts
  *
- * Covers the mobile download path (downloadMobile function) which is called
- * when Platform.isDesktopApp is false. Tests the Blob creation, URL handling,
- * anchor element manipulation, and file download trigger.
+ * Covers the download path which creates a Blob and triggers a browser download
+ * via an anchor element. Tests Blob creation, URL handling, anchor element
+ * manipulation, and file download trigger.
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { Platform } from '../../src/__mocks__/obsidian';
 import { downloadCodeToFile } from '../../src/services/download-service';
-import { testSettings } from '../helpers/test-settings';
 
-describe('downloadCodeToFile - Mobile Path (jsdom)', () => {
+describe('downloadCodeToFile (jsdom)', () => {
 	let mockCreateObjectURL: ReturnType<typeof vi.fn>;
 	let mockRevokeObjectURL: ReturnType<typeof vi.fn>;
 	let clickSpy: ReturnType<typeof vi.fn>;
@@ -21,9 +19,6 @@ describe('downloadCodeToFile - Mobile Path (jsdom)', () => {
 	let removeChildSpy: ReturnType<typeof vi.spyOn>;
 
 	beforeEach(() => {
-		// Set mobile platform
-		Platform.isDesktopApp = false;
-
 		// Mock URL APIs
 		mockCreateObjectURL = vi.fn(() => 'blob:mock-url');
 		mockRevokeObjectURL = vi.fn();
@@ -44,7 +39,6 @@ describe('downloadCodeToFile - Mobile Path (jsdom)', () => {
 	});
 
 	afterEach(() => {
-		Platform.isDesktopApp = true;
 		vi.restoreAllMocks();
 	});
 
@@ -52,42 +46,30 @@ describe('downloadCodeToFile - Mobile Path (jsdom)', () => {
 	// Core Functionality Tests
 	// ============================================================================
 
-	it('creates a Blob with code text and text/plain MIME type', async () => {
+	it('creates a Blob with code text and text/plain MIME type', () => {
 		const codeText = 'console.log("hello");';
 		const suggestedFilename = 'script.js';
 		const blobSpy = vi.spyOn(global, 'Blob');
 
-		await downloadCodeToFile(
-			codeText,
-			suggestedFilename,
-			'note.md',
-			testSettings(),
-			vi.fn()
-		);
+		downloadCodeToFile(codeText, suggestedFilename);
 
 		expect(blobSpy).toHaveBeenCalledWith([codeText], {
 			type: 'text/plain;charset=utf-8',
 		});
 	});
 
-	it('calls URL.createObjectURL with the Blob', async () => {
+	it('calls URL.createObjectURL with the Blob', () => {
 		const codeText = 'const x = 42;';
 		const suggestedFilename = 'code.js';
 
-		await downloadCodeToFile(
-			codeText,
-			suggestedFilename,
-			'note.md',
-			testSettings(),
-			vi.fn()
-		);
+		downloadCodeToFile(codeText, suggestedFilename);
 
 		expect(mockCreateObjectURL).toHaveBeenCalled();
 		const blobArg = mockCreateObjectURL.mock.calls[0][0];
 		expect(blobArg).toBeInstanceOf(Blob);
 	});
 
-	it('sets anchor.href to the blob URL', async () => {
+	it('sets anchor.href to the blob URL', () => {
 		const codeText = 'test code';
 		const suggestedFilename = 'test.txt';
 		const blobUrl = 'blob:mock-url-123';
@@ -101,18 +83,12 @@ describe('downloadCodeToFile - Mobile Path (jsdom)', () => {
 			return node as never;
 		});
 
-		await downloadCodeToFile(
-			codeText,
-			suggestedFilename,
-			'note.md',
-			testSettings(),
-			vi.fn()
-		);
+		downloadCodeToFile(codeText, suggestedFilename);
 
 		expect(capturedAnchor?.href).toBe(blobUrl);
 	});
 
-	it('sets anchor.download to suggested filename', async () => {
+	it('sets anchor.download to suggested filename', () => {
 		const codeText = 'test code';
 		const suggestedFilename = 'my-script.js';
 
@@ -124,18 +100,12 @@ describe('downloadCodeToFile - Mobile Path (jsdom)', () => {
 			return node as never;
 		});
 
-		await downloadCodeToFile(
-			codeText,
-			suggestedFilename,
-			'note.md',
-			testSettings(),
-			vi.fn()
-		);
+		downloadCodeToFile(codeText, suggestedFilename);
 
 		expect(capturedAnchor?.download).toBe(suggestedFilename);
 	});
 
-	it('sets anchor.hidden to true', async () => {
+	it('sets anchor.hidden to true', () => {
 		const codeText = 'test code';
 		const suggestedFilename = 'test.txt';
 
@@ -147,28 +117,16 @@ describe('downloadCodeToFile - Mobile Path (jsdom)', () => {
 			return node as never;
 		});
 
-		await downloadCodeToFile(
-			codeText,
-			suggestedFilename,
-			'note.md',
-			testSettings(),
-			vi.fn()
-		);
+		downloadCodeToFile(codeText, suggestedFilename);
 
 		expect(capturedAnchor?.hidden).toBe(true);
 	});
 
-	it('appends anchor to document.body then removes it', async () => {
+	it('appends anchor to document.body then removes it', () => {
 		const codeText = 'test code';
 		const suggestedFilename = 'test.txt';
 
-		await downloadCodeToFile(
-			codeText,
-			suggestedFilename,
-			'note.md',
-			testSettings(),
-			vi.fn()
-		);
+		downloadCodeToFile(codeText, suggestedFilename);
 
 		expect(appendChildSpy).toHaveBeenCalled();
 		expect(removeChildSpy).toHaveBeenCalled();
@@ -179,34 +137,22 @@ describe('downloadCodeToFile - Mobile Path (jsdom)', () => {
 		expect(appendCallIndex).toBeLessThan(removeCallIndex);
 	});
 
-	it('calls anchor.click() to trigger download', async () => {
+	it('calls anchor.click() to trigger download', () => {
 		const codeText = 'test code';
 		const suggestedFilename = 'test.txt';
 
-		await downloadCodeToFile(
-			codeText,
-			suggestedFilename,
-			'note.md',
-			testSettings(),
-			vi.fn()
-		);
+		downloadCodeToFile(codeText, suggestedFilename);
 
 		expect(clickSpy).toHaveBeenCalled();
 	});
 
-	it('calls URL.revokeObjectURL to clean up blob URL', async () => {
+	it('calls URL.revokeObjectURL to clean up blob URL', () => {
 		const codeText = 'test code';
 		const suggestedFilename = 'test.txt';
 		const blobUrl = 'blob:mock-url-456';
 		mockCreateObjectURL.mockReturnValue(blobUrl);
 
-		await downloadCodeToFile(
-			codeText,
-			suggestedFilename,
-			'note.md',
-			testSettings(),
-			vi.fn()
-		);
+		downloadCodeToFile(codeText, suggestedFilename);
 
 		expect(mockRevokeObjectURL).toHaveBeenCalledWith(blobUrl);
 	});
@@ -215,24 +161,18 @@ describe('downloadCodeToFile - Mobile Path (jsdom)', () => {
 	// Edge Cases and Special Scenarios
 	// ============================================================================
 
-	it('works with empty code text', async () => {
+	it('works with empty code text', () => {
 		const codeText = '';
 		const suggestedFilename = 'empty.txt';
 
-		await downloadCodeToFile(
-			codeText,
-			suggestedFilename,
-			'note.md',
-			testSettings(),
-			vi.fn()
-		);
+		downloadCodeToFile(codeText, suggestedFilename);
 
 		expect(mockCreateObjectURL).toHaveBeenCalled();
 		expect(clickSpy).toHaveBeenCalled();
 		expect(mockRevokeObjectURL).toHaveBeenCalled();
 	});
 
-	it('works with special characters in filename', async () => {
+	it('works with special characters in filename', () => {
 		const codeText = 'code here';
 		const suggestedFilename = 'my-file_v2.0.js';
 
@@ -244,18 +184,12 @@ describe('downloadCodeToFile - Mobile Path (jsdom)', () => {
 			return node as never;
 		});
 
-		await downloadCodeToFile(
-			codeText,
-			suggestedFilename,
-			'note.md',
-			testSettings(),
-			vi.fn()
-		);
+		downloadCodeToFile(codeText, suggestedFilename);
 
 		expect(capturedAnchor?.download).toBe(suggestedFilename);
 	});
 
-	it('works with multiline code text', async () => {
+	it('works with multiline code text', () => {
 		const codeText = `function hello() {
   console.log('world');
   return 42;
@@ -263,19 +197,13 @@ describe('downloadCodeToFile - Mobile Path (jsdom)', () => {
 		const suggestedFilename = 'multi.js';
 		const blobSpy = vi.spyOn(global, 'Blob');
 
-		await downloadCodeToFile(
-			codeText,
-			suggestedFilename,
-			'note.md',
-			testSettings(),
-			vi.fn()
-		);
+		downloadCodeToFile(codeText, suggestedFilename);
 
 		const blobCall = blobSpy.mock.calls[0];
 		expect(blobCall[0][0]).toBe(codeText);
 	});
 
-	it('anchor is appended and removed in correct order', async () => {
+	it('anchor is appended and removed in correct order', () => {
 		const codeText = 'test code';
 		const suggestedFilename = 'test.txt';
 		const callSequence: string[] = [];
@@ -295,13 +223,7 @@ describe('downloadCodeToFile - Mobile Path (jsdom)', () => {
 			return node as never;
 		});
 
-		await downloadCodeToFile(
-			codeText,
-			suggestedFilename,
-			'note.md',
-			testSettings(),
-			vi.fn()
-		);
+		downloadCodeToFile(codeText, suggestedFilename);
 
 		// Verify appendChild was called before removeChild
 		expect(callSequence).toEqual(['appendChild', 'removeChild']);

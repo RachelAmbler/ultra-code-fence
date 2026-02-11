@@ -53,7 +53,7 @@ export function generateFilledBadgeSvg(label: string, backgroundColour: string):
 
 	return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
 		<rect x="2" y="2" width="20" height="20" rx="4" fill="${backgroundColour}"/>
-		<text x="12" y="15" font-family="system-ui, -apple-system, sans-serif" font-size="${fontSize}" font-weight="600" fill="${textColour}" text-anchor="middle">${label}</text>
+		<text x="12" y="15" font-family="system-ui, -apple-system, sans-serif" font-size="${String(fontSize)}" font-weight="600" fill="${textColour}" text-anchor="middle">${label}</text>
 	</svg>`;
 }
 
@@ -71,7 +71,7 @@ export function generateOutlineBadgeSvg(label: string): string {
 
 	return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
 		<rect x="2.5" y="2.5" width="19" height="19" rx="3.5" fill="none" stroke="currentColor" stroke-width="1" opacity="0.5"/>
-		<text x="12" y="15" font-family="system-ui, -apple-system, sans-serif" font-size="${fontSize}" font-weight="600" fill="currentColor" text-anchor="middle">${label}</text>
+		<text x="12" y="15" font-family="system-ui, -apple-system, sans-serif" font-size="${String(fontSize)}" font-weight="600" fill="currentColor" text-anchor="middle">${label}</text>
 	</svg>`;
 }
 
@@ -169,7 +169,7 @@ export function createIconElement(app: App, options: IconCreationOptions): HTMLS
 	const iconContainer = document.createElement('span');
 	iconContainer.className = CSS_CLASSES.icon;
 
-	const languageKey = language || extension;
+	const languageKey = language ?? extension;
 
 	switch (iconStyle) {
 		case 'custom':
@@ -199,13 +199,13 @@ function buildCustomIcon(
 	languageKey: string | undefined,
 	customIconFolder: string | undefined
 ): HTMLSpanElement {
-	const iconPath = findCustomIconPath(app, customIconFolder || '', languageKey);
+	const iconPath = findCustomIconPath(app, customIconFolder ?? '', languageKey);
 
 	if (iconPath) {
 		const imgElement = document.createElement('img');
 		imgElement.className = CSS_CLASSES.iconImg;
 		imgElement.src = getVaultResourceUrl(app, iconPath);
-		imgElement.alt = languageKey || 'file';
+		imgElement.alt = languageKey ?? 'file';
 		iconContainer.appendChild(imgElement);
 		iconContainer.classList.add(CSS_CLASSES.iconCustom);
 	} else {

@@ -26,7 +26,7 @@ import {
 // =============================================================================
 
 /** Set of recognised top-level section names. */
-const VALID_SECTIONS: Set<string> = new Set(Object.values(YAML_SECTIONS));
+const VALID_SECTIONS = new Set<string>(Object.values(YAML_SECTIONS));
 
 /** Recognised keys within each section. */
 const SECTION_KEYS: Record<string, Set<string>> = {
@@ -43,7 +43,7 @@ const FILTER_SUB_KEYS: Record<string, Set<string>> = {
 };
 
 /** Recognised keys within CALLOUT.ENTRIES items. */
-const CALLOUT_ENTRY_KEYS: Set<string> = new Set(Object.values(YAML_CALLOUT_ENTRY));
+const CALLOUT_ENTRY_KEYS = new Set<string>(Object.values(YAML_CALLOUT_ENTRY));
 
 // =============================================================================
 // Validation
@@ -91,7 +91,7 @@ export function validateYamlSchema(parsed: unknown): YamlWarning[] {
 		const sectionObj = sectionValue as Record<string, unknown>;
 		const validKeys = SECTION_KEYS[key];
 
-		if (!validKeys) continue;
+		if (!(key in SECTION_KEYS)) continue;
 
 		for (const subKey of Object.keys(sectionObj)) {
 			if (!validKeys.has(subKey)) {
@@ -100,7 +100,7 @@ export function validateYamlSchema(parsed: unknown): YamlWarning[] {
 			}
 
 			// Validate deeper nesting for FILTER subsections
-			if (key === YAML_SECTIONS.filter && FILTER_SUB_KEYS[subKey]) {
+			if (key === YAML_SECTIONS.filter && subKey in FILTER_SUB_KEYS) {
 				const filterSub = sectionObj[subKey];
 				if (filterSub && typeof filterSub === 'object' && !Array.isArray(filterSub)) {
 					const filterSubObj = filterSub as Record<string, unknown>;
@@ -124,7 +124,7 @@ export function validateYamlSchema(parsed: unknown): YamlWarning[] {
 							for (const entryKey of Object.keys(entryObj)) {
 								if (!CALLOUT_ENTRY_KEYS.has(entryKey)) {
 									warnings.push({
-										path: `${key}.${subKey}[${i}].${entryKey}`,
+										path: `${key}.${subKey}[${String(i)}].${entryKey}`,
 										key: entryKey,
 									});
 								}

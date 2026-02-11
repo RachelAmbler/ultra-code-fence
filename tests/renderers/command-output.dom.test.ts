@@ -10,7 +10,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderCommandOutput } from '../../src/renderers/command-output';
-import { App, Component, setupObsidianDom } from '../../src/__mocks__/obsidian';
+import { App, Component, setupObsidianDom } from '../../__mocks__/obsidian';
 import type { CommandOutputStyles } from '../../src/types';
 import { CSS_CLASSES, styleClass, COMMAND_OUTPUT_ICON } from '../../src/constants';
 

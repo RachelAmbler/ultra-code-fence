@@ -14,8 +14,8 @@ export default defineConfig({
 	},
 	resolve: {
 		alias: {
-			'obsidian': path.resolve(__dirname, './src/__mocks__/obsidian.ts'),
-			'electron': path.resolve(__dirname, './src/__mocks__/electron.ts'),
+			'obsidian': path.resolve(__dirname, './__mocks__/obsidian.ts'),
+			'electron': path.resolve(__dirname, './__mocks__/electron.ts'),
 		},
 	},
 });

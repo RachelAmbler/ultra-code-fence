@@ -45,7 +45,7 @@ interface SettingsTabDefinition {
 export class UltraCodeFenceSettingTab extends PluginSettingTab {
 	private plugin: SettingsPlugin;
 	private releaseNotesData: ReleaseNotesData;
-	private activeTabId: string = 'general';
+	private activeTabId = 'general';
 
 	/**
 	 * Creates a new settings tab.
@@ -188,12 +188,11 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 			.setName('Supported languages')
 			.setDesc('Comma-separated list. Creates ufence-{lang} code blocks.')
 			.addText(textInput => textInput
-				// eslint-disable-next-line obsidianmd/ui/sentence-case
-				.setPlaceholder('python,javascript,bash,...')
+				.setPlaceholder('Python, javascript, bash, ...')
 				.setValue(this.plugin.settings.supportedLanguages)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.supportedLanguages = value;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}));
 
 		this.createSectionDivider(containerElement);
@@ -203,13 +202,13 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 
 		new Setting(containerElement)
 			.setName('Default path prefix')
-			.setDesc('prepended to PATH if not starting with vault:// or http')
+			.setDesc('Prepended to file paths that do not start with a vault or web address')
 			.addText(textInput => textInput
-				.setPlaceholder('vault://Assets/Scripts/')
+				.setPlaceholder('Folder/subfolder/')
 				.setValue(this.plugin.settings.defaultPathPrefix)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.defaultPathPrefix = value;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}));
 
 		this.createSectionDivider(containerElement);
@@ -250,7 +249,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 
 		new Setting(containerElement)
 			.setName('Style')
-			.setDesc('Override: render.style: "infobar"')
+			.setDesc('Choose the visual style for the title bar above code blocks')
 			.addDropdown(dropdown => dropdown
 				.addOption('tab', 'Tab')
 				.addOption('integrated', 'Integrated')
@@ -258,20 +257,20 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 				.addOption('infobar', 'Info bar')
 				.addOption('none', 'Hidden')
 				.setValue(this.plugin.settings.defaultTitleBarStyle)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.defaultTitleBarStyle = value as TitleBarStyle;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}));
 
 		new Setting(containerElement)
 			.setName('Title template')
-			.setDesc('Override: META.TITLE: "{basename}"')
+			.setDesc('Template for the title text. Supports variables like {filename}')
 			.addText(textInput => textInput
 				.setPlaceholder('{filename}')
 				.setValue(this.plugin.settings.defaultTitleTemplate)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.defaultTitleTemplate = value;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}));
 
 		this.createSectionDivider(containerElement);
@@ -281,16 +280,15 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 
 		new Setting(containerElement)
 			.setName('Display mode')
-			.setDesc('Override: meta.desc: "your text here"')
+			.setDesc('Choose how the description text is displayed')
 			.addDropdown(dropdown => dropdown
 				.addOption('below', 'Below title')
 				.addOption('tooltip', 'Tooltip on hover')
 				.addOption('none', 'Hidden')
 				.setValue(this.plugin.settings.descriptionDisplayMode)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.descriptionDisplayMode = value as DescriptionDisplayMode;
-					await this.plugin.saveSettings();
-					this.display(); // Refresh to show/hide related settings
+					void this.plugin.saveSettings().then(() => { this.display(); }); // Refresh to show/hide related settings
 				}));
 
 		if (this.plugin.settings.descriptionDisplayMode !== 'none') {
@@ -299,9 +297,9 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 				.setDesc('Display description text in italics')
 				.addToggle(toggle => toggle
 					.setValue(this.plugin.settings.descriptionItalic)
-					.onChange(async (value) => {
+					.onChange((value) => {
 						this.plugin.settings.descriptionItalic = value;
-						await this.plugin.saveSettings();
+						void this.plugin.saveSettings();
 					}));
 
 			new Setting(containerElement)
@@ -309,17 +307,16 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 				.setDesc('Custom colour for description text')
 				.addColorPicker(picker => picker
 					.setValue(this.plugin.settings.descriptionColour || '#888888')
-					.onChange(async (value) => {
+					.onChange((value) => {
 						this.plugin.settings.descriptionColour = value;
-						await this.plugin.saveSettings();
+						void this.plugin.saveSettings();
 					}))
 				.addToggle(toggle => toggle
 					.setTooltip('Use custom colour')
 					.setValue(!!this.plugin.settings.descriptionColour)
-					.onChange(async (value) => {
+					.onChange((value) => {
 						this.plugin.settings.descriptionColour = value ? '#888888' : '';
-						await this.plugin.saveSettings();
-						this.display();
+						void this.plugin.saveSettings().then(() => { this.display(); });
 					}));
 		}
 	}
@@ -339,32 +336,32 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 
 		new Setting(containerElement)
 			.setName('Line numbers')
-			.setDesc('Override: render.lines: true')
+			.setDesc('Show line numbers alongside code')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.showLineNumbers)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.showLineNumbers = value;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}));
 
 		new Setting(containerElement)
 			.setName('Zebra stripes')
-			.setDesc('Override: render.zebra: true')
+			.setDesc('Alternate row background colours for readability')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.showZebraStripes)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.showZebraStripes = value;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}));
 
 		new Setting(containerElement)
 			.setName('Copy button')
-			.setDesc('Override: render.copy: true')
+			.setDesc('Show a button to copy the code block content')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.showCopyButton)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.showCopyButton = value;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}));
 
 		new Setting(containerElement)
@@ -372,9 +369,9 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 			.setDesc('Show a button to save code block content to a file')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.showDownloadButton)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.showDownloadButton = value;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}));
 
 		this.createSectionDivider(containerElement);
@@ -384,42 +381,42 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 
 		new Setting(containerElement)
 			.setName('Default fold lines')
-			.setDesc('0 = disabled, 1+ = fold to N lines. Override: render.fold: 10')
+			.setDesc('Collapse long code blocks after this many lines (0 to disable)')
 			.addText(textInput => textInput
 				.setPlaceholder('0')
 				.setValue(String(this.plugin.settings.foldLines))
-				.onChange(async (value) => {
+				.onChange((value) => {
 					const parsedValue = parseInt(value, 10);
 					if (!isNaN(parsedValue) && parsedValue >= 0) {
 						this.plugin.settings.foldLines = parsedValue;
-						await this.plugin.saveSettings();
+						void this.plugin.saveSettings();
 					}
 				}));
 
 		new Setting(containerElement)
 			.setName('Default scroll lines')
-			.setDesc('0 = disabled, 1+ = scroll after N lines. Override: render.scroll: 20. Ignored if fold is active.')
+			.setDesc('Add a scrollbar after this many lines (0 to disable). Ignored when fold is active.')
 			.addText(textInput => textInput
 				.setPlaceholder('0')
 				.setValue(String(this.plugin.settings.scrollLines))
-				.onChange(async (value) => {
+				.onChange((value) => {
 					const parsedValue = parseInt(value, 10);
 					if (!isNaN(parsedValue) && parsedValue >= 0) {
 						this.plugin.settings.scrollLines = parsedValue;
-						await this.plugin.saveSettings();
+						void this.plugin.saveSettings();
 					}
 				}));
 
 		new Setting(containerElement)
 			.setName('Print behaviour')
-			.setDesc('How folded/scrolled code blocks behave when printing. Override: render.print: expand')
+			.setDesc('How folded or scrolled code blocks behave when printing')
 			.addDropdown(dropdown => dropdown
 				.addOption('expand', 'Expand (show full code)')
 				.addOption('asis', 'As displayed')
 				.setValue(this.plugin.settings.printBehaviour)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.printBehaviour = value;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}));
 
 		this.createSectionDivider(containerElement);
@@ -473,12 +470,12 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 			const shiftInput = shiftCell.createEl('input', {
 				type: 'text',
 				cls: 'ucf-cj-input ucf-cj-input-op',
-				value: stored?.shiftJoin ?? '',
+				value: stored.shiftJoin,
 				attr: { placeholder: '&&' },
 			});
-			shiftInput.addEventListener('change', async () => {
+			shiftInput.addEventListener('change', () => {
 				this.plugin.settings.languageCopyJoinDefaults[lang].shiftJoin = shiftInput.value;
-				await this.plugin.saveSettings();
+				void this.plugin.saveSettings();
 			});
 
 			// Alt/Cmd join input
@@ -486,12 +483,12 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 			const altInput = altCell.createEl('input', {
 				type: 'text',
 				cls: 'ucf-cj-input ucf-cj-input-op',
-				value: stored?.altJoin ?? '',
+				value: stored.altJoin,
 				attr: { placeholder: ';' },
 			});
-			altInput.addEventListener('change', async () => {
+			altInput.addEventListener('change', () => {
 				this.plugin.settings.languageCopyJoinDefaults[lang].altJoin = altInput.value;
-				await this.plugin.saveSettings();
+				void this.plugin.saveSettings();
 			});
 
 			// Ignore regex input
@@ -499,12 +496,12 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 			const ignoreInput = ignoreCell.createEl('input', {
 				type: 'text',
 				cls: 'ucf-cj-input ucf-cj-input-ignore',
-				value: stored?.joinIgnoreRegex ?? '',
+				value: stored.joinIgnoreRegex,
 				attr: { placeholder: '^\\s*#' },
 			});
-			ignoreInput.addEventListener('change', async () => {
+			ignoreInput.addEventListener('change', () => {
 				this.plugin.settings.languageCopyJoinDefaults[lang].joinIgnoreRegex = ignoreInput.value;
-				await this.plugin.saveSettings();
+				void this.plugin.saveSettings();
 			});
 
 			// Remove button
@@ -514,10 +511,11 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 				cls: 'ucf-cj-remove',
 				attr: { 'aria-label': `Remove ${lang}` },
 			});
-			removeBtn.addEventListener('click', async () => {
-				delete this.plugin.settings.languageCopyJoinDefaults[lang];
-				await this.plugin.saveSettings();
-				this.display();
+			removeBtn.addEventListener('click', () => {
+				this.plugin.settings.languageCopyJoinDefaults = Object.fromEntries(
+					Object.entries(this.plugin.settings.languageCopyJoinDefaults).filter(([k]) => k !== lang),
+				);
+				void this.plugin.saveSettings().then(() => { this.display(); });
 			});
 		}
 
@@ -528,7 +526,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 		const addInput = addCell.createEl('input', {
 			type: 'text',
 			cls: 'ucf-cj-input ucf-cj-input-lang',
-			attr: { placeholder: 'e.g. bash' },
+			attr: { placeholder: 'Language name' },
 		});
 
 		// Empty cells to fill the row
@@ -542,16 +540,15 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 			cls: 'ucf-cj-add',
 			attr: { 'aria-label': 'Add language' },
 		});
-		addBtn.addEventListener('click', async () => {
+		addBtn.addEventListener('click', () => {
 			const newLang = addInput.value.trim().toLowerCase();
-			if (newLang && !this.plugin.settings.languageCopyJoinDefaults[newLang]) {
+			if (newLang && !(newLang in this.plugin.settings.languageCopyJoinDefaults)) {
 				this.plugin.settings.languageCopyJoinDefaults[newLang] = {
 					shiftJoin: '&&',
 					altJoin: ';',
 					joinIgnoreRegex: '^\\s*#',
 				};
-				await this.plugin.saveSettings();
-				this.display();
+				void this.plugin.saveSettings().then(() => { this.display(); });
 			}
 		});
 
@@ -579,24 +576,23 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 
 		new Setting(containerElement)
 			.setName('Enable ufence-code processor')
-			.setDesc('Allows using ufence-code with render.lang property to specify language')
+			.setDesc('Enable the ufence-code block type for language-agnostic embeds')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.enableGenericProcessor)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.enableGenericProcessor = value;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}));
 
 		new Setting(containerElement)
 			.setName('Default language')
-			.setDesc('Language when RENDER.LANG is not specified in ufence-code blocks')
+			.setDesc('Fallback language for ufence-code blocks without a language override')
 			.addText(textInput => textInput
-				// eslint-disable-next-line obsidianmd/ui/sentence-case
-				.setPlaceholder('text')
+				.setPlaceholder('Text')
 				.setValue(this.plugin.settings.defaultLanguage)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.defaultLanguage = value || 'text';
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}));
 	}
 
@@ -613,76 +609,76 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 		// Prompt styling
 		new Setting(containerElement)
 			.setName('Prompt')
-			.setDesc('Colour / bold / italic')
+			.setDesc('Style the text appearance with colour, bold, and italic')
 			.addColorPicker(picker => picker
 				.setValue(this.plugin.settings.commandPromptColour || '#6b7280')
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.commandPromptColour = value;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}))
 			.addToggle(toggle => toggle
 				.setTooltip('Bold')
 				.setValue(this.plugin.settings.commandPromptBold)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.commandPromptBold = value;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}))
 			.addToggle(toggle => toggle
 				.setTooltip('Italic')
 				.setValue(this.plugin.settings.commandPromptItalic)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.commandPromptItalic = value;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}));
 
 		// Command styling
 		new Setting(containerElement)
 			.setName('Command')
-			.setDesc('Colour / bold / italic')
+			.setDesc('Style the text appearance with colour, bold, and italic')
 			.addColorPicker(picker => picker
 				.setValue(this.plugin.settings.commandTextColour || '#98c379')
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.commandTextColour = value;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}))
 			.addToggle(toggle => toggle
 				.setTooltip('Bold')
 				.setValue(this.plugin.settings.commandTextBold)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.commandTextBold = value;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}))
 			.addToggle(toggle => toggle
 				.setTooltip('Italic')
 				.setValue(this.plugin.settings.commandTextItalic)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.commandTextItalic = value;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}));
 
 		// Output styling
 		new Setting(containerElement)
 			.setName('Output')
-			.setDesc('Colour / bold / italic')
+			.setDesc('Style the text appearance with colour, bold, and italic')
 			.addColorPicker(picker => picker
 				.setValue(this.plugin.settings.outputTextColour || '#abb2bf')
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.outputTextColour = value;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}))
 			.addToggle(toggle => toggle
 				.setTooltip('Bold')
 				.setValue(this.plugin.settings.outputTextBold)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.outputTextBold = value;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}))
 			.addToggle(toggle => toggle
 				.setTooltip('Italic')
 				.setValue(this.plugin.settings.outputTextItalic)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.outputTextItalic = value;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}));
 	}
 
@@ -704,11 +700,10 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 				.addOption('custom', 'Custom (from folder)')
 				.addOption('none', 'None')
 				.setValue(this.plugin.settings.fileIconStyle)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.fileIconStyle = value as FileIconStyle;
 					this.plugin.settings.showFileIcon = value !== 'none';
-					await this.plugin.saveSettings();
-					this.display();
+					void this.plugin.saveSettings().then(() => { this.display(); });
 				}));
 
 		if (this.plugin.settings.fileIconStyle === 'custom') {
@@ -716,12 +711,11 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 				.setName('Icon folder')
 				.setDesc('Folder with icon files (python.svg, bash.png, etc.)')
 				.addText(textInput => textInput
-				// eslint-disable-next-line obsidianmd/ui/sentence-case
-				.setPlaceholder('assets/icons')
+				.setPlaceholder('Assets/icons')
 					.setValue(this.plugin.settings.customIconFolder)
-					.onChange(async (value) => {
+					.onChange((value) => {
 						this.plugin.settings.customIconFolder = value;
-						await this.plugin.saveSettings();
+						void this.plugin.saveSettings();
 					}));
 		}
 
@@ -730,9 +724,9 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 			.setDesc('Show ↗ on clickable titles')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.showLinkIndicator)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.showLinkIndicator = value;
-					await this.plugin.saveSettings();
+					void this.plugin.saveSettings();
 				}));
 
 		this.createSectionDivider(containerElement);
@@ -745,10 +739,9 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 			.setDesc('Automatically match Obsidian theme')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.useThemeColours)
-				.onChange(async (value) => {
+				.onChange((value) => {
 					this.plugin.settings.useThemeColours = value;
-					await this.plugin.saveSettings();
-					this.display();
+					void this.plugin.saveSettings().then(() => { this.display(); });
 				}));
 
 		if (!this.plugin.settings.useThemeColours) {
@@ -756,18 +749,18 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 				.setName('Background colour')
 				.addColorPicker(picker => picker
 					.setValue(this.plugin.settings.titleBarBackgroundColour || '#282c34')
-					.onChange(async (value) => {
+					.onChange((value) => {
 						this.plugin.settings.titleBarBackgroundColour = value;
-						await this.plugin.saveSettings();
+						void this.plugin.saveSettings();
 					}));
 
 			new Setting(containerElement)
 				.setName('Text colour')
 				.addColorPicker(picker => picker
 					.setValue(this.plugin.settings.titleBarTextColour || '#abb2bf')
-					.onChange(async (value) => {
+					.onChange((value) => {
 						this.plugin.settings.titleBarTextColour = value;
-						await this.plugin.saveSettings();
+						void this.plugin.saveSettings();
 					}));
 		}
 	}
@@ -779,14 +772,14 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 	private renderPresetsTab(containerElement: HTMLElement): void {
 		// Intro
 		containerElement.createEl('p', {
-			text: 'Create named YAML presets to reuse across code blocks. Reference a preset with META.PRESET in any ufence block, or set a page-level default with an invisible ufence-ufence block.',
+			text: 'Create named presets to reuse across code blocks. Reference a preset by name in any code block, or set a page-level default.',
 			cls: CSS_CLASSES.tabIntro,
 		});
 
 		this.createSectionDivider(containerElement);
 
 		// Existing presets
-		const presets = this.plugin.settings.presets ?? {};
+		const presets = this.plugin.settings.presets;
 		const names = Object.keys(presets).sort();
 
 		if (names.length > 0) {
@@ -809,7 +802,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 			.setName('Name')
 			.setDesc('A unique name for this preset')
 			.addText(text => text
-				.setPlaceholder('e.g. teaching')
+				.setPlaceholder('Preset name')
 				.onChange(value => { newName = value.trim(); }));
 
 		// YAML editor with syntax highlighting + validation
@@ -824,7 +817,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 			.addButton(button => button
 				.setButtonText('Add preset')
 				.setCta()
-				.onClick(async () => {
+				.onClick(() => {
 					if (!newName) return;
 
 					// Check for duplicate name
@@ -833,8 +826,7 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 					}
 
 					this.plugin.settings.presets[newName] = newYaml;
-					await this.plugin.saveSettings();
-					this.display();
+					void this.plugin.saveSettings().then(() => { this.display(); });
 				}));
 	}
 
@@ -859,9 +851,9 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 
 		// Save button
 		const saveBtn = buttonRow.createEl('button', { text: 'Save' });
-		saveBtn.addEventListener('click', async () => {
+		saveBtn.addEventListener('click', () => {
 			this.plugin.settings.presets[name] = editor.getValue();
-			await this.plugin.saveSettings();
+			void this.plugin.saveSettings();
 			// Brief visual feedback
 			saveBtn.textContent = 'Saved ✓';
 			setTimeout(() => { saveBtn.textContent = 'Save'; }, 1500);
@@ -869,12 +861,13 @@ export class UltraCodeFenceSettingTab extends PluginSettingTab {
 
 		// Delete button
 		const deleteBtn = buttonRow.createEl('button', { text: 'Delete', cls: 'ucf-preset-delete' });
-		deleteBtn.addEventListener('click', async () => {
+		deleteBtn.addEventListener('click', () => {
 			// Confirm deletion
 			if (deleteBtn.dataset.confirming === 'true') {
-				delete this.plugin.settings.presets[name];
-				await this.plugin.saveSettings();
-				this.display();
+				this.plugin.settings.presets = Object.fromEntries(
+					Object.entries(this.plugin.settings.presets).filter(([k]) => k !== name),
+				);
+				void this.plugin.saveSettings().then(() => { this.display(); });
 			} else {
 				deleteBtn.dataset.confirming = 'true';
 				deleteBtn.textContent = 'Click again to confirm';
