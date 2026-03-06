@@ -33,7 +33,7 @@
 		"@typescript-eslint/parser": "^8.54.0",
 		"@vitest/coverage-v8": "^4.0.18",
 		"builtin-modules": "^4.0.0",
-		"esbuild": "^0.24.0",
+		"esbuild": "^0.25.0",
 		"eslint": "^9.39.2",
 		"eslint-plugin-obsidianmd": "^0.1.9",
 		"husky": "^9.1.7",
